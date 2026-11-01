@@ -46,7 +46,7 @@ export function MultiplayerRace({
   room,
   snapshot,
 }: MultiplayerRaceProps) {
-  const [cameraMode, setCameraMode] = useState<RaceCameraMode>('overview')
+  const [cameraMode, setCameraMode] = useState<RaceCameraMode>('free')
   const [observedId, setObservedId] = useState(currentUserId)
   const [inspectedCar, setInspectedCar] = useState<{
     id: string
@@ -161,10 +161,10 @@ export function MultiplayerRace({
           {error && <span role="alert">{error}</span>}
           <button
             onClick={() =>
-              setCameraMode(cameraMode === 'follow' ? 'overview' : 'follow')
+              setCameraMode(cameraMode === 'follow' ? 'free' : 'follow')
             }
           >
-            {cameraMode === 'follow' ? 'Vista general' : 'Seguir piloto'}
+            {cameraMode === 'follow' ? 'Vista libre' : 'Seguir piloto'}
           </button>
           <label className="camera-select">
             Observar
