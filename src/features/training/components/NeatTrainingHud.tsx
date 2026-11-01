@@ -90,7 +90,7 @@ export function NeatTrainingHud({
   populationSize,
   status,
   trainingName,
-  cameraMode = 'overview',
+  cameraMode = 'free',
   onCameraModeChange,
   selectedCar = 0,
   onSelectedCarChange,
@@ -163,12 +163,10 @@ export function NeatTrainingHud({
             <button
               type="button"
               onClick={() =>
-                onCameraModeChange(
-                  cameraMode === 'follow' ? 'overview' : 'follow',
-                )
+                onCameraModeChange(cameraMode === 'follow' ? 'free' : 'follow')
               }
             >
-              {cameraMode === 'follow' ? 'Vista general' : 'Seguir auto'}
+              {cameraMode === 'follow' ? 'Vista libre' : 'Seguir auto'}
             </button>
           )}
 

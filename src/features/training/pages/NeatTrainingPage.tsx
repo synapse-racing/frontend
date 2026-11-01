@@ -81,7 +81,7 @@ export function NeatTrainingPage() {
   const [alive, setAlive] = useState(engine.config.populationSize)
   const [metrics, setMetrics] = useState(() => createInitialMetrics(engine))
   const [currentBest, setCurrentBest] = useState(0)
-  const [cameraMode, setCameraMode] = useState<RaceCameraMode>('overview')
+  const [cameraMode, setCameraMode] = useState<RaceCameraMode>('free')
   const [selectedCar, setSelectedCar] = useState(0)
   const cameraModeRef = useRef(cameraMode)
   cameraModeRef.current = cameraMode
