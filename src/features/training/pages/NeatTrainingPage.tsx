@@ -1,6 +1,7 @@
 import { SceneCanvas } from '../../../shared/three/SceneCanvas.tsx'
 import { useAppearance } from '../../garage/context/appearance-context.ts'
-import type { RaceCameraMode } from '../../../shared/three/RaceCamera.tsx'
+import type { CarPose, RaceCameraMode } from '../../../shared/three/RaceCamera.tsx'
+import type { GenerationDataPoint } from '../components/FitnessHistoryChart.tsx'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Suspense,
@@ -96,6 +97,8 @@ export function NeatTrainingPage() {
   const [selectorError, setSelectorError] = useState<string | null>(null)
   const [persistenceStatus, setPersistenceStatus] =
     useState<PersistenceStatus>('idle')
+  const [generationHistory, setGenerationHistory] = useState<GenerationDataPoint[]>([])
+  const posesRef = useRef(new Map<string, CarPose>())
   const recordsRef = useRef(createEvaluationRecords(engine.genomes))
   const fitnessRef = useRef(new Map<string, number>())
   const carControls = useRef(new Map<string, AgentControl>())
@@ -458,6 +461,14 @@ export function NeatTrainingPage() {
         performance.now() - generationStartedAt.current,
       )
       setMetrics(completedMetrics)
+      setGenerationHistory((prev) => [
+        ...prev,
+        {
+          generation: engine.generation,
+          bestFitness: completedMetrics.bestFitness,
+          averageFitness: completedMetrics.averageFitness,
+        },
+      ])
       setGenomes([...engine.genomes])
       setAlive(engine.config.populationSize)
       setCurrentBest(0)
@@ -530,6 +541,7 @@ export function NeatTrainingPage() {
   }
 
   function selectAnotherRun() {
+    setGenerationHistory([])
     if (selectedRun) {
       void updateRunStatus(selectedRun.id, 'PAUSED')
     }
@@ -539,6 +551,58 @@ export function NeatTrainingPage() {
     setSelectedRun(null)
     void runsQuery.refetch()
   }
+
+  const minimapCars = useMemo(
+    () =>
+      genomes.map((genome, index) => ({
+        id: genome.id,
+        hue: (index * 47) % 360,
+      })),
+    [genomes],
+  )
+
+  const leaderboardEntries = useMemo(() => {
+    void (alive + currentBest)
+    return genomes
+      .map((genome, index) => {
+        const record = recordsRef.current.get(genome.id)
+        const score = fitnessRef.current.get(genome.id) ?? 0
+        const passed = record?.progress.passedCheckpoints ?? 0
+        const isFinished = record?.reason === 'finished'
+        const isCrashed =
+          record?.reason !== undefined && record.reason !== 'finished'
+        return {
+          index,
+          id: genome.id,
+          name: `Auto ${String(index + 1).padStart(2, '0')}`,
+          hue: (index * 47) % 360,
+          score,
+          passedCheckpoints: passed,
+          status: isFinished
+            ? ('finished' as const)
+            : isCrashed
+              ? ('crashed' as const)
+              : ('running' as const),
+        }
+      })
+      .sort((a, b) => {
+        if (a.status === 'finished' && b.status !== 'finished') return -1
+        if (b.status === 'finished' && a.status !== 'finished') return 1
+        if (a.status !== 'crashed' && b.status === 'crashed') return -1
+        if (a.status === 'crashed' && b.status !== 'crashed') return 1
+        return (
+          b.score - a.score ||
+          b.passedCheckpoints - a.passedCheckpoints ||
+          a.index - b.index
+        )
+      })
+      .map((entry, rank) => {
+        if (rank === 0 && entry.status === 'running') {
+          return { ...entry, status: 'leader' as const }
+        }
+        return entry
+      })
+  }, [genomes, alive, currentBest])
 
   return (
     <main className="training-lab neat-lab">
@@ -559,6 +623,7 @@ export function NeatTrainingPage() {
             cameraMode={cameraMode}
             selectedGenomeId={genomes[selectedCar]?.id ?? genomes[0].id}
             showRaycasts={showRaycasts}
+            posesRef={posesRef}
           />
         </Suspense>
       </SceneCanvas>
@@ -595,6 +660,12 @@ export function NeatTrainingPage() {
           trackSeed={activeTrack.recipe.seed}
           showRaycasts={showRaycasts}
           onShowRaycastsChange={setShowRaycasts}
+          track={activeTrack}
+          cars={minimapCars}
+          leaderboardEntries={leaderboardEntries}
+          generationHistory={generationHistory}
+          posesRef={posesRef}
+          selectedGenomeId={genomes[selectedCar]?.id ?? genomes[0].id}
         />
       ) : (
         <TrainingRunSelector

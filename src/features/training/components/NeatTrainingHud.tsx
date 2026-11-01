@@ -6,10 +6,16 @@ import {
   type SimulationSpeed,
 } from '../../../shared/game/SimulationSpeedControl.tsx'
 import { GameSettings } from '../../../shared/game/GameSettings.tsx'
-import type { RaceCameraMode } from '../../../shared/three/RaceCamera.tsx'
+import type { CarPose, RaceCameraMode } from '../../../shared/three/RaceCamera.tsx'
+import type { TrackDefinition } from '../domain/track.ts'
+import { LiveLeaderboard, type LeaderboardEntry } from './LiveLeaderboard.tsx'
+import { TrainingMinimap, type MinimapCarInfo } from './TrainingMinimap.tsx'
+import { FitnessHistoryChart, type GenerationDataPoint } from './FitnessHistoryChart.tsx'
+import './training-hud.css'
 
 export type TrainingStatus = 'idle' | 'running' | 'paused' | 'evolving'
 export type PersistenceStatus = 'idle' | 'saving' | 'saved' | 'error'
+
 interface NeatTrainingHudProps {
   timeScale?: SimulationSpeed
   onTimeScaleChange?: (speed: SimulationSpeed) => void
@@ -39,13 +45,22 @@ interface NeatTrainingHudProps {
   trackSeed?: number
   showRaycasts?: boolean
   onShowRaycastsChange?: (enabled: boolean) => void
+
+  track?: TrackDefinition
+  cars?: MinimapCarInfo[]
+  leaderboardEntries?: LeaderboardEntry[]
+  generationHistory?: GenerationDataPoint[]
+  posesRef?: React.RefObject<Map<string, CarPose>>
+  selectedGenomeId?: string
 }
+
 const statusLabels: Record<TrainingStatus, string> = {
   idle: 'Preparado',
   running: 'Evaluando',
   paused: 'Pausado',
   evolving: 'Evolucionando',
 }
+
 const saveLabels: Record<PersistenceStatus, string> = {
   idle: 'Sin evaluar',
   saving: 'Guardando',
@@ -82,9 +97,16 @@ export function NeatTrainingHud({
   trackSeed,
   showRaycasts = false,
   onShowRaycastsChange,
+  track,
+  cars = [],
+  leaderboardEntries = [],
+  generationHistory = [],
+  posesRef,
+  selectedGenomeId,
 }: NeatTrainingHudProps) {
   const [telemetry, setTelemetry] = useState(false)
   const [controls, setControls] = useState(false)
+
   useEffect(() => {
     const key = (event: KeyboardEvent) => {
       if (
@@ -102,30 +124,44 @@ export function NeatTrainingHud({
     window.addEventListener('keydown', key)
     return () => window.removeEventListener('keydown', key)
   }, [onPauseToggle, status])
+
+  // Fallback entries if none provided by parent
+  const activeEntries =
+    leaderboardEntries.length > 0
+      ? leaderboardEntries
+      : Array.from({ length: populationSize }, (_, index) => ({
+          index,
+          id: `car-${index}`,
+          name: `Auto ${String(index + 1).padStart(2, '0')}`,
+          hue: (index * 47) % 360,
+          score: index === 0 ? currentBest : 0,
+          passedCheckpoints: 0,
+          status: (index === 0 && currentBest > 0 ? 'leader' : 'running') as 'leader' | 'running',
+        }))
+
   return (
     <div className="neat-hud">
+      {/* Top Bar */}
       <header className="neat-hud__topbar">
-        <div>
-          <Link to="/dashboard">← Paddock</Link>
-          <span className={`training-status training-status--${status}`}>
+        <div className="neat-hud__brand-group">
+          <Link to="/dashboard" className="neat-hud__back-link">
+            ← Paddock
+          </Link>
+          <div className="neat-hud__gen-badge">
+            <h2 style={{ margin: 0, fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit' }}>
+              Generación {generation + 1}
+            </h2>
+            <span>/ {trainingName} {trackSeed !== undefined && `#${trackSeed}`}</span>
+          </div>
+          <span className={`neat-hud__status-pill training-status--${status}`}>
             {statusLabels[status]}
           </span>
         </div>
-        <div className="neat-hud__actions">
-          {onAdvanceGeneration && (
-            <button
-              disabled={!canAdvanceGeneration}
-              onClick={onAdvanceGeneration}
-            >
-              Pasar de generación
-            </button>
-          )}
-          <SimulationSpeedControl
-            speed={timeScale}
-            onChange={onTimeScaleChange}
-          />
+
+        <div className="neat-hud__top-actions">
           {onCameraModeChange && (
             <button
+              type="button"
               onClick={() =>
                 onCameraModeChange(
                   cameraMode === 'follow' ? 'overview' : 'follow',
@@ -135,8 +171,10 @@ export function NeatTrainingHud({
               {cameraMode === 'follow' ? 'Vista general' : 'Seguir auto'}
             </button>
           )}
+
+          {/* Accessible Piloto Select (hidden visually or inline) */}
           {onSelectedCarChange && (
-            <label className="camera-select">
+            <label style={{ display: 'none' }}>
               Piloto
               <select
                 aria-label="Auto observado"
@@ -153,7 +191,9 @@ export function NeatTrainingHud({
               </select>
             </label>
           )}
+
           <button
+            type="button"
             aria-expanded={telemetry}
             onClick={() => {
               setTelemetry(!telemetry)
@@ -163,7 +203,9 @@ export function NeatTrainingHud({
           >
             Telemetría
           </button>
+
           <button
+            type="button"
             aria-expanded={controls}
             onClick={() => {
               setControls(!controls)
@@ -173,13 +215,191 @@ export function NeatTrainingHud({
           >
             Opciones
           </button>
+        </div>
+      </header>
+
+      {/* Persistence Error Alert */}
+      {persistenceStatus === 'error' && onRetrySave && (
+        <section className="telemetry-panel" role="alert" style={{ top: '4.5rem', left: '1rem', right: 'auto' }}>
+          <p style={{ margin: '0 0 0.8rem', fontSize: '12px' }}>
+            No se pudo guardar la generación. El entrenamiento está pausado para conservarla.
+          </p>
+          <button type="button" className="primary-button" onClick={onRetrySave}>
+            Reintentar guardado
+          </button>
+        </section>
+      )}
+
+      {/* Main Area: Standings on Left, Minimap / Telemetry on Right */}
+      <div className="neat-hud__main-area">
+        <LiveLeaderboard
+          entries={activeEntries}
+          selectedCar={selectedCar}
+          onSelectCar={(index) => {
+            onSelectedCarChange?.(index)
+            if (cameraMode !== 'follow') {
+              onCameraModeChange?.('follow')
+            }
+          }}
+        />
+
+        <div className="neat-hud__right-column">
+          {track && (
+            <TrainingMinimap
+              track={track}
+              cars={cars}
+              selectedGenomeId={selectedGenomeId}
+              posesRef={posesRef}
+            />
+          )}
+
+          {/* Telemetry Panel */}
+          {telemetry && !inspectingCar && (
+            <section className="telemetry-panel" aria-label="Telemetría NEAT">
+              <h3>Telemetría & Red Neuronal</h3>
+              <label className="setting-toggle" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.8rem' }}>
+                <input
+                  type="checkbox"
+                  checked={showRaycasts}
+                  onChange={(event) =>
+                    onShowRaycastsChange?.(event.target.checked)
+                  }
+                />
+                Mostrar raycasts
+              </label>
+              <p style={{ fontSize: '11px', color: '#9eb0a4', margin: '0 0 1rem', lineHeight: 1.4 }}>
+                Cinco rayos por auto, hasta 8 m. Rojo: detecta borde. Turquesa: libre. Amarillo: auto observado.
+              </p>
+
+              <h3>Historial de Generaciones</h3>
+              <FitnessHistoryChart history={generationHistory} />
+
+              <h3 style={{ marginTop: '1rem' }}>Generación anterior</h3>
+              <dl>
+                <dt>Mejor puntuación</dt>
+                <dd>{metrics.bestFitness.toFixed(0)}</dd>
+                <dt>Promedio</dt>
+                <dd>{metrics.averageFitness.toFixed(0)}</dd>
+                <dt>Especies</dt>
+                <dd>{metrics.speciesCount}</dd>
+              </dl>
+            </section>
+          )}
+
+          {/* Options / Settings Panel */}
+          {!inspectingCar && controls && !telemetry && (
+            <section
+              className="telemetry-panel"
+              aria-label="Opciones del entrenamiento"
+            >
+              <h3>
+                {status === 'paused' ? 'En boxes / Pausa' : 'Control de escudería'}
+              </h3>
+              <div style={{ display: 'grid', gap: '0.5rem', marginBottom: '1rem' }}>
+                <button
+                  type="button"
+                  onClick={onReset}
+                  disabled={
+                    persistenceStatus === 'saving' || status === 'evolving'
+                  }
+                >
+                  Recargar
+                </button>
+                <button
+                  type="button"
+                  onClick={onRegenerateTrack}
+                  disabled={
+                    status === 'evolving' || persistenceStatus === 'saving'
+                  }
+                >
+                  Regenerar pista
+                </button>
+                <button
+                  type="button"
+                  onClick={onSelectRun}
+                  disabled={
+                    persistenceStatus === 'saving' || status === 'evolving'
+                  }
+                >
+                  Cambiar entrenamiento
+                </button>
+                <GameSettings />
+              </div>
+              <p style={{ fontSize: '11px', color: '#9eb0a4', margin: 0 }}>
+                <kbd style={{ padding: '2px 4px', border: '1px solid #4d685c', background: '#0e1613' }}>
+                  ESC
+                </kbd>{' '}
+                Pausar / reanudar
+              </p>
+            </section>
+          )}
+        </div>
+      </div>
+
+      {/* Bottom Arcade Tape-Deck & Metrics Bar */}
+      <footer className="neat-hud__bottom-bar">
+        {/* Live Metrics Cluster */}
+        <section className="neat-metrics neat-hud__stats-cluster" aria-label="Métricas NEAT" style={{ position: 'static', margin: 0, padding: 0, background: 'none', border: 0 }}>
+          <div className="neat-hud__stat">
+            <span className="neat-hud__stat-label">Vivos</span>
+            <strong className="neat-hud__stat-value is-success">
+              {alive}/{populationSize}
+            </strong>
+          </div>
+          <div className="neat-hud__stat">
+            <span className="neat-hud__stat-label">Mejor actual</span>
+            <strong className="neat-hud__stat-value is-accent">
+              {currentBest.toFixed(0)}
+            </strong>
+          </div>
+          <div className="neat-hud__stat">
+            <span className="neat-hud__stat-label">Mejor anterior</span>
+            <strong className="neat-hud__stat-value">
+              {metrics.bestFitness.toFixed(0)}
+            </strong>
+          </div>
+          <div className="neat-hud__stat">
+            <span className="neat-hud__stat-label">
+              {localOnly ? 'En este dispositivo' : 'En tu cuenta'}
+            </span>
+            <strong
+              role="status"
+              className={`neat-hud__stat-value persistence-state persistence-state--${persistenceStatus}`}
+            >
+              {saveLabels[persistenceStatus]}
+            </strong>
+          </div>
+        </section>
+
+        {/* Simulation Arcade Controls */}
+        <div className="neat-hud__tape-controls">
+          {onAdvanceGeneration && (
+            <button
+              type="button"
+              disabled={!canAdvanceGeneration}
+              onClick={onAdvanceGeneration}
+            >
+              Pasar de generación
+            </button>
+          )}
+
+          <SimulationSpeedControl
+            speed={timeScale}
+            onChange={onTimeScaleChange}
+          />
+
           {status === 'idle' ? (
-            <button className="primary-button" onClick={onStart}>
+            <button
+              type="button"
+              className="primary-button play-button"
+              onClick={onStart}
+            >
               Iniciar
             </button>
           ) : (
             <button
-              className="primary-button"
+              type="button"
+              className="primary-button play-button"
               onClick={onPauseToggle}
               disabled={status === 'evolving' || persistenceStatus === 'saving'}
             >
@@ -187,108 +407,7 @@ export function NeatTrainingHud({
             </button>
           )}
         </div>
-      </header>
-      {persistenceStatus === 'error' && onRetrySave && (
-        <section className="telemetry-panel" role="alert">
-          <p>
-            No se pudo guardar la generación. El entrenamiento está pausado para
-            conservarla.
-          </p>
-          <button onClick={onRetrySave}>Reintentar guardado</button>
-        </section>
-      )}
-      <section className="neat-hud__summary">
-        <p className="eyebrow">
-          {trainingName} / Desierto {trackSeed !== undefined && `#${trackSeed}`}
-        </p>
-        <h2>Generación {generation + 1}</h2>
-      </section>
-      {!inspectingCar && (controls || status === 'paused') && !telemetry && (
-        <section
-          className="telemetry-panel"
-          aria-label="Opciones del entrenamiento"
-        >
-          <h3>
-            {status === 'paused' ? 'En boxes / Pausa' : 'Control de escudería'}
-          </h3>
-          <div className="training-options">
-            <button
-              onClick={onReset}
-              disabled={persistenceStatus === 'saving' || status === 'evolving'}
-            >
-              Recargar
-            </button>
-            <button
-              onClick={onRegenerateTrack}
-              disabled={status === 'evolving' || persistenceStatus === 'saving'}
-            >
-              Regenerar pista
-            </button>
-            <button
-              onClick={onSelectRun}
-              disabled={persistenceStatus === 'saving' || status === 'evolving'}
-            >
-              Cambiar entrenamiento
-            </button>
-            <GameSettings />
-          </div>
-          <p className="hud-hint">
-            <kbd>ESC</kbd> Pausar / reanudar
-          </p>
-        </section>
-      )}
-      {telemetry && !inspectingCar && (
-        <section className="telemetry-panel" aria-label="Telemetría NEAT">
-          <h3>Sensores de los autos</h3>
-          <label className="setting-toggle">
-            <input
-              type="checkbox"
-              checked={showRaycasts}
-              onChange={(event) => onShowRaycastsChange?.(event.target.checked)}
-            />
-            Mostrar raycasts
-          </label>
-          <p className="hud-hint">
-            Cinco rayos por auto, hasta 8 m. Rojo: detecta un borde. Turquesa:
-            libre; amarillo si es el auto observado. Pausa el entrenamiento para
-            inspeccionarlos.
-          </p>
-          <h3>Generación anterior</h3>
-          <dl>
-            <dt>Mejor puntuación</dt>
-            <dd>{metrics.bestFitness.toFixed(0)}</dd>
-            <dt>Promedio</dt>
-            <dd>{metrics.averageFitness.toFixed(0)}</dd>
-            <dt>Especies</dt>
-            <dd>{metrics.speciesCount}</dd>
-          </dl>
-        </section>
-      )}
-      <section className="neat-metrics" aria-label="Métricas NEAT">
-        <div>
-          <span>Vivos</span>
-          <strong>
-            {alive}/{populationSize}
-          </strong>
-        </div>
-        <div>
-          <span>Mejor actual</span>
-          <strong>{currentBest.toFixed(0)}</strong>
-        </div>
-        <div>
-          <span>Mejor anterior</span>
-          <strong>{metrics.bestFitness.toFixed(0)}</strong>
-        </div>
-        <div>
-          <span>{localOnly ? 'En este dispositivo' : 'En tu cuenta'}</span>
-          <strong
-            role="status"
-            className={`persistence-state persistence-state--${persistenceStatus}`}
-          >
-            {saveLabels[persistenceStatus]}
-          </strong>
-        </div>
-      </section>
+      </footer>
     </div>
   )
 }

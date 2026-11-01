@@ -33,6 +33,7 @@ interface NeatTrainingSceneProps {
   cameraMode: RaceCameraMode
   selectedGenomeId: string
   showRaycasts: boolean
+  posesRef?: React.RefObject<Map<string, CarPose>>
 }
 
 export function NeatTrainingScene({
@@ -49,8 +50,10 @@ export function NeatTrainingScene({
   showRaycasts,
   onInspectCar,
   onRegisterCar,
+  posesRef,
 }: NeatTrainingSceneProps) {
-  const poses = useRef(new Map<string, CarPose>())
+  const internalPoses = useRef(new Map<string, CarPose>())
+  const poses = posesRef ?? internalPoses
   return (
     <>
       <TrackEnvironment track={track} theme="desert" />

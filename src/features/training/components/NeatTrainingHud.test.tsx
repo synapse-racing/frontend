@@ -40,6 +40,7 @@ describe('NeatTrainingHud', () => {
       </MemoryRouter>,
     )
 
+    await user.click(screen.getByRole('button', { name: 'Opciones' }))
     await user.click(screen.getByRole('button', { name: 'Regenerar pista' }))
     expect(onRegenerateTrack).toHaveBeenCalledOnce()
     await user.keyboard('{Escape}')
