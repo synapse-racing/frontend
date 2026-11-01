@@ -37,23 +37,7 @@ export function DashboardPage() {
         <p className="eyebrow">
           Paddock / {guest ? 'Piloto invitado' : auth.user?.username}
         </p>
-        {guest ? (
-          <section className="guest-progress" aria-label="Modo invitado">
-            <p>Tu progreso se guarda en este dispositivo.</p>
-            <Link
-              className="guest-save-link"
-              to="/register"
-              onClick={requestGuestImport}
-            >
-              Crear cuenta y guardar progreso ↗
-            </Link>
-            <Link to="/login" onClick={requestGuestImport}>
-              Ya tengo cuenta
-            </Link>
-          </section>
-        ) : (
-          <GuestProgressImport />
-        )}
+        {!guest && <GuestProgressImport />}
         <h1>
           A LA <br />
           PISTA.
@@ -137,10 +121,21 @@ export function DashboardPage() {
         </strong>
         <small>PERSONALIZAR ↗</small>
       </Link>
-      <footer className="game-footer">
-        <span />
-        <span>NEAT / RACE LAB</span>
-      </footer>
+      {guest && (
+        <footer className="guest-progress-bar">
+          <span className="guest-progress-bar__icon" aria-hidden="true">↗</span>
+          <div className="guest-progress-bar__copy">
+            <strong>Progreso guardado localmente</strong>
+            <span>Vincula una cuenta para conservarlo.</span>
+          </div>
+          <Link className="guest-progress-bar__create" to="/register" onClick={requestGuestImport}>
+            Crear cuenta ↗
+          </Link>
+          <Link className="guest-progress-bar__login" to="/login" onClick={requestGuestImport}>
+            Iniciar sesión
+          </Link>
+        </footer>
+      )}
     </main>
   )
 }

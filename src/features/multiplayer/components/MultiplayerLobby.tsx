@@ -127,6 +127,9 @@ export function MultiplayerLobby({
       run.currentGeneration > 0 &&
       run.config.simulationVersion === 'race-sim-v1',
   )
+  const selectedRun = compatibleRuns.find(
+    (run) => run.name === currentPlayer?.genomeName,
+  )
   const canStart =
     isHost &&
     room.players.length >= 2 &&
@@ -143,6 +146,47 @@ export function MultiplayerLobby({
           {room.players.length}/{room.maxPlayers} pilotos
         </small>
       </div>
+
+      <section className="lobby-pilot-select" aria-label="Selección de piloto">
+        <div className="lobby-pilot-select__heading">
+          <div>
+            <span>01 / CONFIGURA TU ESCUDERÍA</span>
+            <h2>Elige tu piloto NEAT</h2>
+          </div>
+          <small className={currentPlayer?.genomeName ? 'is-selected' : ''}>
+            {currentPlayer?.genomeName ? 'PILOTO SELECCIONADO' : 'PASO OBLIGATORIO'}
+          </small>
+        </div>
+        <label htmlFor="lobby-pilot-select">Entrenamientos disponibles</label>
+        <select
+          id="lobby-pilot-select"
+          disabled={currentPlayer?.ready || compatibleRuns.length === 0}
+          onChange={(event) => onSelectGenome(event.target.value)}
+          value={selectedRun?.id ?? ''}
+        >
+          <option value="">Selecciona tu piloto para esta carrera</option>
+          {compatibleRuns.map((run) => (
+            <option key={run.id} value={run.id}>
+              {run.name} · gen. {run.currentGeneration} · pista #
+              {run.config.track?.seed ?? run.seed}
+            </option>
+          ))}
+        </select>
+        {selectedRun ? (
+          <p className="lobby-pilot-select__hint">
+            {selectedRun.name} · Generación {selectedRun.currentGeneration} ·
+            espera a que termine el guardado antes de competir.
+          </p>
+        ) : compatibleRuns.length > 0 ? (
+          <p className="lobby-pilot-select__hint">
+            Selecciona un entrenamiento guardado para habilitar la salida.
+          </p>
+        ) : (
+          <p className="lobby-pilot-select__empty">
+            Completa y guarda una generación de entrenamiento para competir.
+          </p>
+        )}
+      </section>
 
       <section className="lobby-track" aria-label="Pista multijugador">
         <div>
@@ -242,34 +286,6 @@ export function MultiplayerLobby({
       </div>
 
       {error && <p className="multiplayer-error">{error}</p>}
-      <label>
-        Piloto NEAT
-        <select
-          disabled={currentPlayer?.ready}
-          onChange={(event) => onSelectGenome(event.target.value)}
-          value={
-            trainingRuns.find((run) => run.name === currentPlayer?.genomeName)
-              ?.id ?? ''
-          }
-        >
-          <option value="">Selecciona un entrenamiento</option>
-          {compatibleRuns.map((run) => (
-            <option key={run.id} value={run.id}>
-              {run.name} · gen. {run.currentGeneration} · pista #
-              {run.config.track?.seed ?? run.seed}
-            </option>
-          ))}
-        </select>
-      </label>
-      <p>
-        Compite tu mejor piloto guardado. Espera al guardado de la generación
-        antes de seleccionarlo.
-      </p>
-      {compatibleRuns.length === 0 && (
-        <p className="multiplayer-error">
-          Completa y guarda una generación de entrenamiento para competir.
-        </p>
-      )}
       <div className="lobby-actions">
         <button onClick={onLeave}>Salir</button>
         <button

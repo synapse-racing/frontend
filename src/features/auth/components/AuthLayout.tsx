@@ -15,11 +15,11 @@ export function AuthLayout({ children }: PropsWithChildren) {
         <div>
           <p className="eyebrow">Acceso al paddock</p>
           <h1>
-            TU LUGAR <br />
-            EN LA <br />
-            <em>PARRILLA.</em>
+            CADA VUELTA <br />
+            ES UNA <br />
+            <em>LECCIÓN.</em>
           </h1>
-          <p>Cada generación, más cerca de la vuelta perfecta.</p>
+          <p>Cada generación, una evolución.</p>
         </div>
       </section>
       <section className="auth-form-panel">{children}</section>

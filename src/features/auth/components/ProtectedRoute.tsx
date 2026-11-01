@@ -25,26 +25,39 @@ export function ProtectedRoute({
 
   if (auth.status === 'visitor' && !allowGuest) {
     return (
-      <main className="page">
-        <p className="eyebrow">Torneo multijugador</p>
-        <h1>Compite con una cuenta.</h1>
-        <p>
-          Tu progreso de invitado está en este dispositivo. Crea una cuenta para
-          guardarlo y competir con otros jugadores.
-        </p>
-        <Link
-          className="primary-button"
-          to="/register"
-          onClick={requestGuestImport}
-        >
-          Crear cuenta y guardar progreso
-        </Link>
-        <p>
-          <Link to="/login" onClick={requestGuestImport}>
-            Ya tengo cuenta
-          </Link>{' '}
-          · <Link to="/dashboard">Volver al Paddock</Link>
-        </p>
+      <main className="guest-multiplayer-gate">
+        <section className="guest-multiplayer-gate__card">
+          <div className="guest-multiplayer-gate__stripe" aria-hidden="true" />
+          <p className="guest-multiplayer-gate__eyebrow">
+            <span aria-hidden="true">●</span> ACCESO A TORNEO
+          </p>
+          <h1>La parrilla te espera.</h1>
+          <p className="guest-multiplayer-gate__description">
+            Crea una cuenta para llevar tu piloto y competir en línea con otros corredores.
+          </p>
+          <div className="guest-multiplayer-gate__actions">
+            <Link
+              className="guest-multiplayer-gate__create"
+              to="/register"
+              onClick={requestGuestImport}
+            >
+              Crear cuenta <span aria-hidden="true">↗</span>
+            </Link>
+            <Link
+              className="guest-multiplayer-gate__login"
+              to="/login"
+              onClick={requestGuestImport}
+            >
+              Ya tengo cuenta
+            </Link>
+          </div>
+          <p className="guest-multiplayer-gate__save-note">
+            Tu progreso de invitado seguirá guardado en este dispositivo.
+          </p>
+          <Link className="guest-multiplayer-gate__back" to="/dashboard">
+            ← Volver al paddock
+          </Link>
+        </section>
       </main>
     )
   }

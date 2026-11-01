@@ -107,6 +107,112 @@
   font-size: 12px;
   line-height: 1.7;
 }
+.guest-multiplayer-gate {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 3rem);
+}
+.guest-multiplayer-gate__card {
+  position: relative;
+  width: min(100%, 550px);
+  overflow: hidden;
+  padding: clamp(2rem, 5vw, 3.5rem);
+  border: 1px solid #d9dec331;
+  border-top: 2px solid #ff8754;
+  background:
+    linear-gradient(145deg, #15201feF, #101718f5),
+    #111a1a;
+  box-shadow: 0 30px 90px #0008;
+  text-align: center;
+  backdrop-filter: blur(14px);
+}
+.guest-multiplayer-gate__stripe {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 92px;
+  height: 7px;
+  background: repeating-linear-gradient(135deg, #ff8754 0 8px, #ff875400 8px 16px);
+  opacity: 0.8;
+}
+.guest-multiplayer-gate__eyebrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 1rem;
+  color: #d6c1a6;
+  font: 10px/1.4 monospace;
+  letter-spacing: 0.2em;
+}
+.guest-multiplayer-gate__eyebrow span {
+  color: #ff8754;
+  font-size: 8px;
+}
+.guest-multiplayer-gate__card h1 {
+  margin: 0;
+  color: #f2eddf;
+  font-size: clamp(2.5rem, 7vw, 4.1rem);
+}
+.guest-multiplayer-gate__description {
+  max-width: 390px;
+  margin: 1rem auto 1.6rem;
+  color: #bbc5bb;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.guest-multiplayer-gate__actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+}
+.guest-multiplayer-gate__create,
+.guest-multiplayer-gate__login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  text-decoration: none;
+}
+.guest-multiplayer-gate__create {
+  gap: 1.1rem;
+  padding: 0.7rem 1rem;
+  background: #ff8754;
+  color: #1c1713;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.guest-multiplayer-gate__create:hover {
+  background: #ffa279;
+}
+.guest-multiplayer-gate__login {
+  color: #e8d9c4;
+  font-size: 12px;
+}
+.guest-multiplayer-gate__login:hover,
+.guest-multiplayer-gate__back:hover {
+  color: #fff;
+}
+.guest-multiplayer-gate__save-note {
+  margin: 1.4rem 0 0;
+  color: #87958e;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.guest-multiplayer-gate__back {
+  display: inline-block;
+  margin-top: 1.1rem;
+  color: #f09a70;
+  font: 10px/1.5 monospace;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
 @media (min-width: 901px) and (max-height: 780px) {
   .menu-stage .auth-intro h1 {
     font-size: 4rem;
