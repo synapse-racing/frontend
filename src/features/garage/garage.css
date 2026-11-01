@@ -377,6 +377,9 @@
   font-size: 12px;
   color: #adbbb2;
 }
+.garage-identity .garage-number-error {
+  color: #ff8e84;
+}
 .garage-number-preview {
   flex: 1;
   border-left: 4px solid var(--paint);

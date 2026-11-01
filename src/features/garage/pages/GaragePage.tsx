@@ -58,7 +58,7 @@ function GarageEditor() {
   const validNumber =
     /^\d{1,2}$/.test(numberText) &&
     Number(numberText) >= 1 &&
-    Number(numberText) <= 99
+    Number(numberText) <= 67
   const dirty =
     JSON.stringify(draft) !== JSON.stringify(garage.appearance) || !validNumber
   const canSave = validNumber && !garage.saving
@@ -234,9 +234,10 @@ function GarageEditor() {
               modelName={currentModel.name}
               numberText={numberText}
               validNumber={validNumber}
+              exceedsMaximum={/^\d+$/.test(numberText) && Number(numberText) > 67}
               onNumberText={(value) => {
                 setNumberText(value)
-                if (/^\d{1,2}$/.test(value) && +value >= 1)
+                if (/^\d{1,2}$/.test(value) && +value >= 1 && +value <= 67)
                   update({ number: +value })
               }}
             />

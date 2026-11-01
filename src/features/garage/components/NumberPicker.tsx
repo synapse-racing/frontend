@@ -6,12 +6,14 @@ export function NumberPicker({
   modelName,
   numberText,
   validNumber,
+  exceedsMaximum,
   onNumberText,
 }: {
   draft: VehicleAppearance
   modelName: string
   numberText: string
   validNumber: boolean
+  exceedsMaximum: boolean
   onNumberText: (value: string) => void
 }) {
   return (
@@ -24,11 +26,11 @@ export function NumberPicker({
             id="garage-number"
             type="number"
             min="1"
-            max="99"
+            max="67"
             step="1"
             value={numberText}
             aria-invalid={!validNumber}
-            aria-describedby="garage-number-hint"
+            aria-describedby={exceedsMaximum ? 'garage-number-error' : 'garage-number-hint'}
             onChange={(event) => onNumberText(event.target.value)}
           />
         </div>
@@ -41,9 +43,15 @@ export function NumberPicker({
           <small>{modelName}</small>
         </div>
       </div>
-      <p id="garage-number-hint">
-        Elige un número del 1 al 99. Aparecerá en tu auto.
-      </p>
+      {exceedsMaximum ? (
+        <p id="garage-number-error" role="alert" className="garage-number-error">
+          El número máximo permitido es 67.
+        </p>
+      ) : (
+        <p id="garage-number-hint">
+          Elige un número del 1 al 67. Aparecerá en tu auto.
+        </p>
+      )}
     </div>
   )
 }
