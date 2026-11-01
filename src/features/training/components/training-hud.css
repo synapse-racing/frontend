@@ -1,0 +1,625 @@
+/* ==========================================================================
+   TRAINING HUD - SYNAPSE MOTORSPORT (GRAPHITE & ORANGE FLOATING OVERLAY)
+   ========================================================================== */
+
+:root {
+  --thud-bg: #0d1417d9;         /* Translucent deep graphite */
+  --thud-surface: #131c21e6;    /* Dark slate gray */
+  --thud-panel: #172228f2;      /* Floating panel solid */
+  --thud-border: #26353d;       /* Subtle slate border */
+  --thud-border-bold: #384c57;  /* Accent border */
+  --thud-ink: #f0f4f2;          /* Crisp light gray/cream */
+  --thud-muted: #8b9ea8;        /* Muted cool gray */
+  --thud-accent: #ff692f;       /* Synapse Motorsport Orange */
+  --thud-accent-hover: #ff8552;
+  --thud-green: #5cdb95;        /* Subdued racing mint */
+  --thud-red: #e65252;          /* Clean race alert red */
+  --thud-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+}
+
+/* Screen overlay root (non-blocking) */
+.neat-hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: var(--thud-ink);
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Sleek Buttons (Graphite & Orange) */
+.neat-hud button,
+.car-actions button {
+  pointer-events: auto;
+  background: #141e24;
+  color: var(--thud-ink);
+  border: 1px solid var(--thud-border-bold);
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.45rem 0.75rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.neat-hud button:hover:not(:disabled),
+.car-actions button:hover:not(:disabled) {
+  background: #1d2a32;
+  border-color: var(--thud-accent);
+  color: #fff;
+}
+
+.neat-hud button:active:not(:disabled),
+.car-actions button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.neat-hud button:disabled,
+.car-actions button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Primary Action Button (Synapse Orange) */
+.neat-hud .primary-button {
+  background: var(--thud-accent);
+  color: #0d1417;
+  border-color: var(--thud-accent);
+  font-weight: 800;
+}
+
+.neat-hud .primary-button:hover:not(:disabled) {
+  background: var(--thud-accent-hover);
+  border-color: var(--thud-accent-hover);
+  color: #000;
+}
+
+/* ==========================================================================
+   TOP BAR (Slim, Translucent, Floating Feel)
+   ========================================================================== */
+.neat-hud__topbar {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 1.2rem;
+  background: #0d1417e6;
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--thud-border);
+  z-index: 10;
+}
+
+.neat-hud__brand-group {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.neat-hud__back-link {
+  color: var(--thud-muted);
+  text-decoration: none;
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0.35rem 0.6rem;
+  background: #121c21;
+  border: 1px solid var(--thud-border);
+  border-radius: 3px;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+
+.neat-hud__back-link:hover {
+  border-color: var(--thud-accent);
+  color: var(--thud-accent);
+}
+
+.neat-hud__gen-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #121b20;
+  border: 1px solid var(--thud-border);
+  border-left: 2px solid var(--thud-accent);
+  padding: 0.3rem 0.65rem;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #e8eded;
+}
+
+.neat-hud__gen-badge span {
+  color: var(--thud-muted);
+  font-weight: 400;
+  font-size: 10px;
+}
+
+.neat-hud__status-pill {
+  font-family: monospace;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 0.2rem 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 3px;
+  border: 1px solid currentColor;
+}
+
+.training-status--running {
+  color: #5cdb95;
+  background: #5cdb9514;
+}
+
+.training-status--paused {
+  color: var(--thud-accent);
+  background: #ff692f14;
+}
+
+.training-status--evolving {
+  color: #82b1ff;
+  background: #82b1ff14;
+}
+
+.training-status--idle {
+  color: var(--thud-muted);
+  background: #8b9ea814;
+}
+
+.neat-hud__top-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ==========================================================================
+   MAIN AREA (OPEN CANVAS, FLOATING WIDGETS)
+   ========================================================================== */
+.neat-hud__main-area {
+  position: absolute;
+  inset: 48px 0 70px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1rem 1.2rem;
+  pointer-events: none;
+}
+
+/* Left: Compact Floating Standings Widget (Doesn't cover the screen) */
+.neat-standings {
+  pointer-events: auto;
+  width: 200px;
+  max-height: 230px;
+  background: #0e1518db;
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--thud-border);
+  border-left: 3px solid var(--thud-accent);
+  border-radius: 4px;
+  box-shadow: var(--thud-shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.neat-standings.is-collapsed {
+  transform: translateX(-175px);
+  opacity: 0.75;
+}
+
+.neat-standings__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.6rem;
+  background: #131c21;
+  border-bottom: 1px solid var(--thud-border);
+}
+
+.neat-standings__title {
+  font-family: monospace;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--thud-muted);
+  text-transform: uppercase;
+}
+
+.neat-standings__toggle {
+  padding: 0.15rem 0.35rem !important;
+  font-size: 9px !important;
+  border: 1px solid var(--thud-border) !important;
+  border-radius: 2px !important;
+}
+
+.neat-standings__list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  display: flex;
+  flex-direction: column;
+}
+
+.neat-standings__row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.3rem 0.5rem !important;
+  border: 0 !important;
+  border-bottom: 1px solid #162026 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  text-align: left;
+  font-size: 10px !important;
+}
+
+.neat-standings__row:hover:not(:disabled) {
+  background: #18242c !important;
+}
+
+.neat-standings__row.is-selected {
+  background: #20313b !important;
+  border-left: 2px solid var(--thud-accent) !important;
+}
+
+.neat-standings__row.is-crashed {
+  opacity: 0.4;
+}
+
+.neat-standings__pos {
+  font-family: monospace;
+  font-weight: 800;
+  width: 16px;
+  color: var(--thud-muted);
+  font-size: 9px;
+}
+
+.neat-standings__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.neat-standings__name {
+  font-family: monospace;
+  font-weight: 700;
+  flex: 1;
+  color: var(--thud-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.neat-standings__badge {
+  font-family: monospace;
+  font-size: 8px;
+  font-weight: 800;
+  padding: 1px 3px;
+  border-radius: 2px;
+  letter-spacing: 0.04em;
+  border: 1px solid currentColor;
+}
+
+.neat-standings__badge--lead {
+  color: var(--thud-accent);
+  background: #ff692f18;
+}
+
+.neat-standings__badge--run {
+  color: #5cdb95;
+  background: #5cdb9518;
+}
+
+.neat-standings__badge--ko {
+  color: var(--thud-red);
+  background: #e6525218;
+}
+
+.neat-standings__badge--fin {
+  color: #82b1ff;
+  background: #82b1ff18;
+}
+
+.neat-standings__score {
+  font-family: monospace;
+  font-size: 9px;
+  color: var(--thud-muted);
+  width: 32px;
+  text-align: right;
+}
+
+/* Right side container */
+.neat-hud__right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+/* Compact Floating Minimap */
+.training-minimap {
+  pointer-events: auto;
+  width: 160px;
+  background: #0e1518db;
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--thud-border);
+  border-top: 2px solid var(--thud-accent);
+  border-radius: 4px;
+  box-shadow: var(--thud-shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.training-minimap__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.3rem 0.5rem;
+  background: #131c21;
+  border-bottom: 1px solid var(--thud-border);
+}
+
+.training-minimap__label {
+  font-family: monospace;
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--thud-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.training-minimap__svg {
+  width: 100%;
+  height: 110px;
+  background: #0a0f12;
+  display: block;
+}
+
+/* ==========================================================================
+   BOTTOM BAR - FLOATING COCKPIT DOCK (DOES NOT COVER WHOLE BOTTOM)
+   ========================================================================== */
+.neat-hud__bottom-bar {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  max-width: calc(100% - 2rem);
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  padding: 0.45rem 1rem;
+  background: #0e1518f0;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--thud-border);
+  border-top: 2px solid var(--thud-accent);
+  border-radius: 5px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  z-index: 10;
+}
+
+.neat-hud__stats-cluster {
+  display: flex;
+  gap: 1.2rem;
+  align-items: center;
+}
+
+.neat-hud__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.neat-hud__stat-label {
+  font-family: monospace;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--thud-muted);
+}
+
+.neat-hud__stat-value {
+  font-family: monospace;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--thud-ink);
+}
+
+.neat-hud__stat-value.is-accent {
+  color: var(--thud-accent);
+}
+
+.neat-hud__stat-value.is-success {
+  color: #5cdb95;
+}
+
+.neat-hud__tape-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-left: 1px solid var(--thud-border);
+  padding-left: 1rem;
+}
+
+.neat-hud__tape-controls .play-button {
+  padding: 0.55rem 1.1rem;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+/* Speed selector group */
+.simulation-speed {
+  display: inline-flex;
+  border: 1px solid var(--thud-border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.simulation-speed button {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0.45rem 0.65rem !important;
+  font-size: 10px !important;
+}
+
+.simulation-speed button[aria-pressed='true'] {
+  background: var(--thud-accent) !important;
+  color: #0b110e !important;
+  font-weight: 800 !important;
+}
+
+/* ==========================================================================
+   CAR ACTIONS / AGENT BRAIN CARD (Floating Right Widget)
+   ========================================================================== */
+.car-actions {
+  position: absolute;
+  bottom: 4.8rem;
+  right: 1.2rem;
+  width: min(260px, calc(100% - 2.4rem));
+  background: #0e1518f0;
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--thud-border);
+  border-top: 2px solid var(--thud-accent);
+  border-radius: 4px;
+  padding: 0.9rem;
+  box-shadow: var(--thud-shadow);
+  z-index: 15;
+  pointer-events: auto;
+}
+
+.car-actions header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+  border-bottom: 1px solid var(--thud-border);
+  padding-bottom: 0.3rem;
+}
+
+.car-actions header h3 {
+  font-family: Impact, 'Arial Narrow', sans-serif;
+  font-style: italic;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--thud-accent);
+}
+
+.car-actions header button {
+  padding: 0.15rem 0.45rem;
+  font-size: 12px;
+  border: 1px solid var(--thud-border);
+  border-radius: 2px;
+}
+
+.car-actions p[role='status'] {
+  font-family: monospace;
+  font-size: 10px;
+  color: var(--thud-muted);
+  margin: 0.3rem 0 0.6rem;
+  line-height: 1.35;
+}
+
+.car-actions .car-actions__eliminate {
+  border-color: #5c2929;
+  background: #251616;
+  color: #ff918a;
+  margin-top: 0.3rem;
+  width: 100%;
+}
+
+.car-actions .car-actions__eliminate:hover:not(:disabled) {
+  background: #3e1b1b;
+  border-color: var(--thud-red);
+  color: #fff;
+}
+
+/* ==========================================================================
+   TELEMETRY & SETTINGS OVERLAYS
+   ========================================================================== */
+.telemetry-panel {
+  position: absolute;
+  top: 3.8rem;
+  right: 1.2rem;
+  width: min(290px, calc(100% - 2.4rem));
+  background: #0e1518f5;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--thud-border);
+  border-top: 2px solid var(--thud-accent);
+  border-radius: 4px;
+  padding: 1rem;
+  box-shadow: var(--thud-shadow);
+  z-index: 12;
+  pointer-events: auto;
+}
+
+.telemetry-panel h3 {
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--thud-accent);
+  margin: 0 0 0.6rem;
+}
+
+.telemetry-panel dl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+  font-family: monospace;
+  font-size: 11px;
+  margin: 0.6rem 0;
+}
+
+.telemetry-panel dt {
+  color: var(--thud-muted);
+}
+
+.telemetry-panel dd {
+  font-weight: 800;
+  color: var(--thud-ink);
+  margin: 0;
+}
+
+/* ==========================================================================
+   RESPONSIVE (Compact screens)
+   ========================================================================== */
+@media (max-width: 760px) {
+  .neat-standings {
+    display: none;
+  }
+  .training-minimap {
+    width: 130px;
+  }
+  .training-minimap__svg {
+    height: 90px;
+  }
+  .neat-hud__bottom-bar {
+    width: calc(100% - 1.5rem);
+    bottom: 0.75rem;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.5rem 0.8rem;
+  }
+  .neat-hud__tape-controls {
+    border-left: 0;
+    padding-left: 0;
+    width: 100%;
+    justify-content: space-between;
+  }
+}
