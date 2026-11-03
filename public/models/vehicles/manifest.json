@@ -13,25 +13,25 @@
   },
   "gt": {
     "high": {
-      "bytes": 894796,
-      "triangles": 42380,
+      "bytes": 960544,
+      "triangles": 45112,
       "draws": 24
     },
     "low": {
-      "bytes": 235248,
-      "triangles": 10304,
+      "bytes": 264868,
+      "triangles": 11484,
       "draws": 16
     }
   },
   "prototype": {
     "high": {
-      "bytes": 894076,
-      "triangles": 40714,
+      "bytes": 861996,
+      "triangles": 39362,
       "draws": 24
     },
     "low": {
-      "bytes": 238244,
-      "triangles": 9658,
+      "bytes": 245244,
+      "triangles": 9926,
       "draws": 16
     }
   }
