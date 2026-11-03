@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local generated artifacts
+/tmp/
+/exports/
+/coverage/
+*.tsbuildinfo
+/src.zip

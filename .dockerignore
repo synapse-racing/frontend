@@ -10,3 +10,10 @@ logs
 node_modules
 *.log
 Dockerfile*
+
+tmp
+exports
+docs/archive
+*.tsbuildinfo
+*.zip
+AGENTS.md

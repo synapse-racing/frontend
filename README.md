@@ -61,7 +61,6 @@ VITE_API_URL=http://localhost:3000/api
 ```
 src/
 ├── app/                  # Root providers (router, query client, auth context)
-├── assets/               # Static assets (fonts, images, models)
 ├── features/
 │   ├── auth/             # Registration, login, session restoration, logout
 │   ├── garage/           # 3D vehicle customizer (model, paint, finish, number)
@@ -74,7 +73,9 @@ src/
 │   └── multiplayer/      # Lobby, race, results (Socket.IO)
 ├── pages/                # Top-level routable pages
 ├── shared/
-│   ├── api/              # Axios instance, token interceptors
+│   ├── api/              # Fetch client and API error normalization
+│   ├── errors/           # Spanish error catalog and classification
+│   ├── components/       # Shared UI, including ErrorNotice
 │   ├── config/           # Runtime environment config
 │   ├── game/             # Shared 3D components (camera, speed control, car actions)
 │   └── three/            # Three.js helpers, vehicle rigs, race camera
@@ -89,7 +90,7 @@ JWT-based auth with rotating refresh tokens. The access token lives exclusively 
 
 ### Garage
 
-Interactive 3D showroom where players configure their car before a race. Supports multiple body models (loaded as `.glb` files), paint color, finish type (matte, gloss, metallic), and race number. Appearance is saved to the user's account via `PATCH /api/users/me/appearance` and restored on every session.
+Interactive 3D showroom where players configure their car before a race. Supports multiple body models (loaded as `.glb` files), paint color, finish type (matte, satin, metallic), and race number. Appearance is saved to the user's account via `PATCH /api/users/me/appearance` and restored on every session.
 
 ### NEAT Training (`/training`)
 
@@ -110,7 +111,7 @@ Private rooms for up to 64 players via Socket.IO. The backend runs the authorita
 | Layer | Library / Tool |
 |---|---|
 | UI | React 19, React Router 7 |
-| 3D | Three.js 0.185, React Three Fiber 9, Drei 10 |
+| 3D | Three.js 0.182, React Three Fiber 9, Drei 10 |
 | State | TanStack Query 5, React Hook Form 7 |
 | Validation | Zod 4 |
 | Realtime | Socket.IO Client 4 |
@@ -128,3 +129,7 @@ docker run -p 80:80 synapse-frontend
 ```
 
 See the backend repository for the full `compose.prod.yaml` stack.
+
+## Repository guidance
+
+See [AGENTS.md](AGENTS.md) for architecture, gameplay invariants and contributor rules. Initial plans are preserved in [docs/archive](docs/archive/README.md) as historical material, not current requirements.
