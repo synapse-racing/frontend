@@ -1,7 +1,9 @@
 import { useEffect } from 'react'
+import type { ReactNode } from 'react'
 import './car-actions.css'
 
 interface Props {
+  children?: ReactNode
   name: string
   status: string
   onFollow: () => void
@@ -17,6 +19,7 @@ export function CarActions({
   onEliminate,
   canEliminate = false,
   onClose,
+  children,
 }: Props) {
   useEffect(() => {
     const close = (event: KeyboardEvent) => {
@@ -50,6 +53,7 @@ export function CarActions({
           Eliminar auto
         </button>
       )}
+      {children}
     </section>
   )
 }

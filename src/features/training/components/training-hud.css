@@ -623,3 +623,113 @@
     justify-content: space-between;
   }
 }
+
+/* Training telemetry */
+.neat-lab .telemetry-panel {
+  max-height: calc(100svh - 11rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.neat-lab .car-actions {
+  top: 4.5rem;
+  bottom: auto;
+  width: min(360px, calc(100% - 2.4rem));
+  max-height: calc(100svh - 10.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.raycast-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.8rem;
+  margin-bottom: 0.8rem;
+  border: 1px solid #4d685c;
+  background: #101d19;
+  cursor: pointer;
+}
+.raycast-toggle:has(:checked) { border-color: #b9f36a; background: #203021; }
+
+.raycast-toggle input { width: 18px; height: 18px; margin: 0; accent-color: #b9f36a; }
+.raycast-toggle span { flex: 1; font-size: 13px; }
+.raycast-toggle small { display: block; margin-top: 4px; color: #9eb0a4; font-size: 10px; }
+.raycast-toggle strong { color: #9eb0a4; font: 11px monospace; }
+.raycast-toggle:has(:checked) strong { color: #b9f36a; }
+.raycast-toggle input {
+  appearance: none;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  width: 36px;
+  min-width: 36px;
+  max-width: 36px;
+  height: 22px;
+  min-height: 22px;
+  max-height: 22px;
+  margin: 0;
+  padding: 2px;
+  border: 1px solid #668077;
+  border-radius: 20px;
+  background: #25322e;
+  cursor: pointer;
+}
+.raycast-toggle input::before {
+  content: '';
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #bccbc3;
+}
+.raycast-toggle input:checked::before { transform: translateX(12px); background: #b9f36a; }
+.raycast-toggle { border-radius: 6px; min-height: 64px; box-sizing: border-box; }
+.raycast-toggle span { min-width: 0; }
+.raycast-toggle:focus-within { outline: none; }
+.raycast-toggle:has(input:focus-visible) { outline: 2px solid #b9f36a; outline-offset: 3px; }
+.raycast-toggle strong { font-size: 10px; }
+.evaluation-summary {
+  padding: 0.65rem;
+  background: #16221f;
+  border: 1px solid #34443e;
+  border-radius: 4px;
+}
+.evaluation-summary__progress span { display: flex; justify-content: space-between; gap: 0.5rem; font-size: 11px; color: #b9c7bf; }
+.evaluation-summary__progress strong { color: #d8f993; }
+.evaluation-summary progress { display: block; width: 100%; height: 8px; margin-top: 8px; accent-color: #b9f36a; }
+.fitness-chart svg { width: 100%; display: block; background: #0a1012; border-radius: 4px; }
+.fitness-chart__legend { display: flex; justify-content: space-between; margin: 0.6rem 0; font-size: 10px; color: #ff8a50; }
+.fitness-chart__legend span:last-child { color: #9eb0bc; }
+.fitness-chart__selector { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; margin: 0.6rem 0; color: #b9c7bf; font-size: 11px; }
+.fitness-chart__selector select { min-width: 0; max-width: 150px; padding: 0.4rem; font-size: 11px; }
+.fitness-chart__record { padding: 0.55rem; border-left: 2px solid #d8f993; background: #243220; color: #d8f993; font-size: 11px; }
+.telemetry-help, .fitness-chart-empty { color: #a4b5b0; font: 11px/1.6 monospace; }
+.genome-diagram { margin-top: 1rem; border-top: 1px solid #34443e; padding-top: 0.75rem; }
+.genome-diagram > button { width: 100%; font-size: 12px; }
+.genome-diagram__canvas { max-height: 260px; overflow: auto; background: #091210; border: 1px solid #34443e; }
+.genome-diagram svg { display: block; width: 100%; min-width: 280px; }
+.genome-diagram .genome-diagram__legend { display: flex; justify-content: space-between; gap: 8px; font-size: 10px; }
+.genome-diagram__legend span:first-child { color: #77dfbb; }
+.genome-diagram__legend span:last-child { color: #ff918a; }
+
+.telemetry-panel .raycast-toggle {
+  margin: 0.75rem 0;
+  padding: 0.65rem;
+  min-height: 56px;
+}
+.telemetry-disclosure {
+  border-top: 1px solid #34443e;
+  margin-top: 0.5rem;
+}
+.telemetry-disclosure > summary {
+  padding: 0.8rem 0.15rem;
+  color: #d4dfd8;
+  font: 600 11px/1.5 monospace;
+  cursor: pointer;
+}
+.telemetry-disclosure > summary::marker { color: #a8c987; }
+.telemetry-disclosure > summary:hover { color: #d8f993; }
+.telemetry-disclosure > summary:focus-visible {
+  outline: 2px solid #b9f36a;
+  outline-offset: 2px;
+}

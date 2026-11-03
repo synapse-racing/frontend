@@ -24,6 +24,7 @@ import {
 } from '../components/NeatTrainingHud.tsx'
 import type { SimulationSpeed } from '../../../shared/game/SimulationSpeedControl.tsx'
 import { CarActions } from '../../../shared/game/CarActions.tsx'
+import { GenomeDiagram } from '../components/GenomeDiagram.tsx'
 import type {
   AgentControl,
   AgentFinishReason,
@@ -46,6 +47,7 @@ const neatCarPrefix = 'neat-car:'
 interface EvaluationRecord {
   progress: TrackProgress
   reason?: AgentFinishReason
+  finishSeconds?: number
 }
 
 function createEvaluationRecords(genomes: Genome[]) {
@@ -173,6 +175,7 @@ export function NeatTrainingPage() {
       speciesCount: nextEngine.currentSpecies().length,
     })
     setCurrentBest(0)
+    setGenerationHistory([])
     setRunId((value) => value + 1)
     setSelectedRun(run)
     setPersistenceStatus(
@@ -299,7 +302,7 @@ export function NeatTrainingPage() {
       index,
       activeTrack.checkpoints.length,
     )
-    if (inspectedCar === genomeId) refreshPanel((value) => value + 1)
+    refreshPanel((value) => value + 1)
   }
 
   function handleAgentFinish(
@@ -311,6 +314,7 @@ export function NeatTrainingPage() {
     const record = recordsRef.current.get(genomeId)
     if (!record) return
     record.reason = reason
+    if (reason === 'finished') record.finishSeconds = runtime.aliveSeconds
 
     const fitness = calculateFitness(runtime, record.progress)
     fitnessRef.current.set(genomeId, fitness)
@@ -467,6 +471,7 @@ export function NeatTrainingPage() {
           generation: engine.generation,
           bestFitness: completedMetrics.bestFitness,
           averageFitness: completedMetrics.averageFitness,
+          ...summarizeEvaluation(recordsRef.current, activeTrack.checkpoints.length),
         },
       ])
       setGenomes([...engine.genomes])
@@ -664,6 +669,7 @@ export function NeatTrainingPage() {
           cars={minimapCars}
           leaderboardEntries={leaderboardEntries}
           generationHistory={generationHistory}
+          evaluation={summarizeEvaluation(recordsRef.current, activeTrack.checkpoints.length)}
           posesRef={posesRef}
           selectedGenomeId={genomes[selectedCar]?.id ?? genomes[0].id}
         />
@@ -691,8 +697,22 @@ export function NeatTrainingPage() {
             canControlGeneration && !fitnessRef.current.has(inspectedCar)
           }
           onClose={() => setInspectedCar(null)}
-        />
+        >
+          <GenomeDiagram genome={genomes.find((genome) => genome.id === inspectedCar)!} />
+        </CarActions>
       )}
     </main>
   )
+}
+
+function summarizeEvaluation(records: Map<string, EvaluationRecord>, checkpointCount: number) {
+  const values = [...records.values()]
+  const finished = values.filter((record) => record.reason === 'finished')
+  const times = finished.flatMap((record) => record.finishSeconds === undefined ? [] : [record.finishSeconds])
+  return {
+    completedCars: finished.length,
+    populationSize: values.length,
+    bestProgress: Math.min(100, Math.max(0, ...values.map((record) => record.reason === 'finished' ? 100 : record.progress.passedCheckpoints / Math.max(1, checkpointCount) * 100))),
+    bestLapSeconds: times.length ? Math.min(...times) : null,
+  }
 }

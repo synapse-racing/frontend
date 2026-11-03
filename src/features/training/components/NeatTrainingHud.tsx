@@ -10,13 +10,14 @@ import type { CarPose, RaceCameraMode } from '../../../shared/three/RaceCamera.t
 import type { TrackDefinition } from '../domain/track.ts'
 import { LiveLeaderboard, type LeaderboardEntry } from './LiveLeaderboard.tsx'
 import { TrainingMinimap, type MinimapCarInfo } from './TrainingMinimap.tsx'
-import { FitnessHistoryChart, type GenerationDataPoint } from './FitnessHistoryChart.tsx'
+import { FitnessHistoryChart, EvaluationSummary, type EvaluationStats, type GenerationDataPoint } from './FitnessHistoryChart.tsx'
 import './training-hud.css'
 
 export type TrainingStatus = 'idle' | 'running' | 'paused' | 'evolving'
 export type PersistenceStatus = 'idle' | 'saving' | 'saved' | 'error'
 
 interface NeatTrainingHudProps {
+  evaluation?: EvaluationStats
   timeScale?: SimulationSpeed
   onTimeScaleChange?: (speed: SimulationSpeed) => void
   alive: number
@@ -103,6 +104,7 @@ export function NeatTrainingHud({
   generationHistory = [],
   posesRef,
   selectedGenomeId,
+  evaluation,
 }: NeatTrainingHudProps) {
   const [telemetry, setTelemetry] = useState(false)
   const [controls, setControls] = useState(false)
@@ -254,25 +256,27 @@ export function NeatTrainingHud({
           {/* Telemetry Panel */}
           {telemetry && !inspectingCar && (
             <section className="telemetry-panel" aria-label="Telemetría NEAT">
-              <h3>Telemetría & Red Neuronal</h3>
-              <label className="setting-toggle" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.8rem' }}>
+              <h3>Esta generación</h3>
+              {evaluation && <EvaluationSummary stats={evaluation} />}
+              <label className="raycast-toggle">
                 <input
                   type="checkbox"
+                  aria-label="Mostrar raycasts"
                   checked={showRaycasts}
                   onChange={(event) =>
                     onShowRaycastsChange?.(event.target.checked)
                   }
                 />
-                Mostrar raycasts
+                <span>Mostrar raycasts<small aria-hidden="true">{showRaycasts ? 'Sensores activados' : 'Sensores desactivados'}</small></span>
               </label>
-              <p style={{ fontSize: '11px', color: '#9eb0a4', margin: '0 0 1rem', lineHeight: 1.4 }}>
-                Cinco rayos por auto, hasta 8 m. Rojo: detecta borde. Turquesa: libre. Amarillo: auto observado.
-              </p>
-
-              <h3>Historial de Generaciones</h3>
+              {showRaycasts && <p className="telemetry-help">Rojo: borde · Turquesa: libre · Amarillo: auto observado.</p>}
+              <details className="telemetry-disclosure">
+                <summary>Evolución del entrenamiento</summary>
               <FitnessHistoryChart history={generationHistory} />
-
-              <h3 style={{ marginTop: '1rem' }}>Generación anterior</h3>
+              </details>
+              <details className="telemetry-disclosure">
+                <summary>Detalles NEAT</summary>
+              <p className="telemetry-help">Resultados de la última generación evaluada.</p>
               <dl>
                 <dt>Mejor puntuación</dt>
                 <dd>{metrics.bestFitness.toFixed(0)}</dd>
@@ -281,6 +285,8 @@ export function NeatTrainingHud({
                 <dt>Especies</dt>
                 <dd>{metrics.speciesCount}</dd>
               </dl>
+              <p className="telemetry-help">Las especies agrupan redes neuronales similares. La puntuación combina sectores superados, vueltas, distancia y supervivencia.</p>
+              </details>
             </section>
           )}
 
