@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import type { TrainingRun } from '../api/training.api.ts'
 import { Link } from 'react-router-dom'
@@ -24,6 +24,30 @@ export function TrainingRunSelector({
   localOnly = false,
 }: TrainingRunSelectorProps) {
   const [name, setName] = useState('Entrenamiento NEAT')
+  const [pendingDelete, setPendingDelete] = useState<TrainingRun | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const deleteDialog = useRef<HTMLDialogElement>(null)
+  const cancelDelete = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    if (pendingDelete) {
+      deleteDialog.current?.showModal()
+      cancelDelete.current?.focus()
+    } else if (deleteDialog.current?.open) deleteDialog.current.close()
+  }, [pendingDelete])
+
+  async function confirmDelete() {
+    if (!pendingDelete || deleting || busy) return
+    setDeleting(true)
+    try {
+      await onDelete(pendingDelete)
+      setPendingDelete(null)
+    } catch {
+      setDeleteError('No se pudo eliminar el entrenamiento. Inténtalo de nuevo.')
+    } finally {
+      setDeleting(false)
+    }
+  }
   const [seed, setSeed] = useState(() =>
     Math.floor(Math.random() * 2_147_483_648),
   )
@@ -144,18 +168,37 @@ export function TrainingRunSelector({
                 className="run-item__delete"
                 disabled={busy}
                 onClick={() => {
-                  if (
-                    window.confirm(`¿Eliminar "${run.name}" y sus checkpoints?`)
-                  ) {
-                    void onDelete(run)
-                  }
+                  setDeleteError(null)
+                  setPendingDelete(run)
                 }}
               >
+                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" /></svg>
                 Eliminar
               </button>
             </article>
           ))}
         </div>
+        <dialog
+          ref={deleteDialog}
+          className="run-delete-dialog"
+          aria-labelledby="run-delete-title"
+          aria-describedby="run-delete-description"
+          onCancel={(event) => {
+            if (deleting) event.preventDefault()
+            else setPendingDelete(null)
+          }}
+          onClose={() => setPendingDelete(null)}
+        >
+          <p className="eyebrow">Entrenamiento guardado</p>
+          <h2 id="run-delete-title">¿Eliminar entrenamiento?</h2>
+          <strong className="run-delete-dialog__name">{pendingDelete?.name}</strong>
+          <p id="run-delete-description">Se eliminarán su progreso y sus puntos de guardado. Esta acción no se puede deshacer.</p>
+          {deleteError && <p role="alert" className="form-error">{deleteError}</p>}
+          <div className="run-delete-dialog__actions">
+            <button ref={cancelDelete} type="button" disabled={deleting} onClick={() => setPendingDelete(null)}>Conservar</button>
+            <button type="button" className="run-delete-dialog__confirm" disabled={deleting || busy} onClick={() => void confirmDelete()}>{deleting ? 'Eliminando…' : 'Eliminar entrenamiento'}</button>
+          </div>
+        </dialog>
       </div>
     </section>
   )

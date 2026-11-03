@@ -1323,3 +1323,40 @@ small {
   text-align: left;
   font-size: 13px;
 }
+
+.run-item__delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid #b969554d;
+  border-radius: 5px;
+  background: #241d1c;
+  color: #e6a695;
+  font-size: 12px;
+  transition: background 150ms, border-color 150ms;
+}
+.run-item__delete:hover:not(:disabled) { background: #3b2421; border-color: #dc8a73; color: #ffd0c2; }
+.run-item__delete svg { flex-shrink: 0; }
+.run-delete-dialog {
+  box-sizing: border-box;
+  width: min(440px, calc(100% - 2rem));
+  max-height: calc(100svh - 2rem);
+  overflow: auto;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  border: 1px solid #67443a;
+  border-top: 3px solid #e59880;
+  border-radius: 8px;
+  color: #e3eadf;
+  background: #17201e;
+  box-shadow: 0 24px 80px #0009;
+}
+.run-delete-dialog::backdrop { background: #070d10c7; backdrop-filter: blur(5px); }
+.run-delete-dialog h2 { margin: 0.7rem 0 1.2rem; font-size: 1.6rem; }
+.run-delete-dialog__name { display: block; padding: 0.8rem; border: 1px solid #ffffff18; background: #ffffff05; overflow-wrap: anywhere; }
+.run-delete-dialog > p:not(.eyebrow) { font-size: 13px; line-height: 1.7; color: #b6c3b9; }
+.run-delete-dialog__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.65rem; margin-top: 1.5rem; }
+.run-delete-dialog__actions button { font-size: 12px; border-radius: 4px; }
+.run-delete-dialog__confirm { background: #793c30; color: #fff0e8; border-color: #bd745f; }
+.run-delete-dialog__confirm:hover:not(:disabled) { background: #914938; }
