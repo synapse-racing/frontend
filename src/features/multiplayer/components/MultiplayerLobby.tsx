@@ -44,6 +44,11 @@ export function MultiplayerLobby({
     capacity <= 64
   const [trackSeed, setTrackSeed] = useState(0)
   const roomTrackSeed = room?.track.seed
+  const joinError = error
+    ? /room not found/i.test(error)
+      ? 'No encontramos una sala con ese código. Revisa el código e inténtalo de nuevo.'
+      : error
+    : null
 
   useEffect(() => {
     if (roomTrackSeed !== undefined) setTrackSeed(roomTrackSeed)
@@ -111,9 +116,13 @@ export function MultiplayerLobby({
               />
             </label>
             <button disabled={busy || code.length !== 6}>Entrar</button>
+            {joinError && (
+              <p className="multiplayer-error multiplayer-error--inline" role="alert">
+                {joinError}
+              </p>
+            )}
           </form>
         </div>
-        {error && <p className="multiplayer-error">{error}</p>}
       </section>
     )
   }
