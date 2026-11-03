@@ -1,5 +1,6 @@
 import type { MouseEvent } from 'react'
 import { Link } from 'react-router-dom'
+import { ErrorNotice } from '../../../shared/components/ErrorNotice.tsx'
 
 export type SaveState = 'saved' | 'dirty' | 'saving' | 'error' | 'success'
 
@@ -21,9 +22,9 @@ export function GarageTopBar({
         SYNAPSE <b>/</b> MOTOR WORKS
       </span>
       <div className="garage-save-status" aria-live="polite">
-        {state === 'error' || state === 'success' ? (
+        {state === 'error' ? <ErrorNotice error={message} compact /> : state === 'success' ? (
           <p
-            role={state === 'error' ? 'alert' : 'status'}
+            role="status"
             className={`garage-chip is-${state}`}
           >
             {message}

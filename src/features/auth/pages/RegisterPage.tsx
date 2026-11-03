@@ -1,7 +1,8 @@
+import { ErrorNotice } from '../../../shared/components/ErrorNotice.tsx'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
-import { ApiError } from '../../../shared/api/http.ts'
+import { errorMessage } from '../../../shared/errors/user-errors.ts'
 import { requestGuestImport } from '../../training/persistence/import-guest-training.ts'
 import { AuthLayout } from '../components/AuthLayout.tsx'
 import { useAuth } from '../context/useAuth.ts'
@@ -26,9 +27,7 @@ export function RegisterPage() {
     } catch (error) {
       setError('root', {
         message:
-          error instanceof ApiError
-            ? error.message
-            : 'No se pudo crear la cuenta',
+          errorMessage(error, 'No se pudo crear la cuenta'),
       })
     }
   })
@@ -67,7 +66,7 @@ export function RegisterPage() {
           )}
         </label>
 
-        {errors.root && <p className="form-error">{errors.root.message}</p>}
+        <ErrorNotice error={errors.root?.message} />
 
         <button className="primary-button" disabled={isSubmitting}>
           {isSubmitting ? 'Creando cuenta...' : 'Crear cuenta'}

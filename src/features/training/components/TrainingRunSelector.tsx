@@ -1,3 +1,4 @@
+import { ErrorNotice } from '../../../shared/components/ErrorNotice.tsx'
 import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import type { TrainingRun } from '../api/training.api.ts'
@@ -141,7 +142,7 @@ export function TrainingRunSelector({
           </button>
         </form>
 
-        {error && <p className="form-error">{error}</p>}
+        <ErrorNotice error={error} />
 
         <div className="run-list">
           {runs.length === 0 && !busy && (
@@ -193,7 +194,7 @@ export function TrainingRunSelector({
           <h2 id="run-delete-title">¿Eliminar entrenamiento?</h2>
           <strong className="run-delete-dialog__name">{pendingDelete?.name}</strong>
           <p id="run-delete-description">Se eliminarán su progreso y sus puntos de guardado. Esta acción no se puede deshacer.</p>
-          {deleteError && <p role="alert" className="form-error">{deleteError}</p>}
+          <ErrorNotice error={deleteError} />
           <div className="run-delete-dialog__actions">
             <button ref={cancelDelete} type="button" disabled={deleting} onClick={() => setPendingDelete(null)}>Conservar</button>
             <button type="button" className="run-delete-dialog__confirm" disabled={deleting || busy} onClick={() => void confirmDelete()}>{deleting ? 'Eliminando…' : 'Eliminar entrenamiento'}</button>

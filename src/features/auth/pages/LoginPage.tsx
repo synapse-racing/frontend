@@ -1,8 +1,9 @@
+import { ErrorNotice } from '../../../shared/components/ErrorNotice.tsx'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { requestGuestImport } from '../../training/persistence/import-guest-training.ts'
-import { ApiError } from '../../../shared/api/http.ts'
+import { errorMessage } from '../../../shared/errors/user-errors.ts'
 import { AuthLayout } from '../components/AuthLayout.tsx'
 import { useAuth } from '../context/useAuth.ts'
 import { loginSchema, type LoginFormData } from '../schemas/auth.schemas.ts'
@@ -24,9 +25,7 @@ export function LoginPage() {
     } catch (error) {
       setError('root', {
         message:
-          error instanceof ApiError
-            ? error.message
-            : 'No se pudo iniciar sesión',
+          errorMessage(error, 'No se pudo iniciar sesión'),
       })
     }
   })
@@ -57,7 +56,7 @@ export function LoginPage() {
           )}
         </label>
 
-        {errors.root && <p className="form-error">{errors.root.message}</p>}
+        <ErrorNotice error={errors.root?.message} />
 
         <button className="primary-button" disabled={isSubmitting}>
           {isSubmitting ? 'Ingresando...' : 'Ingresar'}

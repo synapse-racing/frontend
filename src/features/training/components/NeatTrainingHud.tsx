@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { ErrorNotice } from '../../../shared/components/ErrorNotice.tsx'
 import { Link } from 'react-router-dom'
 import type { GenerationMetrics } from '../neat/population.ts'
 import {
@@ -220,10 +221,8 @@ export function NeatTrainingHud({
 
       {/* Persistence Error Alert */}
       {persistenceStatus === 'error' && onRetrySave && (
-        <section className="telemetry-panel" role="alert" style={{ top: '4.5rem', left: '1rem', right: 'auto' }}>
-          <p style={{ margin: '0 0 0.8rem', fontSize: '12px' }}>
-            No se pudo guardar la generación. El entrenamiento está pausado para conservarla.
-          </p>
+        <section className="telemetry-panel" style={{ top: '4.5rem', left: '1rem', right: 'auto' }}>
+          <ErrorNotice error="No se pudo guardar la generación. El entrenamiento está pausado para conservarla. Reintenta el guardado." />
           <button type="button" className="primary-button" onClick={onRetrySave}>
             Reintentar guardado
           </button>

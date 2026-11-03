@@ -23,10 +23,10 @@ export class AppErrorBoundary extends Component<
       return (
         <main className="fatal-error">
           <p className="eyebrow">Error de aplicación</p>
-          <h1>No pudimos renderizar esta pantalla.</h1>
+          <h1>No pudimos mostrar esta pantalla.</h1>
           <p>
-            La sesión y los entrenamientos guardados permanecen seguros. Puedes
-            recargar o volver al inicio.
+            Ocurrió un error inesperado. Puedes recargar o volver al inicio.
+            Los cambios que aún no se hayan guardado podrían perderse.
           </p>
           <div>
             <button onClick={() => window.location.reload()}>Recargar</button>

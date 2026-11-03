@@ -1,3 +1,4 @@
+import { errorMessage } from '../../../shared/errors/user-errors.ts'
 import { SceneCanvas } from '../../../shared/three/SceneCanvas.tsx'
 import { useAppearance } from '../../garage/context/appearance-context.ts'
 import type { CarPose, RaceCameraMode } from '../../../shared/three/RaceCamera.tsx'
@@ -132,7 +133,7 @@ export function NeatTrainingPage() {
     enabled: isGuest || Boolean(auth.accessToken),
     queryFn: () => {
       if (isGuest) return guestTraining.listGuestRuns()
-      if (!auth.accessToken) throw new Error('Authentication required')
+      if (!auth.accessToken) throw new ApiError('Authentication required', 401)
       return trainingApi.listTrainingRuns(auth.accessToken)
     },
   })
@@ -145,7 +146,7 @@ export function NeatTrainingPage() {
   )
 
   async function withFreshAccess<T>(operation: (token: string) => Promise<T>) {
-    if (!auth.accessToken) throw new Error('Authentication required')
+    if (!auth.accessToken) throw new ApiError('Authentication required', 401)
     try {
       return await operation(auth.accessToken)
     } catch (error) {
@@ -210,7 +211,7 @@ export function NeatTrainingPage() {
       await runsQuery.refetch()
     } catch (error) {
       setSelectorError(
-        error instanceof Error ? error.message : 'No se pudo crear',
+        errorMessage(error, 'No se pudo crear el entrenamiento. Inténtalo de nuevo.'),
       )
     } finally {
       setSelectorBusy(false)
@@ -233,7 +234,7 @@ export function NeatTrainingPage() {
       await updateRunStatus(run.id, 'PAUSED')
     } catch (error) {
       setSelectorError(
-        error instanceof Error ? error.message : 'No se pudo cargar',
+        errorMessage(error, 'No se pudo cargar el entrenamiento. Inténtalo de nuevo.'),
       )
     } finally {
       setSelectorBusy(false)
@@ -251,7 +252,7 @@ export function NeatTrainingPage() {
       await runsQuery.refetch()
     } catch (error) {
       setSelectorError(
-        error instanceof Error ? error.message : 'No se pudo eliminar',
+        errorMessage(error, 'No se pudo eliminar el entrenamiento. Inténtalo de nuevo.'),
       )
     } finally {
       setSelectorBusy(false)
@@ -498,7 +499,7 @@ export function NeatTrainingPage() {
     }
 
     return () => window.clearTimeout(timer)
-  }, [engine, selectedRun, status])
+  }, [engine, selectedRun, status, activeTrack.checkpoints.length])
 
   async function retrySave() {
     const pending = pendingSave.current
@@ -678,7 +679,7 @@ export function NeatTrainingPage() {
           busy={selectorBusy || runsQuery.isLoading}
           error={
             selectorError ??
-            (runsQuery.error instanceof Error ? runsQuery.error.message : null)
+            (runsQuery.error ? errorMessage(runsQuery.error) : null)
           }
           onCreate={createRun}
           onDelete={deleteRun}

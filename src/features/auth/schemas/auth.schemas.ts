@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const loginSchema = z.object({
   email: z.string().email('Ingresa un correo válido'),
-  password: z.string().min(1, 'Ingresa tu contraseña').max(72),
+  password: z.string().min(1, 'Ingresa tu contraseña').max(72, 'Usa como máximo 72 caracteres'),
 })
 
 export const registerSchema = loginSchema.extend({

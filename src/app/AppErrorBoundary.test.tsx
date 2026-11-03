@@ -22,7 +22,7 @@ describe('AppErrorBoundary', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'No pudimos renderizar esta pantalla.',
+        name: 'No pudimos mostrar esta pantalla.',
       }),
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Recargar' })).toBeInTheDocument()

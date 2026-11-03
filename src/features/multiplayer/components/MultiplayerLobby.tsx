@@ -1,3 +1,4 @@
+import { ErrorNotice } from '../../../shared/components/ErrorNotice.tsx'
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import type { RoomState } from '../types/multiplayer.ts'
@@ -44,12 +45,6 @@ export function MultiplayerLobby({
     capacity <= 64
   const [trackSeed, setTrackSeed] = useState(0)
   const roomTrackSeed = room?.track.seed
-  const joinError = error
-    ? /room not found/i.test(error)
-      ? 'No encontramos una sala con ese código. Revisa el código e inténtalo de nuevo.'
-      : error
-    : null
-
   useEffect(() => {
     if (roomTrackSeed !== undefined) setTrackSeed(roomTrackSeed)
   }, [roomTrackSeed])
@@ -116,11 +111,7 @@ export function MultiplayerLobby({
               />
             </label>
             <button disabled={busy || code.length !== 6}>Entrar</button>
-            {joinError && (
-              <p className="multiplayer-error multiplayer-error--inline" role="alert">
-                {joinError}
-              </p>
-            )}
+            <ErrorNotice error={error} />
           </form>
         </div>
       </section>
@@ -294,7 +285,7 @@ export function MultiplayerLobby({
         )}
       </div>
 
-      {error && <p className="multiplayer-error">{error}</p>}
+      <ErrorNotice error={error} />
       <div className="lobby-actions">
         <button onClick={onLeave}>Salir</button>
         <button

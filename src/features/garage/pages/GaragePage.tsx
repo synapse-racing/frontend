@@ -1,3 +1,5 @@
+import { ErrorNotice } from '../../../shared/components/ErrorNotice.tsx'
+import { errorMessage } from '../../../shared/errors/user-errors.ts'
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAppearance } from '../context/appearance-context.ts'
@@ -36,7 +38,7 @@ export function GaragePage() {
     return (
       <main className="garage-loading">
         <h1>Tu box te espera.</h1>
-        <p role="alert">No se pudo cargar el auto de tu cuenta.</p>
+        <ErrorNotice error="No se pudo cargar el auto de tu cuenta. Inténtalo de nuevo." />
         <button onClick={garage.reload}>Reintentar</button>
         <Link to="/dashboard">Volver al Paddock</Link>
       </main>
@@ -136,9 +138,7 @@ function GarageEditor() {
     } catch (cause) {
       setError(true)
       setMessage(
-        cause instanceof Error
-          ? cause.message
-          : 'No se pudo guardar. Puedes reintentarlo sin perder tu diseño.',
+        errorMessage(cause, 'No se pudo guardar. Puedes reintentarlo sin perder tu diseño.'),
       )
       return false
     }

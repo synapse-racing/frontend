@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { errorMessage } from '../../../shared/errors/user-errors.ts'
 import { useAuth } from '../../auth/context/useAuth.ts'
 import {
   connectMultiplayer,
@@ -43,7 +44,7 @@ export function MultiplayerPage() {
       setError('No se pudo conectar con el servidor multijugador')
     })
     socket.on('disconnect', () => setConnection('disconnected'))
-    socket.on('server:error', (serverError) => setError(serverError.message))
+    socket.on('server:error', (serverError) => setError(errorMessage(serverError)))
     socket.on('room:state', (state) => {
       setRoom(state)
       setError(null)

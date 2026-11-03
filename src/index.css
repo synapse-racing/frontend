@@ -1360,3 +1360,29 @@ small {
 .run-delete-dialog__actions button { font-size: 12px; border-radius: 4px; }
 .run-delete-dialog__confirm { background: #793c30; color: #fff0e8; border-color: #bd745f; }
 .run-delete-dialog__confirm:hover:not(:disabled) { background: #914938; }
+
+.error-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+  padding: 0.9rem;
+  margin: 0.75rem 0;
+  border: 1px solid #ad66564d;
+  border-left: 3px solid #e59880;
+  border-radius: 6px;
+  background: #302322;
+  color: #f0d9cf;
+  text-align: left;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.error-notice__icon { display: grid; place-items: center; flex: 0 0 22px; height: 22px; border: 1px solid #e59880; border-radius: 50%; color: #ffc2ad; font: 700 13px monospace; }
+.error-notice > div { min-width: 0; }
+.error-notice strong { display: block; font: 700 13px/1.5 Arial, sans-serif; color: #ffe5da; }
+.error-notice p, .telemetry-panel .error-notice p { margin: 0.3rem 0; font: 12px/1.6 Arial, sans-serif; color: #d7c1b9; }
+.error-notice small { display: block; margin-top: 0.5rem; color: #b7a59f; font: 9px/1.5 monospace; }
+.error-notice a { display: inline-block; margin-top: 0.4rem; font-size: 12px; color: #ffd3a7; text-underline-offset: 3px; }
+.error-notice--compact { max-width: 360px; padding: 0.65rem; margin: 0; }
+.error-notice--compact .error-notice__icon { display: none; }

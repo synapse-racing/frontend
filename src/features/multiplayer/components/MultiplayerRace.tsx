@@ -1,3 +1,4 @@
+import { ErrorNotice } from '../../../shared/components/ErrorNotice.tsx'
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { SnapshotTimeline } from '../domain/snapshotTimeline.ts'
 import { SceneCanvas } from '../../../shared/three/SceneCanvas.tsx'
@@ -158,7 +159,7 @@ export function MultiplayerRace({
             }
             disabled={controlsDisabled || snapshot.status === 'FINISHED'}
           />
-          {error && <span role="alert">{error}</span>}
+          <ErrorNotice error={error} compact />
           <button
             onClick={() =>
               setCameraMode(cameraMode === 'follow' ? 'free' : 'follow')

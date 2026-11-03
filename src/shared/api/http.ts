@@ -1,4 +1,5 @@
 import { environment } from '../config/environment.ts'
+import { getUserError } from '../errors/user-errors.ts'
 
 interface ApiRequestOptions extends RequestInit {
   token?: string | null
@@ -10,11 +11,14 @@ interface ErrorBody {
 
 export class ApiError extends Error {
   readonly status: number
+  readonly code: string
 
   constructor(message: string, status: number) {
-    super(message)
+    const detail = getUserError({ message, status })
+    super(detail.message)
     this.name = 'ApiError'
     this.status = status
+    this.code = detail.code
   }
 }
 
@@ -34,13 +38,17 @@ export async function apiRequest<T>(
     ...options,
     credentials: 'include',
     headers: requestHeaders,
+  }).catch(() => {
+    throw new ApiError('Failed to fetch', 0)
   })
 
   if (!response.ok) {
-    const body = (await response.json().catch(() => ({}))) as ErrorBody
-    const message = Array.isArray(body.message)
-      ? body.message.join('. ')
-      : (body.message ?? 'No se pudo completar la solicitud')
+    const body = (await response.json().catch(() => null)) as ErrorBody | null
+    const message = Array.isArray(body?.message)
+      ? body.message.filter((item) => typeof item === 'string').join('. ')
+      : typeof body?.message === 'string'
+        ? body.message
+        : 'No se pudo completar la solicitud'
     throw new ApiError(message, response.status)
   }
 

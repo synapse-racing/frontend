@@ -91,7 +91,7 @@ export function AppearanceProvider({ children }: PropsWithChildren) {
   async function save(value: VehicleAppearance) {
     const parsed = parseAppearance(value)
     if (!parsed)
-      throw new Error('Revisa los colores y usa un número entre 1 y 99.')
+      throw new Error('Revisa los colores y usa un número entre 1 y 67.')
     if (inFlight.current.has(owner))
       throw new Error('Espera a que termine el guardado actual.')
     inFlight.current.add(owner)
