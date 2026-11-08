@@ -18,9 +18,9 @@ const { evaluateGenome } = require(path.join(frontend, 'neat/genome.ts'))
 const { generateTrack } = require(path.join(frontend, 'domain/track.ts'))
 const { calculateFitness } = require(path.join(frontend, 'domain/fitness.ts'))
 const { createSimulationState, senseSimulation, stepSimulation } = require(path.join(frontend, 'simulation/race-contract.ts'))
-const { RaceSimulation, senseTrack } = require(path.join(backend, 'src/modules/multiplayer/domain/race.simulation.ts'))
-const { evaluateNeatGenome } = require(path.join(backend, 'src/modules/multiplayer/domain/neat-controller.ts'))
-const { generateTrack: generateServerTrack } = require(path.join(backend, 'src/modules/multiplayer/domain/track.ts'))
+const { RaceSimulation, senseTrack } = require(path.join(backend, 'libs/domain/src/race.simulation.ts'))
+const { evaluateNeatGenome } = require(path.join(backend, 'libs/domain/src/neat-controller.ts'))
+const { generateTrack: generateServerTrack } = require(path.join(backend, 'libs/domain/src/track.ts'))
 let comparisons = 0
 
 function evaluate(genome, recipe) {
