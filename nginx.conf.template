@@ -1,5 +1,10 @@
-upstream synapse_backend {
-    server backend:3000;
+upstream core_api {
+    server ${CORE_API_UPSTREAM};
+    keepalive 32;
+}
+
+upstream multiplayer {
+    server ${MULTIPLAYER_UPSTREAM};
     keepalive 32;
 }
 
@@ -34,7 +39,7 @@ server {
     }
 
     location /api/ {
-        proxy_pass http://synapse_backend;
+        proxy_pass http://core_api;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -43,7 +48,7 @@ server {
     }
 
     location /socket.io/ {
-        proxy_pass http://synapse_backend;
+        proxy_pass http://multiplayer;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";

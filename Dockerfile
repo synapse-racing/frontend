@@ -15,7 +15,13 @@ RUN pnpm build
 
 FROM nginxinc/nginx-unprivileged:1.29-alpine AS runtime
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Upstreams are substituted at container start from these variables, so the
+# same image works for the monolith (both -> backend:3000) and the split
+# deployment (core-api and multiplayer on different hosts).
+ENV CORE_API_UPSTREAM=core-api:3001 \
+    MULTIPLAYER_UPSTREAM=multiplayer:3002
+
+COPY nginx.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build --chown=101:101 /app/dist /usr/share/nginx/html
 
 USER 101

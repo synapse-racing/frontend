@@ -121,14 +121,25 @@ Private rooms for up to 64 players via Socket.IO. The backend runs the authorita
 
 ## Docker
 
-The `Dockerfile` builds a production image with an Nginx server. It serves the SPA, falls back all unknown routes to `index.html`, and proxies `/api` and `/socket.io` to the backend container.
+The `Dockerfile` builds a production image with an Nginx server on port `8080`. It serves the SPA, falls back all unknown routes to `index.html`, proxies `/api/` to `CORE_API_UPSTREAM` and `/socket.io/` to `MULTIPLAYER_UPSTREAM`. Both variables are substituted into the Nginx template when the container starts, so one image covers monolith and split deployments.
 
 ```bash
 docker build -t synapse-frontend .
-docker run -p 80:80 synapse-frontend
+
+# Split deployment (defaults: core-api:3001 and multiplayer:3002)
+docker run -p 80:8080 \
+  -e CORE_API_UPSTREAM=10.0.0.5:3001 \
+  -e MULTIPLAYER_UPSTREAM=10.0.0.6:3002 \
+  synapse-frontend
+
+# Monolith: both upstreams point at the same backend
+docker run -p 80:8080 \
+  -e CORE_API_UPSTREAM=backend:3000 \
+  -e MULTIPLAYER_UPSTREAM=backend:3000 \
+  synapse-frontend
 ```
 
-See the backend repository for the full `compose.prod.yaml` stack.
+See the backend repository for the full `compose.prod.yaml` and `compose.dist.yaml` stacks.
 
 ## Repository guidance
 
