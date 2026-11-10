@@ -41,7 +41,9 @@ it('returns to the paddock directly when there are no changes', async () => {
   const user = userEvent.setup()
   const value = mount()
   await user.click(screen.getByRole('button', { name: /Volver al Paddock/ }))
-  expect(screen.getByRole('heading', { name: 'Paddock' })).toBeInTheDocument()
+  expect(
+    await screen.findByRole('heading', { name: 'Paddock' }),
+  ).toBeInTheDocument()
   expect(value.save).not.toHaveBeenCalled()
 })
 
@@ -94,7 +96,9 @@ it('saves and returns to the paddock in a single step', async () => {
     ...defaultAppearance,
     finish: 'metallic',
   })
-  expect(screen.getByRole('heading', { name: 'Paddock' })).toBeInTheDocument()
+  expect(
+    await screen.findByRole('heading', { name: 'Paddock' }),
+  ).toBeInTheDocument()
 })
 
 it('stays in the garage when saving and returning fails', async () => {
@@ -102,7 +106,7 @@ it('stays in the garage when saving and returning fails', async () => {
   mount({ save: vi.fn().mockRejectedValue(new Error('Sin conexión')) })
   await user.click(screen.getByRole('button', { name: /Spectre P1/ }))
   await user.click(screen.getByRole('button', { name: 'Guardar y volver' }))
-  expect(screen.getByRole('alert')).toHaveTextContent('Sin conexión')
+  expect(screen.getByRole('alert')).toHaveTextContent('Comprueba tu conexión')
   expect(
     screen.queryByRole('heading', { name: 'Paddock' }),
   ).not.toBeInTheDocument()
@@ -117,7 +121,7 @@ it('keeps a failed save editable and retries the same design', async () => {
   mount({ save })
   await user.click(screen.getByRole('button', { name: /Spectre P1/ }))
   await user.click(screen.getByRole('button', { name: 'Guardar' }))
-  expect(screen.getByRole('alert')).toHaveTextContent('Sin conexión')
+  expect(screen.getByRole('alert')).toHaveTextContent('Comprueba tu conexión')
   expect(screen.getByRole('button', { name: /Spectre P1/ })).toHaveAttribute(
     'aria-pressed',
     'true',
@@ -145,7 +149,9 @@ it('asks before leaving with unsaved changes and can save on the way out', async
     ...defaultAppearance,
     modelId: 'gt',
   })
-  expect(screen.getByRole('heading', { name: 'Paddock' })).toBeInTheDocument()
+  expect(
+    await screen.findByRole('heading', { name: 'Paddock' }),
+  ).toBeInTheDocument()
 })
 
 it('discards changes from the leave dialog', async () => {
@@ -154,7 +160,9 @@ it('discards changes from the leave dialog', async () => {
   await user.click(screen.getByRole('button', { name: /Veloce GT/ }))
   await user.click(screen.getByRole('link', { name: /Paddock/ }))
   await user.click(screen.getByRole('button', { name: 'Descartar y salir' }))
-  expect(screen.getByRole('heading', { name: 'Paddock' })).toBeInTheDocument()
+  expect(
+    await screen.findByRole('heading', { name: 'Paddock' }),
+  ).toBeInTheDocument()
   expect(value.preview).toHaveBeenLastCalledWith(null)
   expect(value.save).not.toHaveBeenCalled()
 })

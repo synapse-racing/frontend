@@ -95,7 +95,7 @@ it('keeps local data on upload failure and removes it only after a successful ac
     )
   vi.stubGlobal('fetch', fetch)
   await expect(importGuestTrainings('token', vi.fn())).rejects.toThrow(
-    'Offline',
+    'Comprueba tu conexión',
   )
   expect(await listGuestRuns()).toHaveLength(1)
   expect(await importGuestTrainings('token', vi.fn())).toBe(1)

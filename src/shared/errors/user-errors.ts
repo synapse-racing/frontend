@@ -42,7 +42,7 @@ const rules: [RegExp, string][] = [
   [/invalid credentials/i, 'INVALID_CREDENTIALS'],
   [/authentication required|unauthorized|invalid session|jwt expired|sesión (?:cambió|no está|.*vencid)/i, 'UNAUTHORIZED'],
   [/email or username.*in use|already (?:registered|exists)/i, 'ACCOUNT_CONFLICT'],
-  [/failed to fetch|fetch failed|networkerror|load failed|network request|no se pudo conectar/i, 'NETWORK'],
+  [/failed to fetch|fetch failed|networkerror|load failed|network request|no se pudo conectar|offline|sin conexión/i, 'NETWORK'],
   [/room not found/i, 'ROOM_NOT_FOUND'], [/room is full/i, 'ROOM_FULL'],
   [/race has already started/i, 'RACE_STARTED'], [/only the host/i, 'HOST_REQUIRED'],
   [/trained genome|needs a genome/i, 'GENOME_REQUIRED'], [/at least two players/i, 'PLAYERS_REQUIRED'],

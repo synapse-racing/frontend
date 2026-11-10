@@ -172,7 +172,7 @@ describe('authentication navigation', () => {
     expect(fetch).not.toHaveBeenCalled()
     await userEvent.click(screen.getByRole('link', { name: /MULTIJUGADOR/ }))
     expect(
-      await screen.findByRole('heading', { name: 'Compite con una cuenta.' }),
+      await screen.findByRole('heading', { name: 'La parrilla te espera.' }),
     ).toBeInTheDocument()
   })
 
@@ -223,7 +223,7 @@ describe('authentication navigation', () => {
     )
     await user.click(
       await screen.findByRole('link', {
-        name: /Crear cuenta y guardar progreso/,
+        name: /^Crear cuenta/,
       }),
     )
     await user.type(screen.getByLabelText('Nombre de usuario'), 'driver_one')
