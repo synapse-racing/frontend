@@ -1,9 +1,33 @@
 import { ErrorNotice } from '../../../shared/components/ErrorNotice.tsx'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import type { TrainingRun } from '../api/training.api.ts'
 import { Link } from 'react-router-dom'
 import { TrackMap } from '../../../shared/game/TrackMap.tsx'
+import { generateTrack } from '../domain/track.ts'
+
+const TRACK_VERSION = 'grand-prix-v3'
+const statusLabels: Record<TrainingRun['status'], string> = {
+  PAUSED: 'Pausado',
+  RUNNING: 'En curso',
+  COMPLETED: 'Completado',
+}
+
+function savedAtLabel(value: string) {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return 'Fecha desconocida'
+  return new Intl.DateTimeFormat('es-ES', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }).format(date)
+}
+
+function sectorCountFor(run: TrainingRun) {
+  return generateTrack(
+    run.config.track ?? { version: TRACK_VERSION, seed: run.seed },
+  ).checkpoints.length
+}
 
 interface TrainingRunSelectorProps {
   busy: boolean
@@ -52,6 +76,11 @@ export function TrainingRunSelector({
   const [seed, setSeed] = useState(() =>
     Math.floor(Math.random() * 2_147_483_648),
   )
+  const safeSeed = Number.isSafeInteger(seed) ? seed : 0
+  const newSectorCount = useMemo(
+    () => generateTrack({ version: TRACK_VERSION, seed: safeSeed }).checkpoints.length,
+    [safeSeed],
+  )
 
   async function submit(event: FormEvent) {
     event.preventDefault()
@@ -60,16 +89,16 @@ export function TrainingRunSelector({
   }
 
   return (
-    <section className="run-selector" aria-label="Entrenamientos guardados">
+    <section className="run-selector" aria-label="Entrenamiento NEAT">
       <div className="run-selector__panel">
         <div className="run-selector__header">
-          <p className="eyebrow">01 / ENTRENAMIENTO NEAT</p>
+          <p className="eyebrow">01 / PADDOCK</p>
           <Link to="/dashboard" className="run-selector__back">← Paddock</Link>
         </div>
-        <h1>Inicia tu entrenamiento.</h1>
+        <h1>Entrenamiento NEAT</h1>
         <p className="run-selector__lead">
-          Configura el circuito, lanza una nueva población de pilotos o continúa
-          una sesión guardada.
+          Configura el circuito, inicia una nueva población de pilotos o continúa
+          un entrenamiento guardado.
         </p>
         {localOnly && (
           <p className="guest-training-note">
@@ -83,7 +112,7 @@ export function TrainingRunSelector({
             className="run-selector__create run-setup"
             onSubmit={(event) => void submit(event)}
           >
-            <h2>Nuevo entrenamiento</h2>
+            <h2>Nuevo entrenamiento NEAT</h2>
             <label>
               Nombre del entrenamiento
               <input
@@ -98,15 +127,12 @@ export function TrainingRunSelector({
             <div className="track-preset track-preset--selected">
               <div className="track-preset__header">
                 <span>Pista de pruebas · Desierto</span>
-                <span className="track-preset__seed-badge">#{Number.isSafeInteger(seed) ? seed : 0}</span>
+                <span className="track-preset__seed-badge">Semilla #{safeSeed}</span>
               </div>
-              <TrackMap
-                recipe={{
-                  version: 'grand-prix-v3',
-                  seed: Number.isSafeInteger(seed) ? seed : 0,
-                }}
-              />
-              <small>Circuito cerrado · 16 sectores de control</small>
+              <TrackMap recipe={{ version: TRACK_VERSION, seed: safeSeed }} />
+              <small>
+                Circuito cerrado · {newSectorCount} sectores de control
+              </small>
             </div>
 
             <label>
@@ -147,9 +173,9 @@ export function TrainingRunSelector({
             </button>
           </form>
 
-          <section className="run-selector__saved-section" aria-label="Sesiones guardadas">
+          <section className="run-selector__saved-section" aria-label="Entrenamientos guardados">
             <div className="run-list__header">
-              <h2>Sesiones guardadas</h2>
+              <h2>Entrenamientos guardados</h2>
               <span>
                 {runs.length} {runs.length === 1 ? 'guardado' : 'guardados'}
               </span>
@@ -160,7 +186,8 @@ export function TrainingRunSelector({
             <div className="run-list">
               {runs.length === 0 && !busy && (
                 <p className="run-list__empty">
-                  Aún no tienes entrenamientos guardados. Configura uno a la izquierda para comenzar a evaluar tus pilotos.
+                  Aún no tienes entrenamientos guardados. Configura uno a la izquierda
+                  para comenzar a evaluar tus pilotos.
                 </p>
               )}
               {runs.map((run) => (
@@ -172,13 +199,28 @@ export function TrainingRunSelector({
                   >
                     <span className="run-item__title">{run.name}</span>
                     <div className="run-item__stats">
-                      <span className="run-item__pill">Gen. {run.currentGeneration}</span>
+                      <span
+                        className="run-item__status"
+                        data-status={run.status.toLowerCase()}
+                      >
+                        {statusLabels[run.status]}
+                      </span>
+                      <span className="run-item__pill">
+                        Generación {run.currentGeneration}
+                      </span>
                       <span className="run-item__metric">
-                        Récord: <strong>{run.bestFitness.toFixed(0)} pts</strong>
+                        Mejor puntuación:{' '}
+                        <strong>{run.bestFitness.toFixed(0)} pts</strong>
                       </span>
                       <span className="run-item__seed">
-                        Semilla: #{run.config.track?.seed ?? run.seed}
+                        Semilla #{run.config.track?.seed ?? run.seed}
                       </span>
+                      <span className="run-item__sectors">
+                        {sectorCountFor(run)} sectores
+                      </span>
+                      <time className="run-item__date" dateTime={run.updatedAt}>
+                        Guardado el {savedAtLabel(run.updatedAt)}
+                      </time>
                     </div>
                   </button>
                   <button

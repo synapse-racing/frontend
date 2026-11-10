@@ -42,6 +42,8 @@ describe('TrainingRunSelector', () => {
       screen.getByRole('button', { name: /^Población guardada/ }),
     )
     expect(onLoad).toHaveBeenCalledWith(savedRun)
-    expect(screen.getByText(/Gen. 8/)).toBeInTheDocument()
+    expect(screen.getByText('Pausado')).toBeInTheDocument()
+    expect(screen.getByText(/Generación 8/)).toBeInTheDocument()
+    expect(screen.getByText(/Mejor puntuación/)).toBeInTheDocument()
   })
 })
