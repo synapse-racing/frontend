@@ -31,7 +31,7 @@ beforeEach(() => {
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
     fillRect: vi.fn(),
     fillText: vi.fn(),
-  } as unknown as CanvasRenderingContext2D)
+  } as unknown as ReturnType<HTMLCanvasElement['getContext']>)
 })
 
 afterEach(() => {

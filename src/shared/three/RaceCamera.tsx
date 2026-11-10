@@ -1,6 +1,6 @@
 import { OrbitControls } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Vector3 } from 'three'
 import { useReducedMotion } from '../game/preferences.ts'
 export interface CarPose {
@@ -9,6 +9,7 @@ export interface CarPose {
   yaw: number
 }
 export type RaceCameraMode = 'follow' | 'free'
+
 export function RaceCamera({
   mode,
   extent = 50,
@@ -22,7 +23,14 @@ export function RaceCamera({
   const reduced = useReducedMotion()
   const desired = useMemo(() => new Vector3(), [])
   const targetLook = useMemo(() => new Vector3(), [])
-  const look = useMemo(() => new Vector3(), [])
+  // Al remontar la escena, la vista libre arranca desde la orientación real de
+  // la cámara para no dar un salto al regenerar la generación.
+  const [look] = useState(() => {
+    if (mode !== 'free') return new Vector3(0, 0.5, 0)
+    return camera.position
+      .clone()
+      .add(camera.getWorldDirection(new Vector3()).multiplyScalar(25))
+  })
   const smoothedYaw = useRef<number | null>(null)
   const wasFollowing = useRef(false)
 

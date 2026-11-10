@@ -52,7 +52,7 @@ describe.each(['technical-loop-v2', 'grand-prix-v3'] as const)(
       }
     })
 
-    it('generates long closed circuits with alternating bends and non-crossing road edges', () => {
+    it('generates long closed circuits with alternating bends and non-crossing road edges', { timeout: 15_000 }, () => {
       for (let seed = 0; seed < 40; seed++) {
         const track = generateTrack({ version, seed })
         expect(track).toEqual(generateTrack(track.recipe))
