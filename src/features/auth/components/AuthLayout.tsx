@@ -7,7 +7,7 @@ export function AuthLayout({ children }: PropsWithChildren) {
     <main className="auth-shell">
       <header className="auth-access-header">
         <Link className="auth-brand" to="/">
-          ← SYNAPSE / RACING
+          ← SYNAPSE RACING
         </Link>
         <GameSettings />
       </header>

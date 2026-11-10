@@ -44,7 +44,8 @@
   position: absolute;
   bottom: 9rem;
   right: 3rem;
-  font: 11px monospace;
+  font-family: var(--font-data);
+  font-size: var(--text-xs);
   color: #eee4cf;
 }
 .menu-stage__shade {
@@ -80,12 +81,12 @@
   padding-top: 2rem;
 }
 .menu-stage .wordmark {
-  font-size: 13px;
+  font-size: var(--font-body);
   letter-spacing: 0.08em;
 }
-.wordmark__slash {
+.wordmark__accent {
   color: var(--accent);
-  padding: 0 0.5rem;
+  padding-left: 0.35rem;
 }
 .menu-stage .title-content {
   max-width: 760px;
@@ -102,14 +103,14 @@
   letter-spacing: 0.32em;
   color: #f3ebdc;
   margin: 0.25em 0 0 0.09em;
-  font-family: Impact, 'Arial Narrow', sans-serif;
+  font-family: var(--font-display);
   font-style: normal;
 }
 .title-kicker {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 10px;
+  font-size: var(--text-2xs);
   letter-spacing: 0.19em;
   color: #e6d1b0;
 }
@@ -120,7 +121,7 @@
 }
 .menu-stage .title-tagline {
   color: #d0d3c7;
-  font-size: 15px;
+  font-size: var(--font-sub);
   line-height: 1.65;
   margin: 2rem 0 2.4rem;
 }
@@ -130,7 +131,7 @@
   align-items: center;
   padding: 1rem 1.3rem;
   gap: 1rem;
-  font-size: 13px;
+  font-size: var(--font-body);
   box-shadow: 0 8px 35px #00000026;
 }
 .menu-stage .enter-button kbd {
@@ -147,7 +148,8 @@
   background: #ff996c;
 }
 .menu-stage .game-footer {
-  font-size: 9px;
+  font-family: var(--font-data);
+  font-size: var(--text-2xs);
   letter-spacing: 0.14em;
   color: #aeb7a7;
   border: 0;
@@ -189,7 +191,7 @@
 }
 .menu-stage .game-menu p {
   color: #bfc9bd;
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 .menu-stage .auth-shell {
   padding-bottom: 7rem;
@@ -203,7 +205,7 @@
   gap: 1rem;
 }
 .auth-intro__header .auth-brand {
-  font-size: 12px;
+  font-size: var(--text-sm);
   letter-spacing: 0.05em;
 }
 .menu-stage .auth-intro {
@@ -219,7 +221,7 @@
 .menu-stage .auth-intro > div > p:last-child {
   color: #e0dfcf;
   max-width: 25ch;
-  font-size: 14px;
+  font-size: var(--font-sub);
 }
 .menu-stage .auth-form-panel {
   padding: 2rem clamp(1.5rem, 4vw, 4rem);
@@ -285,7 +287,7 @@
     padding: 1rem 1.25rem;
   }
   .menu-stage .wordmark {
-    font-size: 10px;
+    font-size: var(--text-2xs);
   }
   .menu-stage .title-content {
     padding: 2rem 1.5rem 10rem;
@@ -301,14 +303,14 @@
     margin: 1.7rem 0;
   }
   .menu-stage .enter-button {
-    font-size: 11px;
+    font-size: var(--text-xs);
     gap: 0.7rem;
     width: 100%;
     max-width: 340px;
   }
   .menu-stage .game-footer {
     padding: 1rem 1.5rem;
-    font-size: 8px;
+    font-size: var(--text-2xs);
     gap: 0.75rem;
   }
   .menu-stage .game-footer > span:last-child {

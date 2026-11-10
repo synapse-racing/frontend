@@ -70,7 +70,9 @@
   bottom: 6rem;
   max-width: 230px;
   color: #bacbc6;
-  font: 11px/1.6 monospace;
+  font-family: var(--font-data);
+  font-size: var(--text-xs);
+  line-height: 1.6;
   text-align: right;
 }
 @media (max-width: 760px) {

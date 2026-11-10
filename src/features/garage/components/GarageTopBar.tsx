@@ -19,7 +19,7 @@ export function GarageTopBar({
         ← Paddock
       </Link>
       <span className="garage-header__brand">
-        SYNAPSE <b>/</b> RACING
+        SYNAPSE <b>RACING</b>
       </span>
       <div className="garage-save-status" aria-live="polite">
         {state === 'error' ? <ErrorNotice error={message} compact /> : state === 'success' ? (

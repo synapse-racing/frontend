@@ -14,7 +14,7 @@
   padding: 1.25rem 0;
 }
 .auth-access-header .auth-brand {
-  font-size: 12px;
+  font-size: var(--text-sm);
   letter-spacing: 0.06em;
 }
 .menu-stage .auth-intro {
@@ -53,7 +53,8 @@
   background: #b5c1b52b;
 }
 .auth-form__divider span {
-  font: 10px monospace;
+  font-family: var(--font-data);
+  font-size: var(--text-xs);
   color: #b7c5ba;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -66,11 +67,11 @@
   gap: 0.75rem;
   background: #12201d80;
   border-color: #b4c0ad70;
-  font-size: 13px;
+  font-size: var(--font-body);
 }
 .auth-form__guest-note {
   margin: 0.8rem 0 0;
-  font-size: 11px;
+  font-size: var(--text-xs);
   line-height: 1.6;
   color: #aebbad;
 }
@@ -85,17 +86,17 @@
 }
 .guest-progress p {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--text-sm);
   line-height: 1.6;
   color: #d6decb;
 }
 .guest-progress a,
 .guest-progress small {
-  font-size: 11px;
+  font-size: var(--text-xs);
   line-height: 1.6;
 }
 .guest-progress .guest-save-link {
-  font-size: 13px;
+  font-size: var(--font-body);
   font-weight: 700;
   color: #ffb58c;
 }
@@ -104,7 +105,7 @@
   padding: 0.6rem 1rem;
   color: #e4d6b5;
   background: #12201d;
-  font-size: 12px;
+  font-size: var(--text-sm);
   line-height: 1.7;
 }
 .guest-multiplayer-gate {
@@ -143,12 +144,14 @@
   gap: 0.55rem;
   margin: 0 0 1rem;
   color: #d6c1a6;
-  font: 10px/1.4 monospace;
+  font-family: var(--font-data);
+  font-size: var(--text-xs);
+  line-height: 1.4;
   letter-spacing: 0.2em;
 }
 .guest-multiplayer-gate__eyebrow span {
   color: #ff8754;
-  font-size: 8px;
+  font-size: var(--text-2xs);
 }
 .guest-multiplayer-gate__card h1 {
   margin: 0;
@@ -159,7 +162,7 @@
   max-width: 390px;
   margin: 1rem auto 1.6rem;
   color: #bbc5bb;
-  font-size: 14px;
+  font-size: var(--font-sub);
   line-height: 1.7;
 }
 .guest-multiplayer-gate__actions {
@@ -182,7 +185,7 @@
   padding: 0.7rem 1rem;
   background: #ff8754;
   color: #1c1713;
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -192,7 +195,7 @@
 }
 .guest-multiplayer-gate__login {
   color: #e8d9c4;
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 .guest-multiplayer-gate__login:hover,
 .guest-multiplayer-gate__back:hover {
@@ -201,14 +204,16 @@
 .guest-multiplayer-gate__save-note {
   margin: 1.4rem 0 0;
   color: #87958e;
-  font-size: 11px;
+  font-size: var(--text-xs);
   line-height: 1.6;
 }
 .guest-multiplayer-gate__back {
   display: inline-block;
   margin-top: 1.1rem;
   color: #f09a70;
-  font: 10px/1.5 monospace;
+  font-family: var(--font-data);
+  font-size: var(--text-xs);
+  line-height: 1.5;
   letter-spacing: 0.06em;
   text-decoration: none;
   text-transform: uppercase;

@@ -151,7 +151,7 @@ export function NeatTrainingHud({
             ← Paddock
           </Link>
           <div className="neat-hud__gen-badge">
-            <h2 style={{ margin: 0, fontSize: 'inherit', fontWeight: 'inherit', color: 'inherit' }}>
+            <h2 className="neat-hud__gen-title">
               Generación {generation + 1}
             </h2>
             <span>/ {trainingName} {trackSeed !== undefined && `#${trackSeed}`}</span>
@@ -328,11 +328,8 @@ export function NeatTrainingHud({
                 </button>
                 <GameSettings />
               </div>
-              <p style={{ fontSize: '11px', color: '#9eb0a4', margin: 0 }}>
-                <kbd style={{ padding: '2px 4px', border: '1px solid #4d685c', background: '#0e1613' }}>
-                  ESC
-                </kbd>{' '}
-                Pausar / reanudar
+              <p className="neat-hud__shortcut-hint">
+                <kbd>ESC</kbd> Pausar / reanudar
               </p>
             </section>
           )}
@@ -342,7 +339,7 @@ export function NeatTrainingHud({
       {/* Bottom Arcade Tape-Deck & Metrics Bar */}
       <footer className="neat-hud__bottom-bar">
         {/* Live Metrics Cluster */}
-        <section className="neat-metrics neat-hud__stats-cluster" aria-label="Métricas NEAT" style={{ position: 'static', margin: 0, padding: 0, background: 'none', border: 0 }}>
+        <section className="neat-metrics neat-hud__stats-cluster" aria-label="Métricas NEAT">
           <div className="neat-hud__stat">
             <span className="neat-hud__stat-label">Vivos</span>
             <strong className="neat-hud__stat-value is-success">

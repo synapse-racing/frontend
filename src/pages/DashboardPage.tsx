@@ -24,7 +24,7 @@ export function DashboardPage() {
     <main className="game-shell dashboard">
       <header className="game-header">
         <Link className="wordmark" to="/">
-          SYNAPSE / RACING
+          SYNAPSE RACING
         </Link>
         <div className="header-actions">
           <GameSettings />

@@ -101,7 +101,7 @@ function SectorGate({
     context.font = 'bold italic 35px Arial'
     context.textAlign = 'center'
     context.fillText(
-      theme === 'desert' ? 'SYNAPSE / TEST FIELD' : 'SYNAPSE / START + FINISH',
+      theme === 'desert' ? 'SYNAPSE RACING / TEST FIELD' : 'SYNAPSE RACING / START + FINISH',
       256,
       57,
     )

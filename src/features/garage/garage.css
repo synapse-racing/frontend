@@ -28,7 +28,7 @@
 }
 .menu-stage--paddock .guest-progress {
   padding: 0.8rem 1rem;
-  font-size: 12px;
+  font-size: var(--font-data-size);
   margin: 0.7rem 0;
 }
 .paddock-equipped {
@@ -43,14 +43,14 @@
 }
 .paddock-equipped > span,
 .paddock-equipped small {
-  font-family: var(--font-mono, monospace);
-  font-size: var(--text-xs, 11px);
+  font-family: var(--font-data);
+  font-size: var(--text-xs);
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: #bfcac6;
 }
 .paddock-equipped strong {
-  font-family: var(--font-display, Impact, 'Arial Narrow', sans-serif);
+  font-family: var(--font-display);
   font-style: italic;
   font-size: 2.2rem;
   color: #f1e9da;
@@ -89,7 +89,9 @@
   border: 1px solid #ff956d66;
   border-radius: 3px;
   color: var(--accent);
-  font: 18px/1 monospace;
+  font-family: var(--font-data);
+  font-size: var(--text-lg);
+  line-height: 1;
 }
 .guest-progress-bar__copy {
   display: grid;
@@ -99,18 +101,18 @@
 }
 .guest-progress-bar__copy strong {
   color: #f1e9da;
-  font-size: 11px;
+  font-size: var(--font-label);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 .guest-progress-bar__copy span {
   color: #aeb7ad;
-  font-size: 11px;
+  font-size: var(--font-label);
 }
 .guest-progress-bar__create,
 .guest-progress-bar__login {
   flex: 0 0 auto;
-  font-size: 11px;
+  font-size: var(--font-label);
   text-decoration: none;
   white-space: nowrap;
 }
@@ -134,7 +136,7 @@
 .paddock-guest-design {
   display: block;
   margin-top: 1rem;
-  font-size: 12px;
+  font-size: var(--font-data-size);
   color: #d6d7c7;
 }
 .menu-stage--garage {
@@ -164,8 +166,8 @@
   gap: 1.5rem;
   align-items: center;
   justify-content: space-between;
-  font-family: var(--font-mono, monospace);
-  font-size: var(--text-xs, 11px);
+  font-family: var(--font-data);
+  font-size: var(--text-xs);
   letter-spacing: 0.12em;
 }
 .garage-header a,
@@ -199,7 +201,9 @@
   padding: 0.45rem 0.8rem;
   border: 1px solid #60746c65;
   background: #101a1dc9;
-  font: 10px/1.4 monospace;
+  font-family: var(--font-data);
+  font-size: var(--text-2xs);
+  line-height: 1.4;
   letter-spacing: 0.08em;
   color: #a6b6ae;
 }
@@ -232,13 +236,13 @@
 }
 .garage-title .eyebrow {
   margin: 0 0 0.3rem;
-  font-size: 10px;
+  font-size: var(--text-2xs);
 }
 .garage-title h1 {
-  font:
-    italic clamp(1.8rem, 2.6vw, 2.5rem) / 1 Impact,
-    'Arial Narrow',
-    sans-serif;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.8rem, 2.6vw, 2.5rem);
+  line-height: 1;
   margin: 0 0 1rem;
   letter-spacing: -0.02em;
 }
@@ -260,8 +264,8 @@
   padding: 0.85rem 0.2rem;
   background: none;
   color: #9caba5;
-  font-family: var(--font-mono, monospace);
-  font-size: var(--text-xs, 11px);
+  font-family: var(--font-data);
+  font-size: var(--text-xs);
   white-space: nowrap;
 }
 .garage-tabs button[aria-selected='true'] {
@@ -301,7 +305,8 @@
   position: absolute;
   top: 0.4rem;
   left: 0.5rem;
-  font: 9px monospace;
+  font-family: var(--font-data);
+  font-size: var(--text-2xs);
   color: #96a29a;
 }
 .car-silhouette {
@@ -312,26 +317,26 @@
 }
 .garage-model-list strong {
   display: block;
-  font:
-    italic 16px Impact,
-    'Arial Narrow',
-    sans-serif;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--font-sub);
   text-transform: uppercase;
 }
 .garage-model-list small {
   display: block;
-  font-size: 10px;
+  font-size: var(--text-2xs);
   color: #a3afa9;
 }
 .garage-description {
-  font-size: 12px;
+  font-size: var(--font-data-size);
   color: #b5c0b9;
   min-height: 2.8em;
   margin: 1rem 0 0.5rem;
   line-height: 1.65;
 }
 .garage-fair-play {
-  font: 10px monospace;
+  font-family: var(--font-data);
+  font-size: var(--text-2xs);
   color: #8eaca0;
   margin: 0;
 }
@@ -344,7 +349,8 @@
 }
 .garage-colors legend,
 .garage-choice legend {
-  font: 10px monospace;
+  font-family: var(--font-data);
+  font-size: var(--text-2xs);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-bottom: 0.5rem;
@@ -359,7 +365,8 @@
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  font: 10px monospace;
+  font-family: var(--font-data);
+  font-size: var(--text-2xs);
   white-space: nowrap;
 }
 .garage-custom-color input {
@@ -404,7 +411,7 @@
 .garage-choice button {
   flex: 1;
   padding: 0.6rem 0.3rem;
-  font-size: 11px;
+  font-size: var(--font-label);
   background: #122024b8;
   border-color: #718f7f4d;
 }
@@ -414,7 +421,7 @@
   background: #55342678;
 }
 .garage-identity > label {
-  font-size: 12px;
+  font-size: var(--font-data-size);
 }
 .garage-number-row {
   display: flex;
@@ -429,21 +436,19 @@
   flex-shrink: 0;
 }
 .garage-number-input span {
-  font:
-    36px Impact,
-    sans-serif;
+  font-family: var(--font-display);
+  font-size: 36px;
   color: var(--accent);
 }
 .garage-number-input input {
-  font:
-    40px Impact,
-    sans-serif;
+  font-family: var(--font-display);
+  font-size: 40px;
   background: transparent;
   padding: 0.4rem;
   width: 100%;
 }
 .garage-identity p {
-  font-size: 12px;
+  font-size: var(--font-data-size);
   color: #adbbb2;
 }
 .garage-identity .garage-number-error {
@@ -461,19 +466,23 @@
 }
 .garage-number-preview span {
   width: 50px;
-  font: 9px/1.5 monospace;
+  font-family: var(--font-data);
+  font-size: var(--text-2xs);
+  line-height: 1.5;
   letter-spacing: 0.1em;
 }
 .garage-number-preview strong {
-  font:
-    italic 44px/0.9 Impact,
-    sans-serif;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 44px;
+  line-height: 0.9;
   color: #efeade;
 }
 .garage-number-preview small {
   margin-left: auto;
   text-transform: uppercase;
-  font: 10px monospace;
+  font-family: var(--font-data);
+  font-size: var(--text-2xs);
   text-align: right;
 }
 .garage-import {
@@ -488,12 +497,12 @@
   justify-content: space-between;
 }
 .garage-import p {
-  font-size: 11px;
+  font-size: var(--font-label);
   margin: 0;
 }
 .garage-import button {
   padding: 0.4rem 0.6rem;
-  font-size: 11px;
+  font-size: var(--font-label);
   white-space: nowrap;
 }
 .garage-action-bar {
@@ -506,7 +515,7 @@
   border-top: 1px solid #b2c9be36;
 }
 .garage-action-bar button {
-  font-size: 12px;
+  font-size: var(--font-data-size);
   padding: 0.75rem 0.8rem;
   white-space: nowrap;
 }
@@ -516,7 +525,7 @@
 .garage-icon-button {
   width: 44px;
   flex-shrink: 0;
-  font-size: 18px !important;
+  font-size: var(--text-lg) !important;
   padding: 0 !important;
   background: #122024b8;
 }
@@ -542,7 +551,7 @@
   margin: 0 0 0.8rem;
 }
 .garage-dialog p {
-  font-size: 13px;
+  font-size: var(--text-base);
   color: #c3cdc6;
   margin: 0 0 1.3rem;
 }
@@ -552,7 +561,7 @@
 }
 .garage-dialog__actions button {
   width: 100%;
-  font-size: 12px;
+  font-size: var(--font-data-size);
 }
 .garage-car-label {
   position: fixed;
@@ -563,27 +572,29 @@
   pointer-events: none;
 }
 .garage-car-label > span {
-  font: 10px monospace;
+  font-family: var(--font-data);
+  font-size: var(--text-2xs);
   color: #c2cec4;
   text-transform: uppercase;
   letter-spacing: 0.15em;
 }
 .garage-car-label h2 {
-  font:
-    italic clamp(2.4rem, 5vw, 5rem)/1 Impact,
-    'Arial Narrow',
-    sans-serif;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(2.4rem, 5vw, 5rem);
+  line-height: 1;
   text-transform: uppercase;
   margin: 0.35rem 0;
 }
 .garage-car-label p {
   color: #c3c8ba;
-  font: 10px monospace;
+  font-family: var(--font-data);
+  font-size: var(--text-2xs);
 }
 .garage-car-label button {
   pointer-events: auto;
   padding: 0.45rem 0.8rem;
-  font-size: 10px;
+  font-size: var(--text-2xs);
   background: #152022ae;
 }
 .garage-loading {
@@ -658,7 +669,7 @@
     font-size: 1.5rem;
   }
   .paddock-equipped > span {
-    font-size: 8px;
+    font-size: var(--text-2xs);
   }
   .paddock-equipped small {
     display: none;
@@ -674,10 +685,10 @@
   .guest-progress-bar__copy strong,
   .guest-progress-bar__create,
   .guest-progress-bar__login {
-    font-size: 10px;
+    font-size: var(--text-2xs);
   }
   .guest-progress-bar__copy span {
-    font-size: 9px;
+    font-size: var(--text-2xs);
   }
   .guest-progress-bar__icon {
     flex-basis: 26px;
@@ -693,7 +704,7 @@
   .garage-header {
     min-height: 56px;
     gap: 0.5rem;
-    font-size: 9px;
+    font-size: var(--text-2xs);
   }
   .garage-header__brand {
     display: none;
@@ -714,7 +725,7 @@
     margin-bottom: 0.8rem;
   }
   .garage-tabs button {
-    font-size: 10px;
+    font-size: var(--text-2xs);
     padding-inline: 0.6rem;
   }
   .garage-car-label {
@@ -730,7 +741,7 @@
     display: none;
   }
   .garage-car-label > span {
-    font-size: 9px;
+    font-size: var(--text-2xs);
   }
   .garage-car-label button {
     margin-top: 0.3rem;
@@ -745,7 +756,7 @@
   }
   .garage-action-bar button {
     padding-inline: 0.6rem;
-    font-size: 11px;
+    font-size: var(--font-label);
   }
   .garage-loading {
     padding: 12rem 1rem 3rem;
