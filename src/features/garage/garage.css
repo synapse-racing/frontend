@@ -43,16 +43,16 @@
 }
 .paddock-equipped > span,
 .paddock-equipped small {
-  font: 10px monospace;
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-xs, 11px);
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: #bfcac6;
 }
 .paddock-equipped strong {
-  font:
-    italic 2.2rem Impact,
-    'Arial Narrow',
-    sans-serif;
+  font-family: var(--font-display, Impact, 'Arial Narrow', sans-serif);
+  font-style: italic;
+  font-size: 2.2rem;
   color: #f1e9da;
   text-transform: uppercase;
 }
@@ -164,7 +164,8 @@
   gap: 1.5rem;
   align-items: center;
   justify-content: space-between;
-  font: 11px monospace;
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-xs, 11px);
   letter-spacing: 0.12em;
 }
 .garage-header a,
@@ -259,7 +260,8 @@
   padding: 0.85rem 0.2rem;
   background: none;
   color: #9caba5;
-  font: 10px monospace;
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-xs, 11px);
   white-space: nowrap;
 }
 .garage-tabs button[aria-selected='true'] {
