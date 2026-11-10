@@ -879,7 +879,7 @@ small {
 }
 .multiplayer-page {
   min-height: 100svh;
-  background: linear-gradient(130deg, #151c1c, #1b292c);
+  background: linear-gradient(130deg, #131918, #18231f);
   position: relative;
 }
 .multiplayer-nav {
@@ -896,13 +896,22 @@ small {
   border-bottom: 1px solid #ffffff18;
 }
 .multiplayer-nav a {
+  font-family: var(--font-mono);
   text-decoration: none;
-  font-size: 13px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: #cfd8cf;
+}
+.multiplayer-nav a:hover {
+  color: var(--accent);
 }
 .network-state {
-  font: 11px monospace;
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 800;
   color: #e6c28b;
   text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 .network-state--connected {
   color: #b8da79;
@@ -936,9 +945,11 @@ small {
 .multiplayer-actions form {
   display: grid;
   gap: 1rem;
-  padding: 1.5rem;
+  padding: 1.6rem;
+  border: 1px solid #334237;
   border-top: 3px solid var(--accent);
-  background: #253034;
+  background: #19231ee6;
+  border-radius: 4px;
 }
 .multiplayer-actions h2 {
   margin: 0;
@@ -947,16 +958,19 @@ small {
 .multiplayer-actions label {
   display: grid;
   gap: 0.6rem;
-  font-size: 13px;
+  font-size: var(--text-base);
 }
 .multiplayer-actions input {
-  font: 1.2rem monospace;
+  font-family: var(--font-mono);
+  font-size: 1.2rem;
   letter-spacing: 0.15em;
+  border-radius: 3px;
 }
 .multiplayer-actions button {
   background: var(--accent);
   color: #171b16;
   font-weight: 800;
+  border-radius: 3px;
 }
 .multiplayer-error {
   grid-column: 1 / -1;
@@ -984,11 +998,14 @@ small {
 }
 .lobby-code span,
 .lobby-code small {
-  font: 12px monospace;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
   color: var(--muted);
 }
 .lobby-code strong {
-  font: 700 clamp(2rem, 5vw, 4rem) monospace;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 4rem);
   letter-spacing: 0.12em;
   color: var(--accent);
 }
@@ -1101,14 +1118,14 @@ small {
   grid-template-columns: 3rem 1fr auto;
   align-items: center;
   gap: 1rem;
-  background: #233033;
+  background: #19231f;
   padding: 1.2rem;
-  border-bottom: 1px solid #50605f;
+  border-bottom: 1px solid #364438;
 }
 .lobby-players article > span {
-  font:
-    italic 2rem Impact,
-    sans-serif;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 2rem;
   color: var(--accent);
 }
 .lobby-players article > div {
@@ -1117,7 +1134,8 @@ small {
 }
 .lobby-players small,
 .lobby-players i {
-  font: 11px monospace;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
   font-style: normal;
   color: #bac6bf;
 }
