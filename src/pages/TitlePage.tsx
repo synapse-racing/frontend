@@ -34,7 +34,7 @@ export function TitlePage() {
     <main className="game-shell title-screen">
       <header className="game-header">
         <span className="wordmark">
-          SYNAPSE <span className="wordmark__slash">/</span> MOTORSPORT
+          SYNAPSE <span className="wordmark__slash">/</span> RACING
         </span>
         <GameSettings />
       </header>

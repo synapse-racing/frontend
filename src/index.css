@@ -1,15 +1,27 @@
 :root {
-  font-family: Arial, Helvetica, sans-serif;
-  color: #eeeee6;
-  background: #151819;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
+  --font-display: Impact, 'Arial Narrow', Arial, sans-serif;
+  --font-ui: Arial, Helvetica, sans-serif;
+  --font-mono: 'Consolas', 'Courier New', monospace;
+  --text-2xs: 10px;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 13px;
+  --text-md: 15px;
+  --text-lg: 18px;
+  --text-xl: 22px;
   --accent: #ff713c;
+  --accent-hover: #ff9366;
   --muted: #a5aaa6;
   --line: #3b403d;
   --surface: #202523;
   --ink: #eeeee6;
+
+  font-family: var(--font-ui);
+  color: var(--ink);
+  background: #151819;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 * {
   box-sizing: border-box;
@@ -17,6 +29,7 @@
 body {
   margin: 0;
   min-width: 320px;
+  font-family: var(--font-ui);
 }
 button,
 input,
@@ -34,6 +47,8 @@ button {
   padding: 0.7rem 1rem;
   color: var(--ink);
   background: #252b28;
+  font-size: var(--text-base);
+  letter-spacing: 0.03em;
 }
 button:disabled {
   opacity: 0.45;
@@ -72,6 +87,7 @@ select {
   color: var(--ink);
   background: #131916;
   border-radius: 0;
+  font-size: var(--text-base);
 }
 h1,
 h2,
@@ -81,7 +97,7 @@ p {
 }
 h1,
 h2 {
-  font-family: Impact, 'Arial Narrow', Arial, sans-serif;
+  font-family: var(--font-display);
   font-weight: 900;
   font-style: italic;
   text-transform: uppercase;
@@ -92,13 +108,17 @@ kbd {
   display: inline-block;
   padding: 0.2rem 0.35rem;
   border: 1px solid #848b7d;
-  font: 11px monospace;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.05em;
 }
 small {
   line-height: 1.5;
 }
 .eyebrow {
-  font: 12px/1.5 monospace;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.5;
   text-transform: uppercase;
   letter-spacing: 0.15em;
   color: var(--accent);
@@ -110,10 +130,11 @@ small {
   color: #171b16;
   border: 0;
   font-weight: 800;
+  letter-spacing: 0.04em;
 }
 .primary-button:hover:not(:disabled),
 .enter-button:hover:not(:disabled) {
-  background: #ff9366;
+  background: var(--accent-hover);
 }
 .primary-button {
   padding: 0.9rem 1.3rem;
@@ -124,8 +145,9 @@ small {
 }
 .wordmark,
 .auth-brand {
+  font-family: var(--font-display);
   font-size: 15px;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   font-weight: 900;
   font-style: italic;
   text-decoration: none;
