@@ -62,123 +62,143 @@ export function TrainingRunSelector({
   return (
     <section className="run-selector" aria-label="Entrenamientos guardados">
       <div className="run-selector__panel">
-        <div className="garage-heading">
-          <p className="eyebrow">01 / Campo de pruebas</p>
-          <Link to="/dashboard">← Paddock</Link>
+        <div className="run-selector__header">
+          <p className="eyebrow">01 / ENTRENAMIENTO NEAT</p>
+          <Link to="/dashboard" className="run-selector__back">← Paddock</Link>
         </div>
-        <h1>Prepara tu escudería.</h1>
+        <h1>Inicia tu entrenamiento.</h1>
         <p className="run-selector__lead">
-          Genera un circuito reproducible, lanza una nueva temporada o recupera
-          una partida guardada.
+          Configura el circuito, lanza una nueva población de pilotos o continúa
+          una sesión guardada.
         </p>
         {localOnly && (
           <p className="guest-training-note">
-            Modo invitado · Guardado en este navegador. Crea una cuenta desde el
-            Paddock para llevar tu progreso a otros dispositivos.
+            Modo invitado · Progreso guardado localmente en este navegador. Vincula
+            una cuenta desde el Paddock para conservarlo en la nube.
           </p>
         )}
 
-        <form
-          className="run-selector__create run-setup"
-          onSubmit={(event) => void submit(event)}
-        >
-          <label>
-            Nombre de la escudería
-            <input
-              aria-label="Nombre del entrenamiento"
-              maxLength={80}
-              minLength={3}
-              onChange={(event) => setName(event.target.value)}
-              value={name}
-            />
-          </label>
-          <div className="track-preset track-preset--selected">
-            <span>Desierto / Circuito procedural</span>
-            <strong>Test Field</strong>
-            <TrackMap
-              recipe={{
-                version: 'grand-prix-v3',
-                seed: Number.isSafeInteger(seed) ? seed : 0,
-              }}
-            />
-            <small>
-              Rectas, horquillas y chicanes · 16 sectores · reproducible por
-              semilla
-            </small>
-          </div>
-          <label>
-            Semilla del circuito
-            <span className="seed-control">
-              <input
-                aria-label="Semilla del circuito"
-                min={0}
-                max={2147483647}
-                onChange={(event) => setSeed(Number(event.target.value))}
-                type="number"
-                value={seed}
-              />
-              <button
-                type="button"
-                onClick={() =>
-                  setSeed(Math.floor(Math.random() * 2_147_483_648))
-                }
-              >
-                Generar otra
-              </button>
-            </span>
-          </label>
-          <details className="neat-advanced">
-            <summary>Telemetría avanzada</summary>
-            <p>
-              24 pilotos · 5 sensores · 6 entradas y 2 salidas. Cada semilla
-              reproduce el mismo trazado.
-            </p>
-          </details>
-          <button
-            className="primary-button"
-            disabled={busy || name.trim().length < 3}
+        <div className="run-selector__grid">
+          <form
+            className="run-selector__create run-setup"
+            onSubmit={(event) => void submit(event)}
           >
-            Crear temporada
-          </button>
-        </form>
+            <h2>Nuevo entrenamiento</h2>
+            <label>
+              Nombre del entrenamiento
+              <input
+                aria-label="Nombre del entrenamiento"
+                maxLength={80}
+                minLength={3}
+                onChange={(event) => setName(event.target.value)}
+                value={name}
+              />
+            </label>
 
-        <ErrorNotice error={error} />
-
-        <div className="run-list">
-          {runs.length === 0 && !busy && (
-            <p className="run-list__empty">
-              Todavia no hay entrenamientos guardados.
-            </p>
-          )}
-          {runs.map((run) => (
-            <article className="run-item" key={run.id}>
-              <button
-                className="run-item__load"
-                disabled={busy}
-                onClick={() => void onLoad(run)}
-              >
-                <span>{run.name}</span>
-                <small>
-                  Gen. {run.currentGeneration} · Mejor{' '}
-                  {run.bestFitness.toFixed(0)} · Seed{' '}
-                  {run.config.track?.seed ?? run.seed}
-                </small>
-              </button>
-              <button
-                aria-label={`Eliminar ${run.name}`}
-                className="run-item__delete"
-                disabled={busy}
-                onClick={() => {
-                  setDeleteError(null)
-                  setPendingDelete(run)
+            <div className="track-preset track-preset--selected">
+              <div className="track-preset__header">
+                <span>Pista de pruebas · Desierto</span>
+                <span className="track-preset__seed-badge">#{Number.isSafeInteger(seed) ? seed : 0}</span>
+              </div>
+              <TrackMap
+                recipe={{
+                  version: 'grand-prix-v3',
+                  seed: Number.isSafeInteger(seed) ? seed : 0,
                 }}
-              >
-                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" /></svg>
-                Eliminar
-              </button>
-            </article>
-          ))}
+              />
+              <small>Circuito cerrado · 16 sectores de control</small>
+            </div>
+
+            <label>
+              Semilla del trazado
+              <span className="seed-control">
+                <input
+                  aria-label="Semilla del circuito"
+                  min={0}
+                  max={2147483647}
+                  onChange={(event) => setSeed(Number(event.target.value))}
+                  type="number"
+                  value={seed}
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSeed(Math.floor(Math.random() * 2_147_483_648))
+                  }
+                >
+                  Nueva semilla
+                </button>
+              </span>
+            </label>
+
+            <details className="neat-advanced">
+              <summary>Parámetros de la red (NEAT)</summary>
+              <p>
+                Población de 24 autos autónomos · 5 sensores de distancia · 6
+                entradas de red y 2 salidas de control (dirección y aceleración).
+              </p>
+            </details>
+
+            <button
+              className="primary-button"
+              disabled={busy || name.trim().length < 3}
+            >
+              Iniciar entrenamiento
+            </button>
+          </form>
+
+          <section className="run-selector__saved-section" aria-label="Sesiones guardadas">
+            <div className="run-list__header">
+              <h2>Sesiones guardadas</h2>
+              <span>
+                {runs.length} {runs.length === 1 ? 'guardado' : 'guardados'}
+              </span>
+            </div>
+
+            <ErrorNotice error={error} />
+
+            <div className="run-list">
+              {runs.length === 0 && !busy && (
+                <p className="run-list__empty">
+                  Aún no tienes entrenamientos guardados. Configura uno a la izquierda para comenzar a evaluar tus pilotos.
+                </p>
+              )}
+              {runs.map((run) => (
+                <article className="run-item" key={run.id}>
+                  <button
+                    className="run-item__load"
+                    disabled={busy}
+                    onClick={() => void onLoad(run)}
+                  >
+                    <span className="run-item__title">{run.name}</span>
+                    <div className="run-item__stats">
+                      <span className="run-item__pill">Gen. {run.currentGeneration}</span>
+                      <span className="run-item__metric">
+                        Récord: <strong>{run.bestFitness.toFixed(0)} pts</strong>
+                      </span>
+                      <span className="run-item__seed">
+                        Semilla: #{run.config.track?.seed ?? run.seed}
+                      </span>
+                    </div>
+                  </button>
+                  <button
+                    aria-label={`Eliminar ${run.name}`}
+                    className="run-item__delete"
+                    disabled={busy}
+                    onClick={() => {
+                      setDeleteError(null)
+                      setPendingDelete(run)
+                    }}
+                  >
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" /></svg>
+                    Eliminar
+                  </button>
+                </article>
+              ))}
+            </div>
+          </section>
         </div>
+
         <dialog
           ref={deleteDialog}
           className="run-delete-dialog"
@@ -190,7 +210,7 @@ export function TrainingRunSelector({
           }}
           onClose={() => setPendingDelete(null)}
         >
-          <p className="eyebrow">Entrenamiento guardado</p>
+          <p className="eyebrow">Eliminar entrenamiento</p>
           <h2 id="run-delete-title">¿Eliminar entrenamiento?</h2>
           <strong className="run-delete-dialog__name">{pendingDelete?.name}</strong>
           <p id="run-delete-description">Se eliminarán su progreso y sus puntos de guardado. Esta acción no se puede deshacer.</p>
