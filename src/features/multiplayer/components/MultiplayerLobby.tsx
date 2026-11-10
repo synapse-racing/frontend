@@ -263,9 +263,12 @@ export function MultiplayerLobby({
                 </small>
               )}
             </div>
-            <i className={player.ready ? 'is-ready' : ''}>
+            <span
+              className="lobby-player-state"
+              data-state={player.ready ? 'ready' : 'waiting'}
+            >
               {player.ready ? 'Listo' : 'Esperando'}
-            </i>
+            </span>
           </article>
         ))}
         {Array.from(
@@ -279,7 +282,9 @@ export function MultiplayerLobby({
                 <strong>Plaza libre</strong>
                 <small>Invita a otra escudería</small>
               </div>
-              <i>Esperando</i>
+              <span className="lobby-player-state" data-state="waiting">
+                Esperando
+              </span>
             </article>
           ),
         )}
