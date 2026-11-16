@@ -31,21 +31,26 @@ function useBaySign(number: number) {
     canvas.width = 1024
     canvas.height = 256
     const context = canvas.getContext('2d')!
-    context.fillStyle = '#111b21'
+    context.fillStyle = '#080d0a'
     context.fillRect(0, 0, 1024, 256)
-    context.fillStyle = '#ff783e'
-    context.fillRect(0, 0, 12, 256)
-    context.fillRect(1012, 0, 12, 256)
-    context.font = 'bold 82px sans-serif'
-    context.fillStyle = '#e6e5d7'
+    // Toxic green accent borders
+    context.fillStyle = '#00ff66'
+    context.fillRect(0, 0, 16, 256)
+    context.fillRect(1008, 0, 16, 256)
+    context.fillRect(0, 0, 1024, 12)
+    context.fillRect(0, 244, 1024, 12)
+    // Title in bold racing impact
+    context.font = 'italic 900 86px Impact, sans-serif'
+    context.fillStyle = '#ffffff'
     context.textAlign = 'center'
-    context.fillText('S Y N A P S E', 512, 120)
-    context.font = '27px monospace'
-    context.fillStyle = '#9baeb3'
+    context.fillText('SYNAPSE CUSTOMS', 512, 120)
+    // Monospace subtitle
+    context.font = 'bold 28px monospace'
+    context.fillStyle = '#00ff66'
     context.fillText(
-      `RACING DEVELOPMENT / BAY ${String(number).padStart(2, '0')}`,
+      `// TALLER CALLEJERO 2000s · BOX ${String(number).padStart(2, '0')} //`,
       512,
-      184,
+      188,
     )
     const result = new CanvasTexture(canvas)
     result.colorSpace = SRGBColorSpace
@@ -272,9 +277,9 @@ function PaddockCarShowcase({
           <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.002, 0]}>
             <ringGeometry args={[4.12, 4.22, 48]} />
             <meshStandardMaterial
-              color="#ff874e"
-              emissive="#ed632a"
-              emissiveIntensity={0.7}
+              color="#00ff66"
+              emissive="#39ff14"
+              emissiveIntensity={2.2}
             />
           </mesh>
         </group>
@@ -329,9 +334,9 @@ function Cabinet({ x, z }: { x: number; z: number }) {
       <mesh position={[-0.65, 1.2, -0.39]}>
         <boxGeometry args={[0.025, 2.2, 0.025]} />
         <meshStandardMaterial
-          color="#ff7d47"
-          emissive="#ff5720"
-          emissiveIntensity={0.45}
+          color="#00ff66"
+          emissive="#39ff14"
+          emissiveIntensity={1.2}
         />
       </mesh>
     </group>
@@ -352,14 +357,14 @@ export default function GarageScene({
   const sign = useBaySign(appearance.number)
   return (
     <>
-      <color attach="background" args={[desert ? '#605c50' : '#152631']} />
-      <fog attach="fog" args={[desert ? '#605c50' : '#152631', 24, 75]} />
-      <ambientLight intensity={0.65} color="#b8cdd8" />
-      <hemisphereLight args={['#d5edf1', '#272a27', 1.2]} />
+      <color attach="background" args={[desert ? '#383227' : '#070b09']} />
+      <fog attach="fog" args={[desert ? '#383227' : '#070b09', 24, 75]} />
+      <ambientLight intensity={0.5} color="#8fbfa3" />
+      <hemisphereLight args={['#a3ffd1', '#0e1510', 1.0]} />
       <directionalLight
         position={[3, 9, -5]}
-        intensity={3.6}
-        color="#ffead0"
+        intensity={3.2}
+        color="#e6fff2"
         castShadow={high}
         shadow-mapSize={[1024, 1024]}
         shadow-camera-left={-12}
@@ -371,32 +376,32 @@ export default function GarageScene({
         shadow-bias={-0.0004}
         shadow-normalBias={0.04}
       />
-      <directionalLight position={[-6, 5, 4]} intensity={1.7} color="#71a9be" />
+      <directionalLight position={[-6, 5, 4]} intensity={1.5} color="#45caff" />
       <pointLight
         position={[5, 3, 4]}
-        intensity={14}
+        intensity={18}
         distance={16}
         decay={2}
-        color="#ff773a"
+        color="#00ff66"
       />
       <Environment resolution={high ? 128 : 64} frames={1}>
         <Lightformer
-          intensity={3}
-          color="#fff1dc"
+          intensity={2.8}
+          color="#e0fff0"
           position={[0, 8, 0]}
           rotation={[-Math.PI / 2, 0, 0]}
           scale={[9, 5, 1]}
         />
         <Lightformer
-          intensity={1.6}
-          color="#82bacd"
+          intensity={1.8}
+          color="#00f0ff"
           position={[6, 3, 0]}
           rotation={[0, -Math.PI / 2, 0]}
           scale={[12, 3, 1]}
         />
         <Lightformer
-          intensity={2}
-          color="#ff864e"
+          intensity={2.2}
+          color="#00ff66"
           position={[-6, 2, 2]}
           rotation={[0, Math.PI / 2, 0]}
           scale={[10, 2, 1]}
@@ -406,26 +411,26 @@ export default function GarageScene({
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[80, 90]} />
         <meshStandardMaterial
-          color="#252e30"
+          color="#101813"
           roughness={0.6}
-          metalness={0.23}
+          metalness={0.3}
         />
       </mesh>
       <mesh position={[0, 0.025, 0]} receiveShadow>
         <boxGeometry args={[9, 0.05, 10]} />
         <meshStandardMaterial
-          color="#394043"
-          roughness={0.45}
-          metalness={0.36}
+          color="#17231c"
+          roughness={0.4}
+          metalness={0.45}
         />
       </mesh>
       {[-4.25, 4.25].map((x) => (
         <mesh key={x} position={[x, 0.06, 0]}>
           <boxGeometry args={[0.04, 0.02, 9.6]} />
           <meshStandardMaterial
-            color="#ff874e"
-            emissive="#ed632a"
-            emissiveIntensity={0.6}
+            color="#00ff66"
+            emissive="#39ff14"
+            emissiveIntensity={1.4}
           />
         </mesh>
       ))}
@@ -489,9 +494,9 @@ export default function GarageScene({
               <mesh position={[x * 0.93, 1.7, z - 0.3]}>
                 <boxGeometry args={[0.06, 2.5, 0.07]} />
                 <meshStandardMaterial
-                  color="#ff803c"
-                  emissive="#f66128"
-                  emissiveIntensity={1.7}
+                  color="#00ff66"
+                  emissive="#39ff14"
+                  emissiveIntensity={2.2}
                 />
               </mesh>
             </group>

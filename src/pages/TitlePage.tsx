@@ -40,15 +40,13 @@ export function TitlePage() {
       </header>
       <div className="title-content">
         <p className="eyebrow title-kicker">
-          <span /> EL PRÓXIMO PILOTO LO CREAS TÚ.
+          <span /> STREET TUNING SIMULATOR // 2000s
         </p>
         <h1>
           SYNAPSE<span>RACING</span>
         </h1>
         <p className="title-tagline">
-          Nacidos del código.
-          <br />
-          Hechos para competir.
+          ASFALTO NOCTURNO · MOTORES RUGIENDO · SIN REGLAS
         </p>
         <button
           className="enter-button"
@@ -58,15 +56,15 @@ export function TitlePage() {
           }}
         >
           <kbd>ENTER</kbd>
-          Presiona Enter para continuar
+          PISAR A FONDO · Presiona Enter
           <span aria-hidden="true">↗</span>
         </button>
       </div>
       <footer className="game-footer">
         <span>
-          NEAT POWERED <span className="footer-separator">/</span> HUMAN DRIVEN
+          TUNING EDITION <span className="footer-separator">//</span> FLASH ARCADE
         </span>
-        <span>ENTRENA. EVOLUCIONA. COMPITE.</span>
+        <span>QUEMA RUEDA · DEJA TU MARCA</span>
       </footer>
     </main>
   )

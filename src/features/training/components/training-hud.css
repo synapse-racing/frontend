@@ -3,18 +3,18 @@
    ========================================================================== */
 
 :root {
-  --thud-bg: #0d1417d9;         /* Translucent deep graphite */
-  --thud-surface: #131c21e6;    /* Dark slate gray */
-  --thud-panel: #172228f2;      /* Floating panel solid */
-  --thud-border: #26353d;       /* Subtle slate border */
-  --thud-border-bold: #384c57;  /* Accent border */
+  --thud-bg: #090e0cd9;         /* Translucent deep graphite */
+  --thud-surface: #0e1511f0;    /* Dark asphalt */
+  --thud-panel: #111a14f2;      /* Floating panel solid */
+  --thud-border: #283a2f;       /* Subtle slate border */
+  --thud-border-bold: #00ff6688;  /* Toxic green accent border */
   --thud-ink: #f0f4f2;          /* Crisp light gray/cream */
-  --thud-muted: #8b9ea8;        /* Muted cool gray */
+  --thud-muted: #8ba898;        /* Muted cool gray */
   --thud-accent: var(--accent);
   --thud-accent-hover: var(--accent-hover);
-  --thud-green: #5cdb95;        /* Subdued racing mint */
-  --thud-red: #e65252;          /* Clean race alert red */
-  --thud-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --thud-green: #00ff66;        /* Acid green */
+  --thud-red: #ff003c;          /* Street race alert red */
+  --thud-shadow: 3px 3px 0px #000000, 0 0 16px rgba(0, 0, 0, 0.7);
 }
 
 /* Screen overlay root (non-blocking) */
@@ -28,34 +28,42 @@
   user-select: none;
 }
 
-/* Sleek Buttons (Graphite & Orange) */
+/* Sleek Buttons (Brushed Aluminum & Diamond Plate) */
 .neat-hud button,
 .car-actions button {
   pointer-events: auto;
-  background: #141e24;
+  background-color: #16201b;
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 40%, rgba(0, 0, 0, 0.5) 100%),
+    var(--texture-metal);
+  background-size: cover, 180px;
+  background-blend-mode: overlay;
   color: var(--thud-ink);
-  border: 1px solid var(--thud-border-bold);
+  border: 2px outset #58695d;
   font-family: var(--font-ui);
   font-size: var(--font-label);
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  font-weight: 900;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  padding: 0.45rem 0.75rem;
-  border-radius: 3px;
+  padding: 0.5rem 0.85rem;
+  border-radius: 0px;
+  box-shadow: 2px 2px 0px #000;
   cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+  transition: all 130ms ease;
 }
 
 .neat-hud button:hover:not(:disabled),
 .car-actions button:hover:not(:disabled) {
-  background: #1d2a32;
-  border-color: var(--thud-accent);
+  border-color: var(--accent);
+  box-shadow: 2px 2px 0px #000, var(--glow-acid);
   color: #fff;
+  filter: brightness(1.15);
 }
 
 .neat-hud button:active:not(:disabled),
 .car-actions button:active:not(:disabled) {
-  transform: translateY(1px);
+  border-style: inset;
+  transform: translate(1px, 1px);
 }
 
 .neat-hud button:disabled,
@@ -64,22 +72,29 @@
   cursor: not-allowed;
 }
 
-/* Primary Action Button (Synapse Orange) */
+/* Primary Action Button (Stamped Diamond Plate + Harsh Underglow) */
 .neat-hud .primary-button {
-  background: var(--thud-accent);
-  color: #0d1417;
-  border-color: var(--thud-accent);
-  font-weight: 800;
+  background-color: var(--accent);
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, transparent 45%, rgba(0, 0, 0, 0.5) 100%),
+    var(--texture-plate);
+  background-size: cover, 160px;
+  background-blend-mode: overlay;
+  color: #000000;
+  border: 2px outset #8fff78;
+  font-weight: 900;
+  box-shadow: 3px 3px 0px #000, var(--glow-acid);
 }
 
 .neat-hud .primary-button:hover:not(:disabled) {
-  background: var(--thud-accent-hover);
-  border-color: var(--thud-accent-hover);
+  background-color: var(--accent-hover);
+  border-color: #ffffff;
+  box-shadow: 3px 3px 0px #000, 0 0 35px var(--accent), 0 0 60px rgba(0, 255, 102, 0.9);
   color: #000;
 }
 
 /* ==========================================================================
-   TOP BAR (Slim, Translucent, Floating Feel)
+   TOP BAR (Carbon Fiber Weave Panel)
    ========================================================================== */
 .neat-hud__topbar {
   pointer-events: auto;
@@ -87,10 +102,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.5rem 1.2rem;
-  background: #0d1417e6;
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--thud-border);
+  padding: 0.55rem 1.4rem;
+  background-color: #0b110e;
+  background-image:
+    linear-gradient(180deg, rgba(0, 255, 102, 0.08) 0%, transparent 60%, rgba(0, 0, 0, 0.75) 100%),
+    var(--texture-carbon);
+  background-size: cover, 140px;
+  background-blend-mode: overlay;
+  border-bottom: 3px solid var(--accent);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.9), 0 0 15px rgba(0, 255, 102, 0.35);
   z-index: 10;
 }
 
@@ -397,7 +417,7 @@
 }
 
 /* ==========================================================================
-   BOTTOM BAR - FLOATING COCKPIT DOCK (DOES NOT COVER WHOLE BOTTOM)
+   BOTTOM BAR - FLOATING COCKPIT DOCK (Carbon Fiber Weave Panel)
    ========================================================================== */
 .neat-hud__bottom-bar {
   position: absolute;
@@ -410,13 +430,17 @@
   display: flex;
   align-items: center;
   gap: 1.4rem;
-  padding: 0.45rem 1rem;
-  background: #0e1518f0;
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--thud-border);
-  border-top: 2px solid var(--thud-accent);
-  border-radius: 5px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  padding: 0.6rem 1.4rem;
+  background-color: #0b110e;
+  background-image:
+    linear-gradient(180deg, rgba(0, 255, 102, 0.08) 0%, transparent 60%, rgba(0, 0, 0, 0.75) 100%),
+    var(--texture-carbon);
+  background-size: cover, 140px;
+  background-blend-mode: overlay;
+  border: 2px solid #364e3f;
+  border-top: 4px solid var(--accent);
+  border-radius: 0px;
+  box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 255, 102, 0.35);
   z-index: 10;
 }
 
@@ -461,16 +485,19 @@
 .neat-hud__stat-value {
   font-family: var(--font-data);
   font-size: var(--text-md);
-  font-weight: 800;
+  font-weight: 900;
   color: var(--thud-ink);
+  text-shadow: 0 0 8px rgba(0, 255, 102, 0.5), 2px 2px 0 #000;
 }
 
 .neat-hud__stat-value.is-accent {
-  color: var(--thud-accent);
+  color: #39ff14;
+  text-shadow: 0 0 12px #39ff14, 0 0 25px #00ff66, 0 0 45px rgba(0, 255, 102, 0.85);
 }
 
 .neat-hud__stat-value.is-success {
-  color: #5cdb95;
+  color: #39ff14;
+  text-shadow: 0 0 12px #39ff14, 0 0 25px #00ff66, 0 0 45px rgba(0, 255, 102, 0.85);
 }
 
 .neat-hud__tape-controls {
@@ -488,12 +515,13 @@
   letter-spacing: 0.06em;
 }
 
-/* Speed selector group */
+/* Speed selector group (Milled Metal Casing + Electric Blue Glow) */
 .simulation-speed {
   display: inline-flex;
-  border: 1px solid var(--thud-border);
-  border-radius: 3px;
+  border: 2px solid #3c5243;
+  border-radius: 0px;
   overflow: hidden;
+  background: #080d0a;
 }
 
 .simulation-speed button {
@@ -502,29 +530,37 @@
   box-shadow: none !important;
   padding: 0.45rem 0.65rem !important;
   font-size: var(--text-2xs, 10px) !important;
+  background-color: #121c17 !important;
+  color: #9cb3a6 !important;
 }
 
 .simulation-speed button[aria-pressed='true'] {
-  background: var(--thud-accent) !important;
-  color: #0b110e !important;
-  font-weight: 800 !important;
+  background-color: #00f0ff !important;
+  color: #000000 !important;
+  font-weight: 900 !important;
+  box-shadow: 0 0 15px #00f0ff, 0 0 30px rgba(0, 240, 255, 0.8), inset 0 0 8px rgba(0, 240, 255, 0.5) !important;
+  text-shadow: 0 0 8px #00f0ff;
 }
 
 /* ==========================================================================
-   CAR ACTIONS / AGENT BRAIN CARD (Floating Right Widget)
+   CAR ACTIONS / AGENT BRAIN CARD (Carbon Fiber Weave Panel)
    ========================================================================== */
 .car-actions {
   position: absolute;
   bottom: 4.8rem;
   right: 1.2rem;
-  width: min(260px, calc(100% - 2.4rem));
-  background: #0e1518f0;
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--thud-border);
-  border-top: 2px solid var(--thud-accent);
-  border-radius: 4px;
-  padding: 0.9rem;
-  box-shadow: var(--thud-shadow);
+  width: min(280px, calc(100% - 2.4rem));
+  background-color: #0b110e;
+  background-image:
+    linear-gradient(180deg, rgba(0, 255, 102, 0.08) 0%, transparent 60%, rgba(0, 0, 0, 0.75) 100%),
+    var(--texture-carbon);
+  background-size: cover, 140px;
+  background-blend-mode: overlay;
+  border: 3px outset #495e50;
+  border-top: 4px solid var(--accent);
+  border-radius: 0px;
+  padding: 1rem;
+  box-shadow: 6px 6px 0px #000, 0 0 25px rgba(0, 255, 102, 0.35);
   z-index: 15;
   pointer-events: auto;
 }
@@ -541,56 +577,69 @@
 .car-actions header h3 {
   font-family: var(--font-display);
   font-style: italic;
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   text-transform: uppercase;
   margin: 0;
-  color: var(--thud-accent);
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent);
 }
 
 .car-actions header button {
-  padding: 0.15rem 0.45rem;
+  padding: 0.2rem 0.5rem;
   font-size: var(--text-sm);
   border: 1px solid var(--thud-border);
-  border-radius: 2px;
+  border-radius: 0px;
 }
 
 .car-actions p[role='status'] {
   font-family: var(--font-data);
   font-size: var(--font-label);
-  color: var(--thud-muted);
+  color: #b8c9bf;
   margin: 0.3rem 0 0.6rem;
   line-height: 1.35;
 }
 
 .car-actions .car-actions__eliminate {
-  border-color: #5c2929;
-  background: #251616;
-  color: #ff918a;
-  margin-top: 0.3rem;
+  background-color: var(--secondary) !important;
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, transparent 45%, rgba(0, 0, 0, 0.5) 100%),
+    var(--texture-plate) !important;
+  background-size: cover, 160px !important;
+  background-blend-mode: overlay !important;
+  color: #ffffff !important;
+  border: 2px outset #ff73b6 !important;
+  box-shadow: 3px 3px 0px #000, 0 0 18px var(--secondary), 0 0 35px rgba(255, 0, 127, 0.6) !important;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-top: 0.4rem;
   width: 100%;
 }
 
 .car-actions .car-actions__eliminate:hover:not(:disabled) {
-  background: #3e1b1b;
-  border-color: var(--thud-red);
-  color: #fff;
+  border-color: #ffffff !important;
+  box-shadow: 3px 3px 0px #000, 0 0 28px var(--secondary), 0 0 55px rgba(255, 0, 127, 0.9) !important;
+  filter: brightness(1.2);
 }
 
 /* ==========================================================================
-   TELEMETRY & SETTINGS OVERLAYS
+   TELEMETRY & SETTINGS OVERLAYS (Carbon Fiber Weave Panel)
    ========================================================================== */
 .telemetry-panel {
   position: absolute;
   top: 3.8rem;
   right: 1.2rem;
-  width: min(290px, calc(100% - 2.4rem));
-  background: #0e1518f5;
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--thud-border);
-  border-top: 2px solid var(--thud-accent);
-  border-radius: 4px;
-  padding: 1rem;
-  box-shadow: var(--thud-shadow);
+  width: min(300px, calc(100% - 2.4rem));
+  background-color: #0b110e;
+  background-image:
+    linear-gradient(180deg, rgba(0, 255, 102, 0.08) 0%, transparent 60%, rgba(0, 0, 0, 0.75) 100%),
+    var(--texture-carbon);
+  background-size: cover, 140px;
+  background-blend-mode: overlay;
+  border: 3px outset #495e50;
+  border-top: 4px solid var(--accent);
+  border-radius: 0px;
+  padding: 1.1rem;
+  box-shadow: 6px 6px 0px #000, 0 0 25px rgba(0, 255, 102, 0.35);
   z-index: 12;
   pointer-events: auto;
 }
@@ -598,10 +647,11 @@
 .telemetry-panel h3 {
   font-family: var(--font-data);
   font-size: var(--font-label);
-  font-weight: 800;
+  font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--thud-accent);
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent);
   margin: 0 0 0.6rem;
 }
 
@@ -615,7 +665,13 @@
 }
 
 .telemetry-panel dt {
-  color: var(--thud-muted);
+  color: #8da497;
+}
+
+.telemetry-panel dd {
+  color: #39ff14;
+  font-weight: 800;
+  text-shadow: 0 0 8px #00ff66;
 }
 
 .telemetry-panel dd {

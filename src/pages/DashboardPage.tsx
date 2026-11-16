@@ -35,7 +35,7 @@ export function DashboardPage() {
       </header>
       <section className="paddock-content">
         <p className="eyebrow">
-          Paddock / {guest ? 'Piloto invitado' : auth.user?.username}
+          CALLEJÓN CLANDESTINO // {guest ? 'Piloto invitado' : auth.user?.username}
         </p>
         {!guest && <GuestProgressImport />}
         <h1>
@@ -68,7 +68,7 @@ export function DashboardPage() {
             <span className="menu-index">01</span>
             <div>
               <h2>ENTRENAMIENTO</h2>
-              <p>Tu escudería. Tu próxima generación.</p>
+              <p>Quema rueda · Evoluciona tu piloto en el asfalto.</p>
             </div>
             <span className="menu-arrow">↗</span>
           </Link>
@@ -83,8 +83,8 @@ export function DashboardPage() {
               <h2>MULTIJUGADOR</h2>
               <p>
                 {guest
-                  ? 'Requiere cuenta · Guarda tu piloto y compite.'
-                  : 'Lleva a tu mejor piloto al torneo.'}
+                  ? 'Requiere cuenta · Guarda tu máquina y compite online.'
+                  : 'Pique callejero online · Duelo en tiempo real.'}
               </p>
             </div>
             <span className="menu-arrow">↗</span>
@@ -93,14 +93,14 @@ export function DashboardPage() {
             <span className="menu-index">03</span>
             <div>
               <h2>GARAJE</h2>
-              <p>Elige tu auto. Deja tu firma.</p>
+              <p>Taller clandestino · Chapa, alerones y neones.</p>
             </div>
             <span className="menu-arrow">↗</span>
           </Link>
         </nav>
         {!guest && guestAppearance && (
           <Link className="paddock-guest-design" to="/garage">
-            Tu diseño de invitado te espera en el garaje ↗
+            Tu diseño de invitado te espera en el taller ↗
           </Link>
         )}
       </section>
@@ -111,15 +111,15 @@ export function DashboardPage() {
       >
         <span>
           {loading
-            ? 'Preparando tu auto'
+            ? 'Preparando bólido...'
             : loadError
-              ? 'Abre el garaje para cargar tu auto'
-              : 'Tu auto / listo para la pista'}
+              ? 'Abre el taller para cargar tu auto'
+              : 'Tu máquina lista para el pique'}
         </span>
         <strong>
           {car.name} <b>#{String(appearance.number).padStart(2, '0')}</b>
         </strong>
-        <small>PERSONALIZAR ↗</small>
+        <small>METER AL TALLER ↗</small>
       </Link>
       {guest && (
         <footer className="guest-progress-bar">
