@@ -77,6 +77,16 @@ beforeEach(() => {
 })
 
 describe('session renewal isolation', () => {
+  it('keeps the current session when the server cannot confirm logout', async () => {
+    await authenticate()
+    vi.mocked(authApi.logout).mockRejectedValue(new Error('Failed to fetch'))
+    await act(async () => {
+      await expect(auth.logout()).rejects.toThrow('Failed to fetch')
+    })
+    expect(auth.status).toBe('authenticated')
+    expect(auth.accessToken).toBe(accountA.accessToken)
+  })
+
   it('applies a renewed token and profile for the same account', async () => {
     await authenticate()
     const refreshed = {

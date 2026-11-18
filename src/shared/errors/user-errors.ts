@@ -11,6 +11,7 @@ export const errorCatalog: Record<string, UserError> = {
   INVALID_CREDENTIALS: entry('CREDENCIALES_INVALIDAS', 'No pudimos iniciar sesión', 'El correo o la contraseña no coinciden. Revisa tus datos e inténtalo de nuevo.'),
   ACCOUNT_CONFLICT: entry('CUENTA_EXISTENTE', 'Estos datos ya están en uso', 'El correo o el nombre de usuario ya están registrados. Usa otros datos o inicia sesión con tu cuenta.'),
   NETWORK: entry('SIN_CONEXION', 'No pudimos conectar', 'Comprueba tu conexión e inténtalo de nuevo. Si continúa, el servidor puede no estar disponible.'),
+  INSECURE_TRANSPORT: entry('CONEXION_NO_SEGURA', 'Se necesita una conexión segura', 'Abre el juego por HTTPS y comprueba que el servidor también use HTTPS.'),
   FORBIDDEN: entry('SIN_PERMISO', 'No tienes permiso', 'Esta acción no está disponible para tu cuenta o tu rol actual.'),
   ROOM_NOT_FOUND: entry('SALA_NO_ENCONTRADA', 'No encontramos la sala', 'Revisa el código de la sala y vuelve a intentarlo.'),
   ROOM_FULL: entry('SALA_LLENA', 'La parrilla está completa', 'No quedan plazas en esta sala. Prueba con otra o crea una nueva.'),
@@ -40,6 +41,7 @@ export const errorCatalog: Record<string, UserError> = {
 
 const rules: [RegExp, string][] = [
   [/invalid credentials/i, 'INVALID_CREDENTIALS'],
+  [/secure connection required/i, 'INSECURE_TRANSPORT'],
   [/authentication required|unauthorized|invalid session|jwt expired|sesión (?:cambió|no está|.*vencid)/i, 'UNAUTHORIZED'],
   [/email or username.*in use|already (?:registered|exists)/i, 'ACCOUNT_CONFLICT'],
   [/failed to fetch|fetch failed|networkerror|load failed|network request|no se pudo conectar|offline|sin conexión/i, 'NETWORK'],
@@ -50,13 +52,13 @@ const rules: [RegExp, string][] = [
   [/join a room first/i, 'NOT_IN_ROOM'], [/race is not in lobby/i, 'INVALID_STATE'],
   [/training run not found|no se encontró el entrenamiento/i, 'TRAINING_NOT_FOUND'],
   [/(?:best|saved) genome is not available/i, 'GENOME_UNAVAILABLE'],
-  [/unsupported.*(?:snapshot|version)|incompatible simulation|snapshot population|invalid guest (?:training|generation)/i, 'INCOMPATIBLE_TRAINING'],
+  [/unsupported.*(?:snapshot|version)|incompatible simulation|snapshot population|invalid training (?:snapshot|configuration)|invalid guest (?:training|generation)/i, 'INCOMPATIBLE_TRAINING'],
   [/invalid vehicle appearance/i, 'INVALID_APPEARANCE'],
   [/database is not ready|internal server error|service unavailable/i, 'SERVER'],
   [/must be|should not|can only contain|bad request/i, 'INVALID_DATA'],
 ]
 
-export function getUserError(error: unknown, fallback?: string): UserError {
+export function getUserError(error: unknown, fallback?: string, allowLocalMessage = true): UserError {
   const source = typeof error === 'object' && error !== null ? error as { code?: unknown; message?: unknown; status?: unknown } : {}
   const message = typeof error === 'string' ? error : typeof source.message === 'string' ? source.message : ''
   if (typeof source.code === 'string' && errorCatalog[source.code]) return errorCatalog[source.code]
@@ -68,7 +70,7 @@ export function getUserError(error: unknown, fallback?: string): UserError {
     if (key) return errorCatalog[key]
   }
   // Only recognized Spanish UI messages may pass through; never expose arbitrary server diagnostics.
-  if (/^(?:No se pud|No se encontr|La sesión|El garaje|El navegador|Este navegador|Revisa |Espera |Inicia sesión|Usa |Ingresa |Solo se permiten|La velocidad|La capacidad|La sala|Esta acción|Este auto|No hay )/.test(message)) {
+  if (allowLocalMessage && /^(?:No se pud|No se encontr|La sesión|El garaje|El navegador|Este navegador|Revisa |Espera |Inicia sesión|Usa |Ingresa |Solo se permiten|La velocidad|La capacidad|La sala|Esta acción|Este auto|No hay )/.test(message)) {
     return entry('ACCION_NO_COMPLETADA', 'Revisa esta acción', message)
   }
   return fallback ? { ...errorCatalog.UNKNOWN, message: fallback } : errorCatalog.UNKNOWN

@@ -1,6 +1,7 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../features/auth/context/useAuth.ts'
+import { ErrorNotice } from '../shared/components/ErrorNotice.tsx'
 import { useMenuStage } from '../shared/game/menu-stage-context.ts'
 import { GameSettings } from '../shared/game/GameSettings.tsx'
 import { GuestProgressImport } from '../features/training/components/GuestProgressImport.tsx'
@@ -20,6 +21,21 @@ export function DashboardPage() {
   const { preview } = useMenuStage()
   const menu = useRef<HTMLElement>(null)
   const { preferences } = useGamePreferences()
+  const [signingOut, setSigningOut] = useState(false)
+  const [logoutError, setLogoutError] = useState<unknown>(null)
+
+  async function handleLogout() {
+    setSigningOut(true)
+    setLogoutError(null)
+    try {
+      await auth.logout()
+    } catch (error) {
+      setLogoutError(error)
+    } finally {
+      setSigningOut(false)
+    }
+  }
+
   return (
     <main className="game-shell dashboard">
       <header className="game-header">
@@ -28,12 +44,13 @@ export function DashboardPage() {
         </Link>
         <div className="header-actions">
           <GameSettings />
-          <button className="text-button" onClick={() => void auth.logout()}>
-            {guest ? 'Salir del modo invitado' : 'Cerrar sesión'}
+          <button className="text-button" disabled={signingOut} onClick={() => void handleLogout()}>
+            {signingOut ? 'Cerrando sesión…' : guest ? 'Salir del modo invitado' : 'Cerrar sesión'}
           </button>
         </div>
       </header>
       <section className="paddock-content">
+        <ErrorNotice error={logoutError} fallback="No se pudo cerrar sesión. Inténtalo de nuevo." compact />
         <p className="eyebrow">
           CALLEJÓN CLANDESTINO // {guest ? 'Piloto invitado' : auth.user?.username}
         </p>

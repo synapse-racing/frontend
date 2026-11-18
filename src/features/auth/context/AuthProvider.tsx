@@ -77,9 +77,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }
 
   async function logout() {
-    const authenticated = status === 'authenticated'
-    clearSession()
-    if (authenticated) await authApi.logout().catch(() => undefined)
+    const version = ++sessionVersion.current
+    if (status === 'authenticated') await authApi.logout()
+    if (version === sessionVersion.current) clearSession()
   }
 
   function continueAsGuest() {

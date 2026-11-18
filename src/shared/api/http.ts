@@ -1,4 +1,4 @@
-import { environment } from '../config/environment.ts'
+import { environment, resolveApiUrl } from '../config/environment.ts'
 import { getUserError } from '../errors/user-errors.ts'
 
 interface ApiRequestOptions extends RequestInit {
@@ -14,7 +14,7 @@ export class ApiError extends Error {
   readonly code: string
 
   constructor(message: string, status: number) {
-    const detail = getUserError({ message, status })
+    const detail = getUserError({ message, status }, undefined, false)
     super(detail.message)
     this.name = 'ApiError'
     this.status = status
@@ -26,6 +26,12 @@ export async function apiRequest<T>(
   path: string,
   { token, headers, ...options }: ApiRequestOptions = {},
 ): Promise<T> {
+  let url: URL
+  try {
+    url = resolveApiUrl(`${environment.apiUrl}${path}`, new URL(window.location.href))
+  } catch {
+    throw new ApiError('Secure connection required', 0)
+  }
   const requestHeaders = new Headers(headers)
   if (options.body) {
     requestHeaders.set('Content-Type', 'application/json')
@@ -34,9 +40,10 @@ export async function apiRequest<T>(
     requestHeaders.set('Authorization', `Bearer ${token}`)
   }
 
-  const response = await fetch(`${environment.apiUrl}${path}`, {
+  const response = await fetch(url.href, {
     ...options,
     credentials: 'include',
+    redirect: 'error',
     headers: requestHeaders,
   }).catch(() => {
     throw new ApiError('Failed to fetch', 0)
