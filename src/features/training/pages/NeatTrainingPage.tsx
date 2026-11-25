@@ -1,4 +1,5 @@
 import { errorMessage } from '../../../shared/errors/user-errors.ts'
+import { useSoundtrack } from '../../../shared/game/soundtrack-context.ts'
 import { SceneCanvas } from '../../../shared/three/SceneCanvas.tsx'
 import { useAppearance } from '../../garage/context/appearance-context.ts'
 import type { CarPose, RaceCameraMode } from '../../../shared/three/RaceCamera.tsx'
@@ -96,6 +97,12 @@ export function NeatTrainingPage() {
   const [showRaycasts, setShowRaycasts] = useState(false)
   const [runId, setRunId] = useState(0)
   const [selectedRun, setSelectedRun] = useState<TrainingRun | null>(null)
+  const { setRaceActive } = useSoundtrack()
+
+  useEffect(() => {
+    setRaceActive(Boolean(selectedRun) && status !== 'idle')
+    return () => setRaceActive(false)
+  }, [selectedRun, status, setRaceActive])
   const [selectorBusy, setSelectorBusy] = useState(false)
   const [selectorError, setSelectorError] = useState<string | null>(null)
   const [persistenceStatus, setPersistenceStatus] =

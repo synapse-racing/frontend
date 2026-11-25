@@ -12,6 +12,7 @@ export function GamePreferences({ children }: PropsWithChildren) {
       return {
         quality: saved.quality === 'low' ? 'low' : 'high',
         sound: saved.sound === true,
+        music: saved.music !== false,
         reducedMotion: saved.reducedMotion === true,
         pauseMenuAnimation: saved.pauseMenuAnimation === true,
       }

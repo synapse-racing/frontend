@@ -3,12 +3,14 @@ import { createContext, useContext, useEffect, useState } from 'react'
 export interface Preferences {
   quality: 'low' | 'high'
   sound: boolean
+  music: boolean
   reducedMotion: boolean
   pauseMenuAnimation: boolean
 }
 export const defaults: Preferences = {
   quality: 'high',
   sound: false,
+  music: true,
   reducedMotion: false,
   pauseMenuAnimation: false,
 }

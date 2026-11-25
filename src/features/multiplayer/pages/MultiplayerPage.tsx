@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { errorMessage } from '../../../shared/errors/user-errors.ts'
+import { useSoundtrack } from '../../../shared/game/soundtrack-context.ts'
 import { useAuth } from '../../auth/context/useAuth.ts'
 import {
   connectMultiplayer,
@@ -88,12 +89,18 @@ export function MultiplayerPage() {
     setResult(null)
   }
 
+  const { setRaceActive } = useSoundtrack()
   const currentUserId = auth.user?.id ?? ''
   const racing =
     room &&
     (room.status !== 'LOBBY' ||
       result !== null ||
       snapshot?.status === 'FINISHED')
+
+  useEffect(() => {
+    setRaceActive(Boolean(racing))
+    return () => setRaceActive(false)
+  }, [racing, setRaceActive])
 
   return (
     <main className="multiplayer-page">

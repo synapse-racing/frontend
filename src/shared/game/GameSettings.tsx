@@ -31,6 +31,14 @@ export function GameSettings() {
         <label className="setting-toggle">
           <input
             type="checkbox"
+            checked={preferences.music}
+            onChange={(e) => update({ music: e.target.checked })}
+          />{' '}
+          Música del menú y carrera
+        </label>
+        <label className="setting-toggle">
+          <input
+            type="checkbox"
             checked={preferences.sound}
             onChange={(e) => update({ sound: e.target.checked })}
           />{' '}

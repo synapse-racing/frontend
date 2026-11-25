@@ -9,6 +9,7 @@ import { NotFoundPage } from './pages/NotFoundPage.tsx'
 import { TitlePage } from './pages/TitlePage.tsx'
 import { GamePreferences } from './shared/game/GamePreferences.tsx'
 import { MenuStage } from './shared/game/MenuStage.tsx'
+import { SoundtrackManager } from './shared/game/SoundtrackManager.tsx'
 
 const NeatTrainingPage = lazy(() =>
   import('./features/training/pages/NeatTrainingPage.tsx').then((module) => ({
@@ -30,7 +31,8 @@ const GaragePage = lazy(() =>
 function App() {
   return (
     <GamePreferences>
-      <Routes>
+      <SoundtrackManager>
+        <Routes>
         <Route element={<MenuStage />}>
           <Route path="/" element={<TitlePage />} />
           <Route element={<PublicOnlyRoute />}>
@@ -94,7 +96,8 @@ function App() {
           </Route>
         </Route>
         <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+        </Routes>
+      </SoundtrackManager>
     </GamePreferences>
   )
 }
