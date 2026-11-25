@@ -1,13 +1,14 @@
-import { act, render } from '@testing-library/react'
+import { act, fireEvent, render } from '@testing-library/react'
 import { useEffect, useImperativeHandle, type Ref } from 'react'
 import { PerspectiveCamera, Vector3 } from 'three'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { RaceCamera } from './RaceCamera.tsx'
 
-type Orbit = { getDistance: () => number; panSpeed: number; target: Vector3 }
+type Orbit = { getDistance: () => number; panSpeed: number; zoomSpeed: number; target: Vector3 }
 
 const scene = vi.hoisted(() => ({
   camera: null as PerspectiveCamera | null,
+  canvas: null as HTMLCanvasElement | null,
   frame: null as ((_: unknown, delta: number) => void) | null,
   controls: null as {
     target: [number, number, number]
@@ -19,6 +20,8 @@ const scene = vi.hoisted(() => ({
 vi.mock('@react-three/fiber', () => ({
   useThree: () => ({
     camera: scene.camera,
+    events: {},
+    gl: { domElement: scene.canvas },
     size: { width: 1280, height: 720 },
   }),
   useFrame: (callback: typeof scene.frame) => {
@@ -41,9 +44,51 @@ vi.mock('@react-three/drei', () => ({
 beforeEach(() => {
   scene.camera = new PerspectiveCamera(52, 16 / 9, 0.1, 2000)
   scene.camera.position.set(0, 52, 46)
+  scene.canvas = document.createElement('canvas')
   scene.controls = null
   const target = new Vector3()
-  scene.orbit = { getDistance: () => scene.camera!.position.distanceTo(target), panSpeed: 1, target }
+  scene.orbit = { getDistance: () => scene.camera!.position.distanceTo(target), panSpeed: 1, zoomSpeed: 1, target }
+})
+
+it('moves the same distance per wheel step near and far from the pivot', () => {
+  const { container } = render(<RaceCamera mode="free" getTarget={() => undefined} />)
+  const canvas = scene.canvas!
+  const orbit = scene.orbit!
+  let wheelSpeed = 1
+  canvas.addEventListener('wheel', () => { wheelSpeed = orbit.zoomSpeed })
+  container.append(canvas)
+  for (const distance of [2.5, 25, 100]) {
+    orbit.getDistance = () => distance
+    fireEvent.wheel(canvas, { deltaY: -120 })
+    expect(distance - distance * 0.95 ** wheelSpeed).toBeCloseTo(1.5)
+    fireEvent.wheel(canvas, { deltaY: 120 })
+    expect(distance / 0.95 ** wheelSpeed - distance).toBeCloseTo(1.5)
+    expect(orbit.zoomSpeed).toBe(1)
+  }
+})
+
+it('moves the free camera and its pivot with WASD and arrows without capturing text input', () => {
+  const view = render(
+    <><RaceCamera mode="free" getTarget={() => undefined} /><input aria-label="Prueba" /></>,
+  )
+  const camera = scene.camera!
+  const orbit = scene.orbit!
+  const initialOffset = orbit.target.clone().sub(camera.position)
+  const initialPosition = camera.position.clone()
+  fireEvent.keyDown(window, { code: 'KeyW' })
+  act(() => scene.frame!(null, 0.1))
+  expect(camera.position.z).toBeCloseTo(initialPosition.z - 2)
+  fireEvent.keyUp(window, { code: 'KeyW' })
+  fireEvent.keyDown(window, { code: 'ArrowRight' })
+  act(() => scene.frame!(null, 0.1))
+  expect(camera.position.x).toBeCloseTo(initialPosition.x + 2)
+  expect(camera.position.y).toBe(initialPosition.y)
+  expect(orbit.target.clone().sub(camera.position).distanceTo(initialOffset)).toBeLessThan(1e-7)
+
+  fireEvent.blur(window)
+  fireEvent.keyDown(view.getByRole('textbox'), { code: 'KeyD' })
+  act(() => scene.frame!(null, 0.1))
+  expect(camera.position.x).toBeCloseTo(initialPosition.x + 2)
 })
 
 it('maintains useful drag travel when zooming in and restores normal sensitivity when zooming out', () => {
