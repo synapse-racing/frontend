@@ -42,6 +42,9 @@ export function RaceCarModel({
   const finish = appearance?.finish ?? defaultAppearance.finish
   const livery = appearance?.livery ?? defaultAppearance.livery
   const number = appearance?.number ?? defaultAppearance.number
+  const skin = appearance?.skin ?? defaultAppearance.skin
+  const skinScale = appearance?.skinScale ?? defaultAppearance.skinScale
+  const skinMode = appearance?.skinMode ?? defaultAppearance.skinMode
   const materials = useMemo(
     () =>
       createVehicleMaterials(
@@ -53,6 +56,9 @@ export function RaceCarModel({
           finish,
           livery,
           number,
+          skin,
+          skinScale,
+          skinMode,
         },
         faded,
       ),
@@ -64,6 +70,9 @@ export function RaceCarModel({
       finish,
       livery,
       number,
+      skin,
+      skinScale,
+      skinMode,
       faded,
     ],
   )

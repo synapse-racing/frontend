@@ -194,3 +194,20 @@ it('imports a guest design into the preview only until explicitly applied', asyn
   await user.click(screen.getByRole('button', { name: 'Guardar' }))
   expect(value.save).toHaveBeenCalledWith(guest)
 })
+
+it('selects a skin, toggles wrap/tint mode and saves the appearance', async () => {
+  const user = userEvent.setup()
+  const value = mount()
+  await user.click(screen.getByRole('tab', { name: /05 \/ Skins/ }))
+  expect(screen.getByRole('button', { name: 'Vinilo teñido' })).toBeDisabled()
+  await user.click(screen.getByRole('button', { name: 'Llamas I' }))
+  expect(screen.getByRole('button', { name: 'Vinilo teñido' })).toBeEnabled()
+  await user.click(screen.getByRole('button', { name: 'Vinilo teñido' }))
+  await user.click(screen.getByRole('button', { name: 'Guardar' }))
+  expect(value.save).toHaveBeenCalledWith({
+    ...defaultAppearance,
+    skin: 'llamas',
+    skinMode: 'tint',
+    skinScale: 1,
+  })
+})

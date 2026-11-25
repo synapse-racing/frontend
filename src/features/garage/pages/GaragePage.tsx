@@ -13,6 +13,7 @@ import { ModelPicker } from '../components/ModelPicker.tsx'
 import { ColorPicker } from '../components/ColorPicker.tsx'
 import { FinishPicker } from '../components/FinishPicker.tsx'
 import { NumberPicker } from '../components/NumberPicker.tsx'
+import { SkinPicker } from '../components/SkinPicker.tsx'
 import { GarageTopBar, type SaveState } from '../components/GarageTopBar.tsx'
 import { GarageActionBar } from '../components/GarageActionBar.tsx'
 import { LeaveDialog } from '../components/LeaveDialog.tsx'
@@ -22,6 +23,7 @@ const tabs = [
   ['colors', '02 / Colores'],
   ['finish', '03 / Acabado'],
   ['number', '04 / Número'],
+  ['skins', '05 / Skins'],
 ] as const
 type Tab = (typeof tabs)[number][0]
 
@@ -242,6 +244,7 @@ function GarageEditor() {
               }}
             />
           )}
+          {tab === 'skins' && <SkinPicker draft={draft} onChange={update} />}
         </section>
         {guestDesign && (
           <div className="garage-import">

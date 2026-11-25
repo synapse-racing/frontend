@@ -16,7 +16,7 @@ import {
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defaultAppearance } from '../../../features/garage/domain/appearance.ts'
-import { createVehicleMaterials } from './materials.ts'
+import { createVehicleMaterials, getSkinTexture } from './materials.ts'
 import {
   animateVehicleWheels,
   createVehicleRig,
@@ -442,4 +442,32 @@ it('disposes only instance-owned decals and preserves shared textures, source ge
   paletteDisposals.forEach((dispose) => expect(dispose).not.toHaveBeenCalled())
   animateVehicleWheels(second, 0.21, 0.2)
   expect(second.wheels[0].spin.rotation.x).toBeCloseTo(-1)
+})
+
+it('separates lean paint shader from triplanar skin shader and shares cached skin textures', () => {
+  const plain = createVehicleMaterials(
+    { ...defaultAppearance, skin: 'none' },
+    false,
+  )
+  const skinnedA = createVehicleMaterials(
+    { ...defaultAppearance, skin: 'llamas', skinScale: 1.5, skinMode: 'wrap' },
+    false,
+  )
+  const skinnedB = createVehicleMaterials(
+    { ...defaultAppearance, skin: 'llamas', skinScale: 2, skinMode: 'tint' },
+    false,
+  )
+  cleanup.push(() => {
+    Object.values(plain).forEach((m) => m.dispose())
+    Object.values(skinnedA).forEach((m) => m.dispose())
+    Object.values(skinnedB).forEach((m) => m.dispose())
+  })
+
+  expect(plain.paint.defines?.USE_VEHICLE_SKIN).toBeUndefined()
+  expect(plain.paint.customProgramCacheKey()).toBe('vehicle-paint-v3-none')
+  expect(skinnedA.paint.defines?.USE_VEHICLE_SKIN).toBe(1)
+  expect(skinnedA.paint.customProgramCacheKey()).toBe('vehicle-paint-v3-skin')
+  expect(skinnedB.paint.customProgramCacheKey()).toBe('vehicle-paint-v3-skin')
+  expect(getSkinTexture('none')).toBeNull()
+  expect(getSkinTexture('llamas')).toBe(getSkinTexture('llamas'))
 })
