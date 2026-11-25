@@ -1574,12 +1574,14 @@ small {
 }
 .race-countdown {
   position: absolute;
-  inset: 0;
+  inset: clamp(4rem, 18dvh, 11rem) 0 auto;
   display: grid;
   place-content: center;
+  pointer-events: none;
   font-family: var(--font-display);
-  font-size: clamp(6rem, 20vw, 14rem);
+  font-size: clamp(3rem, min(14vw, 16dvh), 8rem);
   font-style: italic;
+  line-height: 1;
   color: #fff4d3;
   text-shadow: 4px 6px #151a13;
 }

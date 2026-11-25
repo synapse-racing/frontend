@@ -119,6 +119,7 @@ export function MultiplayerPage() {
 
       {racing && snapshot ? (
         <MultiplayerRace
+          key={snapshot.startAt}
           currentUserId={currentUserId}
           controlsDisabled={connection !== 'connected'}
           onEliminateCar={(userId, startAt) => {

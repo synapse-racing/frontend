@@ -50,6 +50,35 @@ beforeEach(() => {
   scene.orbit = { getDistance: () => scene.camera!.position.distanceTo(target), panSpeed: 1, zoomSpeed: 1, target }
 })
 
+it('opens at track level looking at the starting grid, even away from the origin', () => {
+  const grid = { x: 115, z: -73, yaw: Math.PI / 2 }
+  render(<RaceCamera mode="free" startingGrid={grid} getTarget={() => undefined} />)
+
+  const camera = scene.camera!
+  const car = new Vector3(grid.x, 0.8, grid.z)
+  expect(camera.position.distanceTo(car)).toBeLessThan(12)
+  expect(camera.position.y).toBeLessThan(5)
+  expect(camera.position.x).toBeGreaterThan(grid.x)
+  expect(camera.getWorldDirection(new Vector3()).dot(car.sub(camera.position).normalize())).toBeGreaterThan(0.97)
+  expect(scene.orbit!.target.distanceTo(new Vector3(grid.x, 0.8, grid.z))).toBeLessThan(2)
+})
+
+it('preserves manual camera movement across updates and reframes a new session', () => {
+  const grid = { x: 20, z: 45, yaw: 0 }
+  const view = render(<RaceCamera key={1} mode="free" startingGrid={grid} getTarget={() => undefined} />)
+  const camera = scene.camera!
+  fireEvent.keyDown(window, { code: 'KeyW' })
+  act(() => scene.frame!(null, 0.1))
+  fireEvent.keyUp(window, { code: 'KeyW' })
+  const moved = camera.position.clone()
+
+  view.rerender(<RaceCamera key={1} mode="free" startingGrid={{ ...grid }} getTarget={() => undefined} />)
+  expect(camera.position.equals(moved)).toBe(true)
+  const nextGrid = { x: -50, z: 25, yaw: Math.PI }
+  view.rerender(<RaceCamera key={2} mode="free" startingGrid={nextGrid} getTarget={() => undefined} />)
+  expect(camera.position.distanceTo(new Vector3(nextGrid.x, 0.8, nextGrid.z))).toBeLessThan(12)
+})
+
 it('moves the same distance per wheel step near and far from the pivot', () => {
   const { container } = render(<RaceCamera mode="free" getTarget={() => undefined} />)
   const canvas = scene.canvas!

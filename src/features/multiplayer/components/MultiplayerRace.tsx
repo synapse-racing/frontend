@@ -110,6 +110,11 @@ export function MultiplayerRace({
         <RaceCamera
           extent={Math.max(...track.groundSize)}
           mode={cameraMode}
+          startingGrid={{
+            x: track.spawnPosition[0],
+            z: track.spawnPosition[2],
+            yaw: track.spawnYaw,
+          }}
           getTarget={() => poses.current.get(observedId)}
         />
       </SceneCanvas>

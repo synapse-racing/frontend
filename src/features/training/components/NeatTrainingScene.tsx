@@ -16,6 +16,7 @@ import type {
 } from '../domain/agent-control.ts'
 
 interface NeatTrainingSceneProps {
+  runKey: number
   generationKey: string
   genomes: Genome[]
   appearance?: VehicleAppearance
@@ -37,6 +38,7 @@ interface NeatTrainingSceneProps {
 }
 
 export function NeatTrainingScene({
+  runKey,
   generationKey,
   genomes,
   appearance,
@@ -54,6 +56,11 @@ export function NeatTrainingScene({
 }: NeatTrainingSceneProps) {
   const internalPoses = useRef(new Map<string, CarPose>())
   const poses = posesRef ?? internalPoses
+  const startingGrid = {
+    x: track.spawnPosition[0],
+    z: track.spawnPosition[2],
+    yaw: track.spawnYaw,
+  }
   return (
     <>
       <TrackEnvironment track={track} district="workshops" />
@@ -76,16 +83,11 @@ export function NeatTrainingScene({
         />
       ))}
       <RaceCamera
-        key={generationKey}
+        key={runKey}
         extent={Math.max(...track.groundSize)}
         mode={cameraMode}
-        getTarget={() =>
-          poses.current.get(selectedGenomeId) ?? {
-            x: track.spawnPosition[0],
-            z: track.spawnPosition[2],
-            yaw: track.spawnYaw,
-          }
-        }
+        startingGrid={startingGrid}
+        getTarget={() => poses.current.get(selectedGenomeId) ?? startingGrid}
       />
     </>
   )

@@ -1,6 +1,6 @@
 import { OrbitControls } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
-import { useCallback, useEffect, useMemo, useRef, useState, type ComponentRef } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentRef } from 'react'
 import { Vector3 } from 'three'
 import { useReducedMotion } from '../game/preferences.ts'
 export interface CarPose {
@@ -24,23 +24,46 @@ export function RaceCamera({
   mode,
   extent = 50,
   getTarget,
+  startingGrid,
 }: {
   extent?: number
   mode: RaceCameraMode
   getTarget: () => CarPose | undefined
+  startingGrid?: CarPose
 }) {
   const { camera, events, gl } = useThree()
   const reduced = useReducedMotion()
   const desired = useMemo(() => new Vector3(), [])
   const targetLook = useMemo(() => new Vector3(), [])
-  // Al remontar la escena, la vista libre arranca desde la orientación real de
-  // la cámara para no dar un salto al regenerar la generación.
-  const [look] = useState(() => {
-    if (mode !== 'free') return new Vector3(0, 0.5, 0)
-    return camera.position
-      .clone()
-      .add(camera.getWorldDirection(new Vector3()).multiplyScalar(25))
+  const [{ look, gridPosition }] = useState(() => {
+    if (startingGrid) {
+      const { x, z, yaw } = startingGrid
+      const backX = Math.sin(yaw)
+      const backZ = Math.cos(yaw)
+      return {
+        look: new Vector3(x - backX * 1.2, 0.8, z - backZ * 1.2),
+        gridPosition: new Vector3(
+          x + backX * 8.5 + backZ * 3.5,
+          3.5,
+          z + backZ * 8.5 - backX * 3.5,
+        ),
+      }
+    }
+    return {
+      look: mode === 'free'
+        ? camera.position.clone().addScaledVector(camera.getWorldDirection(new Vector3()), 25)
+        : new Vector3(0, 0.5, 0),
+      gridPosition: undefined,
+    }
   })
+  const initialized = useRef(false)
+  useLayoutEffect(() => {
+    if (!gridPosition || initialized.current) return
+    initialized.current = true
+    camera.position.copy(gridPosition)
+    camera.lookAt(look)
+    camera.updateMatrixWorld()
+  }, [camera, gridPosition, look])
   const smoothedYaw = useRef<number | null>(null)
   const wasFollowing = useRef(false)
   const controls = useRef<ComponentRef<typeof OrbitControls>>(null)

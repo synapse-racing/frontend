@@ -172,6 +172,7 @@ export function NeatTrainingPage() {
     carControls.current.clear()
     setInspectedCar(null)
     setSelectedCar(0)
+    setCameraMode('free')
     setEngine(nextEngine)
     setGenomes([...nextEngine.genomes])
     setStatus('idle')
@@ -426,6 +427,7 @@ export function NeatTrainingPage() {
       generationClosing.current = false
       carControls.current.clear()
       setInspectedCar(null)
+      setCameraMode('free')
       setSelectedRun(updated)
       setGenomes([...engine.genomes])
       setAlive(engine.config.populationSize)
@@ -622,6 +624,7 @@ export function NeatTrainingPage() {
       <SceneCanvas>
         <Suspense fallback={null}>
           <NeatTrainingScene
+            runKey={runId}
             generationKey={generationKey}
             genomes={genomes}
             appearance={appearance}
