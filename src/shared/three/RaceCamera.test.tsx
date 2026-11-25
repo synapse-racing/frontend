@@ -1,16 +1,20 @@
 import { act, render } from '@testing-library/react'
-import { useEffect } from 'react'
+import { useEffect, useImperativeHandle, type Ref } from 'react'
 import { PerspectiveCamera, Vector3 } from 'three'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { RaceCamera } from './RaceCamera.tsx'
+
+type Orbit = { getDistance: () => number; panSpeed: number; target: Vector3 }
 
 const scene = vi.hoisted(() => ({
   camera: null as PerspectiveCamera | null,
   frame: null as ((_: unknown, delta: number) => void) | null,
   controls: null as {
     target: [number, number, number]
-    minDistance: number
+    onStart: () => void
+    onChange: () => void
   } | null,
+  orbit: null as Orbit | null,
 }))
 vi.mock('@react-three/fiber', () => ({
   useThree: () => ({
@@ -23,9 +27,11 @@ vi.mock('@react-three/fiber', () => ({
 }))
 vi.mock('../game/preferences.ts', () => ({ useReducedMotion: () => false }))
 vi.mock('@react-three/drei', () => ({
-  OrbitControls: (props: NonNullable<typeof scene.controls>) => {
+  OrbitControls: (props: NonNullable<typeof scene.controls> & { ref: Ref<Orbit> }) => {
     scene.controls = props
+    useImperativeHandle(props.ref, () => scene.orbit!, [])
     useEffect(() => {
+      scene.orbit!.target.set(...props.target)
       scene.camera!.lookAt(...props.target)
     }, [props.target])
     return null
@@ -36,6 +42,62 @@ beforeEach(() => {
   scene.camera = new PerspectiveCamera(52, 16 / 9, 0.1, 2000)
   scene.camera.position.set(0, 52, 46)
   scene.controls = null
+  const target = new Vector3()
+  scene.orbit = { getDistance: () => scene.camera!.position.distanceTo(target), panSpeed: 1, target }
+})
+
+it('maintains useful drag travel when zooming in and restores normal sensitivity when zooming out', () => {
+  render(<RaceCamera mode="free" getTarget={() => undefined} />)
+  const { onStart, onChange } = scene.controls!
+  const orbit = scene.orbit!
+  orbit.getDistance = () => 40
+  onStart()
+  expect(orbit.panSpeed).toBe(1)
+
+  // Perspective OrbitControls multiplies the drag gain by the orbit distance.
+  orbit.getDistance = () => 12
+  onChange()
+  const dragTravel = orbit.getDistance() * orbit.panSpeed
+  orbit.getDistance = () => 3
+  onChange()
+  expect(orbit.getDistance() * orbit.panSpeed).toBeCloseTo(dragTravel)
+  expect(orbit.panSpeed).toBeGreaterThan(2)
+
+  orbit.getDistance = () => 40
+  onChange()
+  expect(orbit.panSpeed).toBe(1)
+})
+
+it('moves the pivot forward for repeated zoom without stopping at the previous target', () => {
+  render(<RaceCamera mode="free" getTarget={() => undefined} />)
+  const camera = scene.camera!
+  const orbit = scene.orbit!
+  const direction = camera.getWorldDirection(new Vector3())
+  for (let step = 0; step < 3; step++) {
+    const previousTarget = orbit.target.clone()
+    camera.position.copy(previousTarget).addScaledVector(direction, -0.1)
+    scene.controls!.onChange()
+    expect(orbit.target.clone().sub(previousTarget).dot(direction)).toBeGreaterThan(1)
+    expect(camera.getWorldDirection(new Vector3()).distanceTo(direction)).toBeLessThan(1e-7)
+  }
+})
+
+it('keeps the camera above the course even when a damped movement has no change event', () => {
+  render(<RaceCamera mode="free" getTarget={() => undefined} />)
+  const camera = scene.camera!
+  const orbit = scene.orbit!
+  camera.position.y = -0.3
+  orbit.target.set(2, -0.7, 40)
+  camera.lookAt(orbit.target)
+  const offset = orbit.target.clone().sub(camera.position)
+  scene.controls!.onChange()
+  expect(camera.position.y).toBeGreaterThan(camera.near)
+  expect(orbit.target.clone().sub(camera.position).distanceTo(offset)).toBeLessThan(1e-7)
+
+  const floor = camera.position.y
+  camera.position.y -= 0.00001
+  act(() => scene.frame!(null, 0.016))
+  expect(camera.position.y).toBe(floor)
 })
 
 it('releases following without changing the view and leaves camera movement under user control', () => {
@@ -46,9 +108,6 @@ it('releases following without changing the view and leaves camera movement unde
   const rotation = scene.camera!.quaternion.clone()
   view.rerender(<RaceCamera mode="free" getTarget={getTarget} />)
   expect(scene.controls!.target).toEqual([50, 0.5, 80])
-  expect(scene.controls!.minDistance).toBeLessThan(
-    position.distanceTo(new Vector3(50, 0.5, 80)),
-  )
   expect(scene.camera!.position.equals(position)).toBe(true)
   expect(scene.camera!.quaternion.angleTo(rotation)).toBeLessThan(1e-7)
   const orbitTarget = scene.controls!.target
