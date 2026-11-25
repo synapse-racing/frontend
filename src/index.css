@@ -127,12 +127,17 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
+:root {
+  --game-viewport: 100vh;
+}
+@supports (height: 100dvh) {
+  :root { --game-viewport: 100dvh; }
+}
 * {
   box-sizing: border-box;
 }
 body {
   margin: 0;
-  min-width: 320px;
   font-family: var(--font-ui);
 }
 button,
@@ -184,22 +189,15 @@ button,
 a,
 input,
 select {
-  transition:
-    background 0.15s,
-    border-color 0.15s,
-    color 0.15s,
-    box-shadow 0.15s,
-    transform 0.15s;
+  transition: background-color 100ms ease-out, border-color 100ms ease-out, color 100ms ease-out;
 }
-button:hover:not(:disabled) {
-  border-color: var(--accent);
-  box-shadow: 3px 3px 0px #000, var(--glow-acid);
-  filter: brightness(1.2);
+@media (hover: hover) {
+  button:hover:not(:disabled) {
+    border-color: var(--accent);
+  }
 }
 button:active:not(:disabled) {
-  border-style: inset;
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0px #000;
+  box-shadow: inset 0 2px 5px #0009;
 }
 a:focus-visible,
 button:focus-visible,
@@ -351,17 +349,12 @@ small {
   box-shadow: 4px 4px 0px #000, var(--glow-acid);
   text-shadow: 0 0 2px rgba(255, 255, 255, 0.6);
 }
-.primary-button:hover:not(:disabled),
-.enter-button:hover:not(:disabled) {
-  background-color: var(--accent-hover);
-  border-color: #ffffff;
-  box-shadow: 5px 5px 0px #000, 0 0 35px var(--accent), 0 0 70px rgba(0, 255, 102, 0.9);
-  transform: scale(1.02);
-}
-.primary-button:active:not(:disabled),
-.enter-button:active:not(:disabled) {
-  border-style: inset;
-  transform: scale(0.99) translate(1px, 1px);
+@media (hover: hover) {
+  .primary-button:hover:not(:disabled),
+  .enter-button:hover:not(:disabled) {
+    background-color: var(--accent-hover);
+    border-color: #fff;
+  }
 }
 .primary-button {
   padding: 0.9rem 1.4rem;
@@ -562,7 +555,9 @@ small {
   border: 3px outset #495e50;
   border-top: 5px solid var(--accent);
   width: min(480px, calc(100% - 2rem));
-  padding: 2.2rem;
+  max-height: calc(var(--game-viewport) - 2rem);
+  padding: clamp(1rem, 4vw, 2rem);
+  overflow: auto;
   box-shadow: 6px 6px 0px #000000, 0 0 35px rgba(0, 255, 102, 0.35);
 }
 .game-dialog::backdrop {
@@ -699,7 +694,7 @@ small {
 .multiplayer-race {
   position: relative;
   width: 100%;
-  height: 100svh;
+  height: var(--game-viewport);
   overflow: hidden;
   background: #c8b58d;
 }
@@ -729,6 +724,7 @@ small {
   border-bottom: 2px solid var(--accent);
   pointer-events: auto;
 }
+.race-hud header button { padding-inline: 0.65rem; }
 .neat-hud__topbar > div:first-child,
 .neat-hud__actions {
   display: flex;
@@ -1593,14 +1589,19 @@ small {
   z-index: 5;
   background: #0a1314d9;
   backdrop-filter: blur(8px);
-  padding: 2rem;
+  padding: clamp(0.6rem, 3dvh, 2rem);
   display: grid;
+  grid-template-rows: minmax(0, 1fr);
   place-items: center;
   overflow: auto;
 }
 .race-results > div {
   width: min(100%, 650px);
-  padding: 2rem;
+  max-height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  padding: clamp(0.7rem, 3dvh, 2rem);
   background: #24322e;
   border-top: 4px solid var(--accent);
 }
@@ -1611,15 +1612,19 @@ small {
 .race-results ol {
   padding: 0;
   list-style: none;
-  margin: 2rem 0;
+  min-height: 0;
+  margin: clamp(0.55rem, 2dvh, 1.6rem) 0;
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 .race-results li {
   display: grid;
-  grid-template-columns: 3rem 1fr auto;
+  grid-template-columns: 3rem minmax(0, 1fr) auto;
   gap: 1rem;
   align-items: center;
   border-bottom: 1px solid #526156;
   padding: 1rem 0;
+  overflow-wrap: anywhere;
 }
 .race-results li:first-child > span {
   color: var(--accent);
@@ -1642,7 +1647,7 @@ small {
 }
 .race-standings p {
   display: flex;
-  gap: 1rem;
+  gap: 0.35rem;
   justify-content: space-between;
   margin: 0.7rem 0;
   font-family: var(--font-data);
@@ -1658,6 +1663,7 @@ small {
   pointer-events: auto;
   display: grid;
   gap: 0.5rem;
+  max-width: calc(50% - 1rem);
 }
 .race-camera button {
   font-size: var(--text-sm);
@@ -1672,6 +1678,7 @@ small {
 }
 .camera-select select {
   max-width: 170px;
+  min-width: 0;
   padding: 0.5rem;
 }
 @media (max-width: 900px) {
@@ -1828,9 +1835,6 @@ small {
   .neat-metrics span {
     font-size: var(--text-2xs);
   }
-  .telemetry-panel {
-    top: 13rem;
-  }
   .race-hud header {
     left: 0.5rem;
     right: 0.5rem;
@@ -1840,41 +1844,43 @@ small {
   .race-position {
     left: 0.5rem;
     bottom: 0.5rem;
-    padding: 0.7rem;
+    padding: 0.5rem;
   }
+  .race-position strong { font-size: 2.45rem; }
+  .race-position small { font-size: var(--text-2xs); }
   .race-progress {
     right: 0.5rem;
     bottom: 0.5rem;
     gap: 0.5rem;
     font-size: var(--text-2xs);
-    padding: 1rem 0.6rem;
+    padding: 0.5rem 0.6rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: calc(100% - 7rem);
   }
+  .race-progress span:last-child { font-size: 1.3rem; }
   .race-standings {
     top: 5rem;
     left: 0.5rem;
-    min-width: 140px;
     padding: 0.5rem;
   }
   .race-camera {
     right: 0.5rem;
     top: 5rem;
   }
-  .race-results {
-    padding: 1rem;
-  }
-  .race-results > div {
-    padding: 1.2rem;
-  }
   .race-results li {
-    grid-template-columns: 2rem 1fr;
+    grid-template-columns: 2rem minmax(0, 1fr);
     gap: 0.5rem;
   }
   .race-results li small {
     grid-column: 2;
   }
   .camera-select select {
-    max-width: 115px;
+    max-width: 100%;
+    width: 100%;
   }
+  .camera-select { flex-wrap: wrap; gap: 0.25rem; }
+  .race-camera button { padding-inline: 0.4rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   *,

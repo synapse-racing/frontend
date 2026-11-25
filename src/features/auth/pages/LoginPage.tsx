@@ -32,7 +32,7 @@ export function LoginPage() {
 
   return (
     <AuthLayout>
-      <form className="auth-form" onSubmit={submit} noValidate>
+      <form className="auth-form auth-form--login" onSubmit={submit} noValidate>
         <h2>Iniciar sesión</h2>
         <p className="auth-form__lead">Continúa desde tu última generación.</p>
 
@@ -72,24 +72,26 @@ export function LoginPage() {
             Crea una cuenta
           </Link>
         </p>
-        <div className="auth-form__divider">
-          <span>o empieza a probar</span>
+        <div className="auth-form__guest">
+          <div className="auth-form__divider">
+            <span>o empieza a probar</span>
+          </div>
+          <button
+            type="button"
+            className="guest-button"
+            disabled={isSubmitting}
+            onClick={() => {
+              auth.continueAsGuest()
+              navigate('/dashboard')
+            }}
+          >
+            Continuar como invitado <span aria-hidden="true">↗</span>
+          </button>
+          <p className="auth-form__guest-note">
+            Entrena sin cuenta. Tu progreso se guarda en este navegador y puedes
+            llevarlo a una cuenta después.
+          </p>
         </div>
-        <button
-          type="button"
-          className="guest-button"
-          disabled={isSubmitting}
-          onClick={() => {
-            auth.continueAsGuest()
-            navigate('/dashboard')
-          }}
-        >
-          Continuar como invitado <span aria-hidden="true">↗</span>
-        </button>
-        <p className="auth-form__guest-note">
-          Entrena sin cuenta. Tu progreso se guarda en este navegador y puedes
-          llevarlo a una cuenta después.
-        </p>
       </form>
     </AuthLayout>
   )

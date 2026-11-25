@@ -8,12 +8,12 @@ import {
   exhibitionCar,
   exhibitionShot,
 } from '../game/exhibition.ts'
-import type { TrackTheme } from './TrackEnvironment.tsx'
+import type { MenuTheme } from '../game/menu-stage-context.ts'
 import { TrackEnvironment } from './TrackEnvironment.tsx'
 import { RaceCarModel } from './RaceCarModel.tsx'
 
 interface Props {
-  theme: TrackTheme
+  theme: MenuTheme
   calm: boolean
   paused: boolean
   reduced: boolean
@@ -143,7 +143,7 @@ export default function ExhibitionScene({
 
   return (
     <>
-      <TrackEnvironment track={track} theme={theme} cinematic />
+      <TrackEnvironment track={track} district={theme === 'desert' ? 'workshops' : 'night-race'} cinematic />
       <directionalLight
         ref={sun}
         intensity={2.4}

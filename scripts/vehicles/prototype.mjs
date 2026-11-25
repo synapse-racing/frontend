@@ -518,25 +518,24 @@ function makeLightingAndDetails(b) {
       )
   }
   for (const side of [-1, 1]) {
-    const lampZ = sampleRange(-1.105, -0.968, b.high ? 10 : 5)
-    const lampGrid = lampZ.map((z) => {
-      const taper = smooth(-1.105, -0.98, z)
-      return [
-        side * (0.324 + 0.012 * taper),
-        side * (0.456 + 0.012 * taper),
-      ].map((x) => [x, bodyTop(x, z) + 0.003, z])
-    })
-    b.patch('carbon', lampGrid, side < 0)
-    for (const x of [0.35, 0.393, 0.435]) {
-      b.tube(
-        'lights',
-        sampleRange(-1.085, -0.989, b.high ? 6 : 3).map((z) => [
-          side * x,
-          bodyTop(side * x, z) + 0.01,
-          z,
-        ]),
-        0.006,
-      )
+    const lampGrid = (inset = 0) =>
+      sampleRange(-1.105 + inset, -0.968 - inset, b.high ? 16 : 10).map((z) => {
+        const corner = 0.018
+        const edge = Math.max(0, corner - Math.min(z + 1.105, -0.968 - z))
+        const rounding = corner - Math.sqrt(Math.max(0, corner ** 2 - edge ** 2))
+        const center = 0.365 + 0.027 * smooth(-1.105, -0.98, z)
+        return sampleRange(-1, 1, b.high ? 10 : 6).map((u) => [
+          side * (center + u * (0.054 - inset - rounding)), z,
+        ])
+      })
+    b.bodyDetail('carbon', lampGrid(), 0.003, side < 0)
+    b.bodyDetail('glass', lampGrid(0.006), 0.0045, side < 0)
+    for (const x of [0.339, 0.375, 0.411]) {
+      const grid = sampleRange(-1.082, -0.989, b.high ? 14 : 8).map((z) => {
+        const sweep = 0.018 * smooth(-1.082, -0.989, z)
+        return sampleRange(-0.004, 0.004, 2).map((offset) => [side * (x + sweep + offset), z])
+      })
+      b.bodyDetail('lights', grid, 0.006, side < 0)
     }
 
     b.box(
@@ -631,12 +630,6 @@ function makeLightingAndDetails(b) {
       )
     }
   }
-  bodyRibbon(
-    b,
-    'accent',
-    sampleRange(-1.13, -0.49, b.high ? 24 : 12).map((z) => [0, z]),
-    0.032,
-  )
   b.box(
     'rearLights',
     [0.028, 0.028, 0.008],

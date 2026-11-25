@@ -6,6 +6,10 @@ import {
   ExtrudeGeometry,
   Float32BufferAttribute,
   Matrix4,
+  Mesh,
+  MeshBasicMaterial,
+  DoubleSide,
+  Raycaster,
   RingGeometry,
   Shape,
   SphereGeometry,
@@ -133,6 +137,23 @@ export function createBuilder(detail = 'high') {
     },
     patch(role, grid, flip = false) {
       return builder.add(role, surface(grid, flip))
+    },
+    bodyDetail(role, grid, lift = 0.004, flip = false) {
+      const material = new MeshBasicMaterial({ side: DoubleSide })
+      const meshes = parts.paint.map((geometry) => new Mesh(geometry, material))
+      meshes.forEach((mesh) => mesh.updateMatrixWorld())
+      const ray = new Raycaster(new Vector3(), new Vector3(0, -1, 0))
+      try {
+        const projected = grid.map((row) => row.map(([x, z]) => {
+          ray.ray.origin.set(x, 2, z)
+          const hit = ray.intersectObjects(meshes, false)[0]
+          if (!hit) throw new Error('Body detail falls outside the painted surface')
+          return [x, hit.point.y + lift, z]
+        }))
+        return builder.patch(role, projected, flip)
+      } finally {
+        material.dispose()
+      }
     },
     panel(role, points, thickness = 0.008) {
       const vertices = points.map((point) => new Vector3(...point))

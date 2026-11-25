@@ -56,7 +56,7 @@ export function NeatTrainingScene({
   const poses = posesRef ?? internalPoses
   return (
     <>
-      <TrackEnvironment track={track} theme="desert" />
+      <TrackEnvironment track={track} district="workshops" />
       {genomes.map((genome, index) => (
         <NeatVehicle
           key={`${generationKey}-${genome.id}`}
@@ -76,6 +76,7 @@ export function NeatTrainingScene({
         />
       ))}
       <RaceCamera
+        key={generationKey}
         extent={Math.max(...track.groundSize)}
         mode={cameraMode}
         getTarget={() =>

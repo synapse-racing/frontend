@@ -2,7 +2,6 @@ import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../features/auth/context/useAuth.ts'
 import { ErrorNotice } from '../shared/components/ErrorNotice.tsx'
-import { useMenuStage } from '../shared/game/menu-stage-context.ts'
 import { GameSettings } from '../shared/game/GameSettings.tsx'
 import { GuestProgressImport } from '../features/training/components/GuestProgressImport.tsx'
 import { requestGuestImport } from '../features/training/persistence/import-guest-training.ts'
@@ -18,7 +17,6 @@ export function DashboardPage() {
   const guest = auth.status === 'visitor'
   const { appearance, guestAppearance, loading, loadError } = useAppearance()
   const car = vehicleCatalog.find((model) => model.id === appearance.modelId)!
-  const { preview } = useMenuStage()
   const menu = useRef<HTMLElement>(null)
   const { preferences } = useGamePreferences()
   const [signingOut, setSigningOut] = useState(false)
@@ -56,7 +54,7 @@ export function DashboardPage() {
         </p>
         {!guest && <GuestProgressImport />}
         <h1>
-          A LA <br />
+          A LA<br />{' '}
           PISTA.
         </h1>
         <nav
@@ -78,24 +76,20 @@ export function DashboardPage() {
         >
           <Link
             to="/training"
-            onFocus={() => preview('desert')}
-            onMouseEnter={() => preview('desert')}
             onClick={() => playMenuSound(preferences.sound)}
           >
-            <span className="menu-index">01</span>
+            <span className="menu-index" aria-hidden="true">01</span>
             <div>
               <h2>ENTRENAMIENTO</h2>
               <p>Quema rueda · Evoluciona tu piloto en el asfalto.</p>
             </div>
-            <span className="menu-arrow">↗</span>
+            <span className="menu-arrow" aria-hidden="true">↗</span>
           </Link>
           <Link
             to="/multiplayer"
-            onFocus={() => preview('tournament')}
-            onMouseEnter={() => preview('tournament')}
             onClick={() => playMenuSound(preferences.sound)}
           >
-            <span className="menu-index">02</span>
+            <span className="menu-index" aria-hidden="true">02</span>
             <div>
               <h2>MULTIJUGADOR</h2>
               <p>
@@ -104,15 +98,15 @@ export function DashboardPage() {
                   : 'Pique callejero online · Duelo en tiempo real.'}
               </p>
             </div>
-            <span className="menu-arrow">↗</span>
+            <span className="menu-arrow" aria-hidden="true">↗</span>
           </Link>
           <Link to="/garage" onClick={() => playMenuSound(preferences.sound)}>
-            <span className="menu-index">03</span>
+            <span className="menu-index" aria-hidden="true">03</span>
             <div>
               <h2>GARAJE</h2>
               <p>Taller clandestino · Chapa, alerones y neones.</p>
             </div>
-            <span className="menu-arrow">↗</span>
+            <span className="menu-arrow" aria-hidden="true">↗</span>
           </Link>
         </nav>
         {!guest && guestAppearance && (

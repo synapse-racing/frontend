@@ -21,11 +21,14 @@
 .neat-hud {
   position: absolute;
   inset: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 0.4rem;
+  padding: clamp(0.4rem, 1.5vw, 1rem);
   pointer-events: none;
   font-family: var(--font-ui);
   color: var(--thud-ink);
   overflow: hidden;
-  user-select: none;
 }
 
 /* Sleek Buttons (Brushed Aluminum & Diamond Plate) */
@@ -49,21 +52,16 @@
   border-radius: 0px;
   box-shadow: 2px 2px 0px #000;
   cursor: pointer;
-  transition: all 130ms ease;
 }
 
 .neat-hud button:hover:not(:disabled),
 .car-actions button:hover:not(:disabled) {
   border-color: var(--accent);
-  box-shadow: 2px 2px 0px #000, var(--glow-acid);
-  color: #fff;
-  filter: brightness(1.15);
 }
 
 .neat-hud button:active:not(:disabled),
 .car-actions button:active:not(:disabled) {
-  border-style: inset;
-  transform: translate(1px, 1px);
+  box-shadow: inset 0 2px 5px #0009;
 }
 
 .neat-hud button:disabled,
@@ -89,7 +87,6 @@
 .neat-hud .primary-button:hover:not(:disabled) {
   background-color: var(--accent-hover);
   border-color: #ffffff;
-  box-shadow: 3px 3px 0px #000, 0 0 35px var(--accent), 0 0 60px rgba(0, 255, 102, 0.9);
   color: #000;
 }
 
@@ -97,12 +94,14 @@
    TOP BAR (Carbon Fiber Weave Panel)
    ========================================================================== */
 .neat-hud__topbar {
+  position: relative;
+  inset: auto;
   pointer-events: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 0.55rem 1.4rem;
+  gap: 0.4rem 0.8rem;
+  padding: 0.4rem clamp(0.45rem, 2vw, 1.1rem);
   background-color: #0b110e;
   background-image:
     linear-gradient(180deg, rgba(0, 255, 102, 0.08) 0%, transparent 60%, rgba(0, 0, 0, 0.75) 100%),
@@ -118,6 +117,8 @@
   display: flex;
   align-items: center;
   gap: 0.8rem;
+  min-width: 0;
+  flex-wrap: wrap;
 }
 
 .neat-hud__back-link {
@@ -142,6 +143,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  min-width: 0;
   background: #121b20;
   border: 1px solid var(--thud-border);
   border-left: 2px solid var(--thud-accent);
@@ -155,6 +157,7 @@
 }
 
 .neat-hud__gen-title {
+  flex-shrink: 0;
   margin: 0;
   font-family: inherit;
   font-size: inherit;
@@ -169,6 +172,9 @@
   color: var(--thud-muted);
   font-weight: 400;
   font-size: var(--text-2xs, 10px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .neat-hud__status-pill {
@@ -206,18 +212,19 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 /* ==========================================================================
    MAIN AREA (OPEN CANVAS, FLOATING WIDGETS)
    ========================================================================== */
 .neat-hud__main-area {
-  position: absolute;
-  inset: 48px 0 70px 0;
+  min-height: 0;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 1rem 1.2rem;
+  gap: 0.5rem;
+  padding: 0.2rem 0;
   pointer-events: none;
 }
 
@@ -225,7 +232,7 @@
 .neat-standings {
   pointer-events: auto;
   width: 200px;
-  max-height: 230px;
+  max-height: min(230px, 100%);
   background: #0e1518db;
   backdrop-filter: blur(8px);
   border: 1px solid var(--thud-border);
@@ -235,12 +242,6 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: transform 180ms ease, opacity 180ms ease;
-}
-
-.neat-standings.is-collapsed {
-  transform: translateX(-175px);
-  opacity: 0.75;
 }
 
 .neat-standings__header {
@@ -372,6 +373,9 @@
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+  min-width: 0;
+  max-height: 100%;
+  margin-inline-start: auto;
   align-items: flex-end;
   pointer-events: none;
 }
@@ -420,17 +424,15 @@
    BOTTOM BAR - FLOATING COCKPIT DOCK (Carbon Fiber Weave Panel)
    ========================================================================== */
 .neat-hud__bottom-bar {
-  position: absolute;
-  bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: auto;
-  max-width: calc(100% - 2rem);
+  justify-self: center;
+  max-width: 100%;
   pointer-events: auto;
   display: flex;
   align-items: center;
-  gap: 1.4rem;
-  padding: 0.6rem 1.4rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  padding: 0.4rem clamp(0.45rem, 2vw, 1.15rem);
   background-color: #0b110e;
   background-image:
     linear-gradient(180deg, rgba(0, 255, 102, 0.08) 0%, transparent 60%, rgba(0, 0, 0, 0.75) 100%),
@@ -455,6 +457,7 @@
   padding: 0;
   background: none;
   border: 0;
+  justify-content: center;
 }
 .neat-hud__shortcut-hint {
   margin: 0;
@@ -504,6 +507,8 @@
   display: flex;
   align-items: center;
   gap: 0.45rem;
+  flex-wrap: wrap;
+  justify-content: center;
   border-left: 1px solid var(--thud-border);
   padding-left: 1rem;
 }
@@ -625,10 +630,10 @@
    TELEMETRY & SETTINGS OVERLAYS (Carbon Fiber Weave Panel)
    ========================================================================== */
 .telemetry-panel {
-  position: absolute;
-  top: 3.8rem;
-  right: 1.2rem;
-  width: min(300px, calc(100% - 2.4rem));
+  position: relative;
+  inset: auto;
+  width: min(300px, calc(100vw - 2.4rem));
+  min-height: 0;
   background-color: #0b110e;
   background-image:
     linear-gradient(180deg, rgba(0, 255, 102, 0.08) 0%, transparent 60%, rgba(0, 0, 0, 0.75) 100%),
@@ -694,8 +699,7 @@
     height: 90px;
   }
   .neat-hud__bottom-bar {
-    width: calc(100% - 1.5rem);
-    bottom: 0.75rem;
+    width: 100%;
     flex-direction: column;
     gap: 0.6rem;
     padding: 0.5rem 0.8rem;
@@ -704,16 +708,31 @@
     border-left: 0;
     padding-left: 0;
     width: 100%;
-    justify-content: space-between;
   }
 }
 
 /* Training telemetry */
 .neat-lab .telemetry-panel {
-  max-height: calc(100svh - 11rem);
+  max-height: 100%;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
+}
+.neat-hud__right-column:has(.telemetry-panel) .training-minimap {
+  display: none;
+}
+@media (max-width: 480px), (max-height: 480px) {
+  .neat-hud__brand-group { gap: 0.35rem; }
+  .neat-hud__top-actions { gap: 0.3rem; }
+  .neat-hud__top-actions button,
+  .neat-hud__tape-controls button {
+    min-height: 2.2rem;
+    padding-inline: 0.45rem;
+  }
+  .neat-hud__gen-badge span { display: none; }
+  .neat-hud__stats-cluster { gap: 0.4rem; }
+  .neat-hud__bottom-bar .neat-metrics > div { flex: 0 1 auto; padding: 0; }
+  .neat-hud__stat-label { letter-spacing: 0; }
 }
 .neat-lab .car-actions {
   top: 4.5rem;

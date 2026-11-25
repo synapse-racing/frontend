@@ -4,6 +4,7 @@ import type { TrainingRun } from '../../training/api/training.api.ts'
 import { TrackMap } from '../../../shared/game/TrackMap.tsx'
 import { vehicleCatalog } from '../../garage/domain/appearance.ts'
 import { ErrorNotice } from '../../../shared/components/ErrorNotice.tsx'
+import './lobby.css'
 
 export interface LobbyProps {
   busy: boolean
@@ -51,7 +52,7 @@ export function Lobby({
 
   function handleJoin(event: FormEvent) {
     event.preventDefault()
-    if (code.trim().length === 6) onJoin(code.trim().toUpperCase())
+    if (!busy && code.length === 6) onJoin(code)
   }
 
   /* ============================================================
@@ -60,12 +61,8 @@ export function Lobby({
   if (!room) {
     return (
       <section
-        className="lobby-root bg-[url('/assets/textures/asphalt.jpg')] text-white font-black italic uppercase tracking-tighter"
+        className="lobby-root lobby-root--entry"
         style={{
-          width: '100%',
-          maxWidth: '920px',
-          margin: '0 auto',
-          padding: '28px',
           backgroundImage:
             "linear-gradient(135deg, rgba(6, 9, 7, 0.94) 0%, rgba(10, 15, 12, 0.96) 100%), url('/assets/textures/asphalt.jpg')",
           backgroundRepeat: 'repeat',
@@ -75,10 +72,6 @@ export function Lobby({
           borderLeft: '6px solid #00f0ff',
           boxShadow:
             'inset 0 0 45px rgba(0, 0, 0, 0.95), 0 0 30px rgba(0, 240, 255, 0.25)',
-          clipPath:
-            'polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 28px 100%, 0 calc(100% - 28px))',
-          position: 'relative',
-          userSelect: 'none',
         }}
       >
         {/* Hex Rivets */}
@@ -88,8 +81,8 @@ export function Lobby({
         <span style={rivetStyle(undefined, undefined, '8px', '8px')} />
 
         {/* Top Decal Banner */}
-        <div style={{ borderBottom: '2px solid #00f0ff', paddingBottom: '14px', marginBottom: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="lobby-entry-heading">
+          <div className="lobby-entry-heading__strip">
             <span
               style={{
                 fontSize: '11px',
@@ -139,13 +132,7 @@ export function Lobby({
         </div>
 
         {/* Split Grid: Crear vs Unirse */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '20px',
-          }}
-        >
+        <div className="lobby-panels lobby-panels--entry">
           {/* Box 1: Crear Sala */}
           <div
             className="bg-[url('/assets/textures/carbon-fiber.jpg')]"
@@ -184,7 +171,6 @@ export function Lobby({
                     ? 'inset 0 0 10px #000, 0 0 10px rgba(57, 255, 20, 0.3)'
                     : 'inset 0 0 10px #000, 0 0 10px rgba(255, 0, 60, 0.4)',
                   padding: '4px 10px',
-                  transform: 'skewX(-10deg)',
                 }}
               >
                 <input
@@ -206,7 +192,6 @@ export function Lobby({
                     fontWeight: 900,
                     fontFamily: 'inherit',
                     width: '100%',
-                    outline: 'none',
                   }}
                 />
                 <span style={{ fontSize: '10px', color: '#7a8c82' }}>PILOTOS</span>
@@ -224,7 +209,6 @@ export function Lobby({
                 if (validCapacity) onCreate(capacity)
               }}
               style={{
-                transform: 'skewX(-12deg)',
                 background: validCapacity && !busy
                   ? 'linear-gradient(180deg, #39ff14 0%, #1c850b 100%)'
                   : 'linear-gradient(180deg, #444c47 0%, #1e2420 100%)',
@@ -239,7 +223,6 @@ export function Lobby({
                 fontWeight: 900,
                 cursor: validCapacity && !busy ? 'pointer' : 'not-allowed',
                 marginTop: 'auto',
-                transition: 'all 0.12s ease',
               }}
             >
               Crear código
@@ -283,7 +266,6 @@ export function Lobby({
                   border: '2px solid #ff007f',
                   boxShadow: 'inset 0 0 10px #000, 0 0 12px rgba(255, 0, 127, 0.35)',
                   padding: '4px 10px',
-                  transform: 'skewX(-10deg)',
                 }}
               >
                 <input
@@ -303,7 +285,6 @@ export function Lobby({
                     letterSpacing: '0.25em',
                     fontFamily: 'monospace',
                     width: '100%',
-                    outline: 'none',
                   }}
                 />
               </div>
@@ -317,7 +298,6 @@ export function Lobby({
               type="submit"
               disabled={busy || code.length !== 6}
               style={{
-                transform: 'skewX(-12deg)',
                 background: code.length === 6 && !busy
                   ? 'linear-gradient(180deg, #ff007f 0%, #a30052 100%)'
                   : 'linear-gradient(180deg, #444c47 0%, #1e2420 100%)',
@@ -332,7 +312,6 @@ export function Lobby({
                 fontWeight: 900,
                 cursor: code.length === 6 && !busy ? 'pointer' : 'not-allowed',
                 marginTop: 'auto',
-                transition: 'all 0.12s ease',
               }}
             >
               Entrar
@@ -366,12 +345,8 @@ export function Lobby({
 
   return (
     <section
-      className="lobby-root bg-[url('/assets/textures/carbon-fiber.jpg')] text-white font-black italic uppercase tracking-tighter"
+      className="lobby-root lobby-root--room"
       style={{
-        width: '100%',
-        maxWidth: '960px',
-        margin: '0 auto',
-        padding: '24px',
         backgroundImage:
           "linear-gradient(135deg, rgba(8, 12, 10, 0.94) 0%, rgba(12, 16, 14, 0.97) 100%), url('/assets/textures/carbon-fiber.jpg')",
         backgroundRepeat: 'repeat',
@@ -381,13 +356,6 @@ export function Lobby({
         borderLeft: '6px solid #39ff14',
         boxShadow:
           'inset 0 0 45px rgba(0, 0, 0, 0.95), 0 0 35px rgba(57, 255, 20, 0.3)',
-        clipPath:
-          'polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px))',
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '20px',
-        userSelect: 'none',
       }}
     >
       {/* Corner Hex Rivets */}
@@ -472,378 +440,311 @@ export function Lobby({
 
       {/* Main Grid: Pilot Selection & Track Preview */}
       <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-          gap: '16px',
-        }}
+        className="lobby-room-body"
+        role="region"
+        aria-label="Configuración y pilotos"
+        tabIndex={0}
       >
-        {/* Pilot Select (NEAT) */}
-        <section
-          className="lobby-pilot-select bg-[url('/assets/textures/metal-scratch.jpg')]"
-          aria-label="Selección de piloto"
-          style={{
-            backgroundImage:
-              "linear-gradient(135deg, rgba(12, 16, 14, 0.94) 0%, rgba(6, 8, 7, 0.96) 100%), url('/assets/textures/metal-scratch.jpg')",
-            backgroundSize: 'cover',
-            backgroundBlendMode: 'multiply',
-            border: '2px solid #5a665e',
-            borderTop: '3px solid #00f0ff',
-            padding: '16px',
-            boxShadow: 'inset 0 0 20px #000',
-            clipPath:
-              'polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '10px',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <span style={{ fontSize: '9px', color: '#00f0ff', letterSpacing: '0.1em' }}>
-                01 // CONFIGURA TU ESCUDERÍA
-              </span>
-              <h2 style={{ margin: '2px 0 0', fontSize: '18px', color: '#fff' }}>
-                Elige tu piloto NEAT
-              </h2>
-            </div>
-            <small
-              style={{
-                fontSize: '9px',
-                padding: '3px 8px',
-                transform: 'skewX(-10deg)',
-                background: currentPlayer?.genomeName ? '#39ff14' : '#fffb00',
-                color: '#000',
-                boxShadow: currentPlayer?.genomeName
-                  ? '0 0 10px #39ff14'
-                  : '0 0 10px #fffb00',
-              }}
-            >
-              {currentPlayer?.genomeName ? 'PILOTO SELECCIONADO' : 'PASO OBLIGATORIO'}
-            </small>
-          </div>
-
-          <label
-            htmlFor="lobby-pilot-select"
-            style={{ fontSize: '11px', color: '#c4d4ca', display: 'flex', flexDirection: 'column', gap: '4px' }}
+        <div className="lobby-panels">
+          {/* Pilot Select (NEAT) */}
+          <section
+            className="lobby-pilot-select bg-[url('/assets/textures/metal-scratch.jpg')]"
+            aria-label="Selección de piloto"
+            style={{
+              backgroundImage:
+                "linear-gradient(135deg, rgba(12, 16, 14, 0.94) 0%, rgba(6, 8, 7, 0.96) 100%), url('/assets/textures/metal-scratch.jpg')",
+              backgroundSize: 'cover',
+              backgroundBlendMode: 'multiply',
+              border: '2px solid #5a665e',
+              borderTop: '3px solid #00f0ff',
+              padding: '16px',
+              boxShadow: 'inset 0 0 20px #000',
+              clipPath:
+                'polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+            }}
           >
-            <span>Entrenamientos disponibles</span>
-            <div
-              style={{
-                background: '#090d0b',
-                border: '2px solid #00f0ff',
-                boxShadow: 'inset 0 0 8px #000, 0 0 10px rgba(0, 240, 255, 0.3)',
-                padding: '4px 8px',
-                transform: 'skewX(-8deg)',
-              }}
-            >
-              <select
-                id="lobby-pilot-select"
-                disabled={currentPlayer?.ready || compatibleRuns.length === 0}
-                onChange={(event) => onSelectGenome(event.target.value)}
-                value={selectedRun?.id ?? ''}
+            <div className="lobby-pilot-select__heading">
+              <div>
+                <span style={{ fontSize: '9px', color: '#00f0ff', letterSpacing: '0.1em' }}>
+                  01 // CONFIGURA TU ESCUDERÍA
+                </span>
+                <h2 style={{ margin: '2px 0 0', fontSize: '18px', color: '#fff' }}>
+                  Elige tu piloto NEAT
+                </h2>
+              </div>
+              <small
                 style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#fff',
-                  fontSize: '12px',
-                  fontWeight: 900,
-                  fontFamily: 'inherit',
-                  width: '100%',
-                  outline: 'none',
-                  cursor: 'pointer',
+                  fontSize: '9px',
+                  padding: '3px 8px',
+                  transform: 'skewX(-10deg)',
+                  background: currentPlayer?.genomeName ? '#39ff14' : '#fffb00',
+                  color: '#000',
+                  boxShadow: currentPlayer?.genomeName
+                    ? '0 0 10px #39ff14'
+                    : '0 0 10px #fffb00',
                 }}
               >
-                <option value="" style={{ background: '#111', color: '#aaa' }}>
-                  Selecciona tu piloto para esta carrera
-                </option>
-                {compatibleRuns.map((run) => (
-                  <option key={run.id} value={run.id} style={{ background: '#111', color: '#fff' }}>
-                    {run.name} · gen. {run.currentGeneration} · pista #{run.config.track?.seed ?? run.seed}
-                  </option>
-                ))}
-              </select>
+                {currentPlayer?.genomeName ? 'PILOTO SELECCIONADO' : 'PASO OBLIGATORIO'}
+              </small>
             </div>
-          </label>
 
-          {selectedRun ? (
-            <p style={{ margin: 0, fontSize: '10px', color: '#39ff14', textShadow: '0 0 6px #39ff14' }}>
-              {selectedRun.name} · Generación {selectedRun.currentGeneration} · espera a que termine el guardado antes de competir.
-            </p>
-          ) : compatibleRuns.length > 0 ? (
-            <p style={{ margin: 0, fontSize: '10px', color: '#fffb00' }}>
-              Selecciona un entrenamiento guardado para habilitar la salida.
-            </p>
-          ) : (
-            <p style={{ margin: 0, fontSize: '10px', color: '#ff003c' }}>
-              Completa y guarda una generación de entrenamiento para competir.
-            </p>
-          )}
-        </section>
-
-        {/* Track Info & Seed Controls */}
-        <section
-          className="lobby-track bg-[url('/assets/textures/metal-scratch.jpg')]"
-          aria-label="Pista multijugador"
-          style={{
-            backgroundImage:
-              "linear-gradient(135deg, rgba(12, 16, 14, 0.94) 0%, rgba(6, 8, 7, 0.96) 100%), url('/assets/textures/metal-scratch.jpg')",
-            backgroundSize: 'cover',
-            backgroundBlendMode: 'multiply',
-            border: '2px solid #5a665e',
-            borderTop: '3px solid #ff6600',
-            padding: '16px',
-            boxShadow: 'inset 0 0 20px #000',
-            clipPath:
-              'polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '10px',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <div>
-              <span style={{ fontSize: '9px', color: '#ff6600', letterSpacing: '0.1em' }}>
-                CIRCUITO OFICIAL // SEED
-              </span>
-              <strong style={{ display: 'block', fontSize: '18px', color: '#fff' }}>
-                {room.track.version === 'grand-prix-v3'
-                  ? 'Grand Prix'
-                  : room.track.version === 'technical-loop-v2'
-                    ? 'Circuito Técnico'
-                    : room.track.version === 'curved-loop-v1'
-                      ? 'Curved Loop'
-                      : 'Clásico'}{' '}
-                #{room.track.seed}
-              </strong>
-            </div>
-            <div
-              style={{
-                width: '120px',
-                height: '70px',
-                background: '#0a0e0c',
-                border: '1px solid #3c4840',
-                padding: '4px',
-              }}
+            <label
+              htmlFor="lobby-pilot-select"
+              style={{ fontSize: '11px', color: '#c4d4ca', display: 'flex', flexDirection: 'column', gap: '4px' }}
             >
-              <TrackMap recipe={room.track} />
-            </div>
-          </div>
-
-          {isHost ? (
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: 'auto' }}>
-              <input
-                aria-label="Semilla de pista multijugador"
-                min={0}
-                max={2_147_483_647}
-                onChange={(event) => setTrackSeed(Number(event.target.value))}
-                type="number"
-                value={trackSeed}
+              <span>Entrenamientos disponibles</span>
+              <div
                 style={{
                   background: '#090d0b',
-                  border: '2px solid #ff6600',
-                  color: '#fff',
-                  fontSize: '12px',
-                  fontWeight: 900,
-                  fontFamily: 'inherit',
-                  padding: '6px 8px',
-                  width: '110px',
-                  outline: 'none',
-                  transform: 'skewX(-8deg)',
-                }}
-              />
-              <button
-                type="button"
-                disabled={
-                  busy ||
-                  !Number.isSafeInteger(trackSeed) ||
-                  trackSeed < 0 ||
-                  trackSeed > 2_147_483_647
-                }
-                onClick={() => onSelectTrack(trackSeed)}
-                style={{
-                  transform: 'skewX(-8deg)',
-                  background: 'linear-gradient(180deg, #555f58 0%, #202623 100%)',
-                  border: '2px solid #ff6600',
-                  color: '#ff6600',
-                  padding: '6px 10px',
-                  fontSize: '11px',
-                  fontWeight: 900,
-                  cursor: 'pointer',
+                  border: '2px solid #00f0ff',
+                  boxShadow: 'inset 0 0 8px #000, 0 0 10px rgba(0, 240, 255, 0.3)',
+                  padding: '4px 8px',
                 }}
               >
-                Aplicar semilla
-              </button>
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => {
-                  const seed = Math.floor(Math.random() * 2_147_483_648)
-                  setTrackSeed(seed)
-                  onSelectTrack(seed)
-                }}
-                style={{
-                  transform: 'skewX(-8deg)',
-                  background: 'linear-gradient(180deg, #444c47 0%, #1e2420 100%)',
-                  border: '2px solid #737f77',
-                  color: '#fff',
-                  padding: '6px 10px',
-                  fontSize: '11px',
-                  fontWeight: 900,
-                  cursor: 'pointer',
-                }}
-              >
-                Generar otra
-              </button>
-            </div>
-          ) : (
-            <small style={{ fontSize: '10px', color: '#88998f', fontStyle: 'normal' }}>
-              Solo el host puede cambiar la pista.
-            </small>
-          )}
-        </section>
-      </div>
-
-      {/* Grid: Players in Room */}
-      <div
-        className="lobby-players"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '10px',
-        }}
-      >
-        {room.players.map((player, index) => {
-          const isReady = player.ready
-          return (
-            <article
-              key={player.userId}
-              style={{
-                background: isReady
-                  ? 'linear-gradient(180deg, rgba(20,35,25,0.9), rgba(10,18,13,0.95))'
-                  : 'linear-gradient(180deg, rgba(30,35,32,0.9), rgba(15,18,16,0.95))',
-                border: isReady ? '2px solid #39ff14' : '2px solid #5a665e',
-                boxShadow: isReady
-                  ? '0 0 14px rgba(57, 255, 20, 0.4), inset 0 0 10px #000'
-                  : 'inset 0 0 10px #000',
-                padding: '10px 14px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                transform: 'skewX(-6deg)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span
+                <select
+                  id="lobby-pilot-select"
+                  disabled={busy || currentPlayer?.ready || compatibleRuns.length === 0}
+                  onChange={(event) => onSelectGenome(event.target.value)}
+                  value={selectedRun?.id ?? ''}
                   style={{
-                    fontSize: '18px',
-                    color: isReady ? '#39ff14' : '#77887e',
-                    fontFamily: 'monospace',
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#fff',
+                    fontSize: '12px',
+                    fontWeight: 900,
+                    fontFamily: 'inherit',
+                    width: '100%',
+                    cursor: 'pointer',
                   }}
                 >
-                  {String(index + 1).padStart(2, '0')}
+                  <option value="" style={{ background: '#111', color: '#aaa' }}>
+                    Selecciona tu piloto para esta carrera
+                  </option>
+                  {compatibleRuns.map((run) => (
+                    <option key={run.id} value={run.id} style={{ background: '#111', color: '#fff' }}>
+                      {run.name} · gen. {run.currentGeneration} · pista #{run.config.track?.seed ?? run.seed}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </label>
+
+            {selectedRun ? (
+              <p style={{ margin: 0, fontSize: '10px', color: '#39ff14', textShadow: '0 0 6px #39ff14' }}>
+                {selectedRun.name} · Generación {selectedRun.currentGeneration} · espera a que termine el guardado antes de competir.
+              </p>
+            ) : compatibleRuns.length > 0 ? (
+              <p style={{ margin: 0, fontSize: '10px', color: '#fffb00' }}>
+                Selecciona un entrenamiento guardado para habilitar la salida.
+              </p>
+            ) : (
+              <p style={{ margin: 0, fontSize: '10px', color: '#ff003c' }}>
+                Completa y guarda una generación de entrenamiento para competir.
+              </p>
+            )}
+          </section>
+
+          {/* Track Info & Seed Controls */}
+          <section
+            className="lobby-track bg-[url('/assets/textures/metal-scratch.jpg')]"
+            aria-label="Pista multijugador"
+            style={{
+              backgroundImage:
+                "linear-gradient(135deg, rgba(12, 16, 14, 0.94) 0%, rgba(6, 8, 7, 0.96) 100%), url('/assets/textures/metal-scratch.jpg')",
+              backgroundSize: 'cover',
+              backgroundBlendMode: 'multiply',
+              border: '2px solid #5a665e',
+              borderTop: '3px solid #ff6600',
+              padding: '16px',
+              boxShadow: 'inset 0 0 20px #000',
+              clipPath:
+                'polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <span style={{ fontSize: '9px', color: '#ff6600', letterSpacing: '0.1em' }}>
+                  DISTRITO NEÓN // SEMILLA
                 </span>
-                <div>
-                  <strong style={{ display: 'block', fontSize: '14px', color: '#fff' }}>
-                    {player.username}
-                  </strong>
-                  <div style={{ display: 'flex', gap: '6px', fontSize: '9px', color: '#97a39d' }}>
-                    <span style={{ color: player.userId === room.hostUserId ? '#39ff14' : '#c3cec7' }}>
-                      {player.userId === room.hostUserId ? 'HOST' : 'PILOTO'}
-                    </span>
-                    <span>·</span>
-                    <span>{player.genomeName ?? 'Sin piloto NEAT'}</span>
+                <strong style={{ display: 'block', fontSize: '18px', color: '#fff' }}>
+                  {room.track.version === 'grand-prix-v3'
+                    ? 'Grand Prix'
+                    : room.track.version === 'technical-loop-v2'
+                      ? 'Circuito Técnico'
+                      : room.track.version === 'curved-loop-v1'
+                        ? 'Curved Loop'
+                        : 'Clásico'}{' '}
+                  #{room.track.seed}
+                </strong>
+              </div>
+              <div
+                style={{
+                  width: '120px',
+                  height: '70px',
+                  background: '#0a0e0c',
+                  border: '1px solid #3c4840',
+                  padding: '4px',
+                }}
+              >
+                <TrackMap recipe={room.track} />
+              </div>
+            </div>
+
+            {isHost ? (
+              <div className="lobby-track__controls">
+                <input
+                  aria-label="Semilla de pista multijugador"
+                  min={0}
+                  max={2_147_483_647}
+                  onChange={(event) => setTrackSeed(Number(event.target.value))}
+                  type="number"
+                  value={trackSeed}
+                  style={{
+                    background: '#090d0b',
+                    border: '2px solid #ff6600',
+                    color: '#fff',
+                    fontSize: '12px',
+                    fontWeight: 900,
+                    fontFamily: 'inherit',
+                    padding: '6px 8px',
+                    width: '110px',
+                  }}
+                />
+                <button
+                  type="button"
+                  disabled={
+                    busy ||
+                    !Number.isSafeInteger(trackSeed) ||
+                    trackSeed < 0 ||
+                    trackSeed > 2_147_483_647
+                  }
+                  onClick={() => onSelectTrack(trackSeed)}
+                  style={{
+                    background: 'linear-gradient(180deg, #555f58 0%, #202623 100%)',
+                    border: '2px solid #ff6600',
+                    color: '#ff6600',
+                    padding: '6px 10px',
+                    fontSize: '11px',
+                    fontWeight: 900,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Aplicar semilla
+                </button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => {
+                    const seed = Math.floor(Math.random() * 2_147_483_648)
+                    setTrackSeed(seed)
+                    onSelectTrack(seed)
+                  }}
+                  style={{
+                    background: 'linear-gradient(180deg, #444c47 0%, #1e2420 100%)',
+                    border: '2px solid #737f77',
+                    color: '#fff',
+                    padding: '6px 10px',
+                    fontSize: '11px',
+                    fontWeight: 900,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Generar otra
+                </button>
+              </div>
+            ) : (
+              <small style={{ fontSize: '10px', color: '#88998f', fontStyle: 'normal' }}>
+                Solo el host puede cambiar la pista.
+              </small>
+            )}
+          </section>
+        </div>
+
+        {/* Grid: Players in Room */}
+        <div className="lobby-players">
+          {room.players.map((player, index) => {
+            const isReady = player.ready
+            return (
+              <article
+                key={player.userId}
+                style={{
+                  background: isReady
+                    ? 'linear-gradient(180deg, rgba(20,35,25,0.9), rgba(10,18,13,0.95))'
+                    : 'linear-gradient(180deg, rgba(30,35,32,0.9), rgba(15,18,16,0.95))',
+                  border: isReady ? '2px solid #39ff14' : '2px solid #5a665e',
+                  boxShadow: isReady
+                    ? '0 0 14px rgba(57, 255, 20, 0.4), inset 0 0 10px #000'
+                    : 'inset 0 0 10px #000',
+                  padding: '10px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <div className="lobby-player-info">
+                  <span
+                    style={{
+                      fontSize: '18px',
+                      color: isReady ? '#39ff14' : '#77887e',
+                      fontFamily: 'monospace',
+                    }}
+                  >
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <div className="lobby-player-info__copy">
+                    <strong style={{ display: 'block', fontSize: '14px', color: '#fff' }}>
+                      {player.username}
+                    </strong>
+                    <div className="lobby-player-info__pilot">
+                      <span style={{ color: player.userId === room.hostUserId ? '#39ff14' : '#c3cec7' }}>
+                        {player.userId === room.hostUserId ? 'HOST' : 'PILOTO'}
+                      </span>
+                      <span>·</span>
+                      <span>{player.genomeName ?? 'Sin piloto NEAT'}</span>
+                    </div>
+                    {player.appearance && (
+                      <small style={{ fontSize: '9px', color: '#7a8c82' }}>
+                        {vehicleCatalog.find((m) => m.id === player.appearance?.modelId)?.name ?? 'Auto'} · #{player.appearance.number}
+                      </small>
+                    )}
                   </div>
-                  {player.appearance && (
-                    <small style={{ fontSize: '9px', color: '#7a8c82' }}>
-                      {vehicleCatalog.find((m) => m.id === player.appearance?.modelId)?.name ?? 'Auto'} · #{player.appearance.number}
-                    </small>
-                  )}
                 </div>
-              </div>
 
-              <span
-                className="lobby-player-state"
-                data-state={isReady ? 'ready' : 'waiting'}
-                style={{
-                  padding: '3px 8px',
-                  fontSize: '10px',
-                  background: isReady ? '#39ff14' : '#ffaa00',
-                  color: '#000',
-                  boxShadow: isReady ? '0 0 10px #39ff14' : '0 0 10px #ffaa00',
-                  transform: 'skewX(-8deg)',
-                }}
-              >
-                {isReady ? 'Listo' : 'Esperando'}
-              </span>
-            </article>
-          )
-        })}
-
-        {/* Empty Slots */}
-        {Array.from(
-          { length: Math.max(0, room.maxPlayers - room.players.length) },
-          (_, index) => (
-            <article
-              key={`empty-${index}`}
-              style={{
-                background: 'rgba(15, 20, 17, 0.6)',
-                border: '1px dashed #445048',
-                padding: '10px 14px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                transform: 'skewX(-6deg)',
-                opacity: 0.7,
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '18px', color: '#445048', fontFamily: 'monospace' }}>
-                  {String(room.players.length + index + 1).padStart(2, '0')}
+                <span
+                  className="lobby-player-state"
+                  data-state={isReady ? 'ready' : 'waiting'}
+                  style={{
+                    padding: '3px 8px',
+                    fontSize: '10px',
+                    background: isReady ? '#39ff14' : '#ffaa00',
+                    color: '#000',
+                    boxShadow: isReady ? '0 0 10px #39ff14' : '0 0 10px #ffaa00',
+                    transform: 'skewX(-8deg)',
+                  }}
+                >
+                  {isReady ? 'Listo' : 'Esperando'}
                 </span>
-                <div>
-                  <strong style={{ fontSize: '13px', color: '#7a8c82' }}>Plaza libre</strong>
-                  <small style={{ display: 'block', fontSize: '9px', color: '#55635a' }}>
-                    Invita a otra escudería
-                  </small>
-                </div>
-              </div>
-              <span
-                className="lobby-player-state"
-                data-state="waiting"
-                style={{
-                  padding: '2px 6px',
-                  fontSize: '9px',
-                  background: '#333d37',
-                  color: '#77887e',
-                }}
-              >
-                Esperando
-              </span>
-            </article>
-          ),
-        )}
+              </article>
+            )
+          })}
+
+        </div>
       </div>
 
       <ErrorNotice error={error} />
 
       {/* Action Footer */}
-      <div
-        className="lobby-actions"
-        style={{
-          display: 'flex',
-          gap: '12px',
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-          borderTop: '2px solid #333d37',
-          paddingTop: '16px',
-        }}
-      >
+      <div className="lobby-actions">
         <button
           type="button"
           onClick={onLeave}
           style={{
-            transform: 'skewX(-12deg)',
             background: 'linear-gradient(180deg, #444c47 0%, #1e2420 100%)',
             border: '2px solid #737f77',
             borderTopColor: '#b4c0b8',
@@ -860,10 +761,9 @@ export function Lobby({
         <button
           type="button"
           className="primary-button"
-          disabled={!currentPlayer?.genomeName}
+          disabled={busy || !currentPlayer?.genomeName}
           onClick={() => onReady(!currentPlayer?.ready)}
           style={{
-            transform: 'skewX(-12deg)',
             background: currentPlayer?.ready
               ? 'linear-gradient(180deg, #ff007f 0%, #99004d 100%)'
               : 'linear-gradient(180deg, #39ff14 0%, #1c850b 100%)',
@@ -886,10 +786,9 @@ export function Lobby({
         {isHost && (
           <button
             type="button"
-            disabled={!canStart}
+            disabled={busy || !canStart}
             onClick={onStart}
             style={{
-              transform: 'skewX(-12deg)',
               background: canStart
                 ? 'linear-gradient(180deg, #00f0ff 0%, #007a82 100%)'
                 : 'linear-gradient(180deg, #333d37 0%, #181d1a 100%)',

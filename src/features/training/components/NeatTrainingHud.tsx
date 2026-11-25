@@ -219,16 +219,6 @@ export function NeatTrainingHud({
         </div>
       </header>
 
-      {/* Persistence Error Alert */}
-      {persistenceStatus === 'error' && onRetrySave && (
-        <section className="telemetry-panel" style={{ top: '4.5rem', left: '1rem', right: 'auto' }}>
-          <ErrorNotice error="No se pudo guardar la generación. El entrenamiento está pausado para conservarla. Reintenta el guardado." />
-          <button type="button" className="primary-button" onClick={onRetrySave}>
-            Reintentar guardado
-          </button>
-        </section>
-      )}
-
       {/* Main Area: Standings on Left, Minimap / Telemetry on Right */}
       <div className="neat-hud__main-area">
         <LiveLeaderboard
@@ -243,6 +233,14 @@ export function NeatTrainingHud({
         />
 
         <div className="neat-hud__right-column">
+          {persistenceStatus === 'error' && onRetrySave && (
+            <section className="telemetry-panel" aria-label="Guardado del entrenamiento">
+              <ErrorNotice error="No se pudo guardar la generación. El entrenamiento está pausado para conservarla. Reintenta el guardado." compact />
+              <button type="button" className="primary-button" onClick={onRetrySave}>
+                Reintentar guardado
+              </button>
+            </section>
+          )}
           {track && (
             <TrainingMinimap
               track={track}

@@ -60,9 +60,9 @@ export function RaceCamera({
       smoothedYaw.current += angleDiff * (1 - Math.exp(-6 * dt))
 
       targetLook.set(
-        target.x - (reduced ? 0 : Math.sin(target.yaw) * 2),
+        target.x - (reduced ? 0 : Math.sin(target.yaw) * 4.5),
         0.5,
-        target.z - (reduced ? 0 : Math.cos(target.yaw) * 2),
+        target.z - (reduced ? 0 : Math.cos(target.yaw) * 4.5),
       )
       look.lerp(targetLook, 1 - Math.exp(-10 * dt))
     }
@@ -70,9 +70,9 @@ export function RaceCamera({
 
     const followYaw = reduced ? 0 : smoothedYaw.current
     desired.set(
-      target.x + (reduced ? 0 : Math.sin(followYaw) * 10),
-      reduced ? 24 : 6.8,
-      target.z + (reduced ? 16 : Math.cos(followYaw) * 10),
+      target.x + (reduced ? 0 : Math.sin(followYaw) * 9),
+      reduced ? 24 : 4.3,
+      target.z + (reduced ? 16 : Math.cos(followYaw) * 9),
     )
     camera.position.lerp(desired, 1 - Math.exp(-7 * dt))
     camera.lookAt(look)

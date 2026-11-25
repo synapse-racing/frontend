@@ -196,31 +196,42 @@ export function buildGt(detail = 'high') {
       [0.123, 0.052, 0.083],
     )
 
-    topStrip('carbon', side, [
+    const lampSurface = (role, rows, lift) => {
+      const grid = []
+      for (let row = 0; row < rows.length - 1; row++) {
+        const from = rows[row], to = rows[row + 1]
+        for (const t of range(0, 1, high ? 8 : 5).slice(row ? 1 : 0)) {
+          const z = from[0] + (to[0] - from[0]) * t
+          const inside = from[1] + (to[1] - from[1]) * t
+          const outside = from[2] + (to[2] - from[2]) * t
+          grid.push(range(inside, outside, high ? 12 : 8).map((x) => {
+            const point = topPoint(side * x, z)
+            return [point[0], point[2]]
+          }))
+        }
+      }
+      b.bodyDetail(role, grid, lift, side < 0)
+    }
+    lampSurface('carbon', [
       [-1.107, 0.297, 0.412],
       [-1.065, 0.289, 0.454],
       [-0.995, 0.33, 0.478],
       [-0.971, 0.379, 0.472],
-    ])
-    topStrip(
-      'lights',
-      side,
-      [
-        [-1.093, 0.309, 0.406],
-        [-1.069, 0.307, 0.445],
-        [-1.052, 0.316, 0.449],
-      ],
-      0.008,
-    )
-    b.tube(
-      'lights',
-      [
-        [0.346, -1.037],
-        [0.376, -1.017],
-        [0.456, -0.991],
-      ].map(([x, z]) => topPoint(side * x, z, 0.01)),
-      0.006,
-    )
+    ], 0.003)
+    lampSurface('glass', [
+      [-1.097, 0.31, 0.408],
+      [-1.063, 0.302, 0.443],
+      [-0.998, 0.341, 0.466],
+      [-0.984, 0.382, 0.462],
+    ], 0.0045)
+    lampSurface('lights', [
+      [-1.084, 0.315, 0.417],
+      [-1.073, 0.311, 0.433],
+    ], 0.006)
+    lampSurface('lights', [
+      [-1.024, 0.337, 0.451],
+      [-1.013, 0.345, 0.459],
+    ], 0.006)
 
     topStrip(
       'carbon',

@@ -615,7 +615,6 @@ export function NeatTrainingPage() {
       <SceneCanvas>
         <Suspense fallback={null}>
           <NeatTrainingScene
-            key={generationKey}
             generationKey={generationKey}
             genomes={genomes}
             appearance={appearance}
