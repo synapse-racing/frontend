@@ -16,7 +16,7 @@ export function GarageActionBar({
   onExit: () => void
 }) {
   return (
-    <div className="garage-action-bar">
+    <div className={dirty || saving ? 'garage-action-bar garage-action-bar--editing' : 'garage-action-bar'}>
       <button
         type="button"
         className="garage-icon-button"

@@ -19,11 +19,11 @@ import { GarageActionBar } from '../components/GarageActionBar.tsx'
 import { LeaveDialog } from '../components/LeaveDialog.tsx'
 
 const tabs = [
-  ['model', '01 / Modelo'],
-  ['colors', '02 / Colores'],
-  ['finish', '03 / Acabado'],
-  ['number', '04 / Número'],
-  ['skins', '05 / Skins'],
+  ['model', 'Modelo'],
+  ['colors', 'Colores'],
+  ['finish', 'Acabado'],
+  ['number', 'Número'],
+  ['skins', 'Skins'],
 ] as const
 type Tab = (typeof tabs)[number][0]
 
@@ -222,10 +222,12 @@ function GarageEditor() {
           ))}
         </div>
         <section
-          className="garage-tab-content"
+          key={tab}
+          className={tab === 'skins' ? 'garage-tab-content garage-tab-content--skins' : 'garage-tab-content'}
           role="tabpanel"
           id={`garage-panel-${tab}`}
           aria-labelledby={`garage-tab-${tab}`}
+          tabIndex={tab === 'skins' ? 0 : undefined}
         >
           {tab === 'model' && <ModelPicker draft={draft} onChange={update} />}
           {tab === 'colors' && <ColorPicker draft={draft} onChange={update} />}

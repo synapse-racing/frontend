@@ -51,11 +51,11 @@ export function TitlePage() {
         <div className="title-brand-row">
           <img
             src="/synapse.png"
-            alt="Synapse Racing"
+            alt=""
             className="title-hero-logo"
           />
           <h1>
-            SYNAPSE<span>RACING</span>
+            SYNAPSE <span>RACING</span>
           </h1>
         </div>
         <p className="title-tagline">

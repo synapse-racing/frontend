@@ -198,7 +198,8 @@ it('imports a guest design into the preview only until explicitly applied', asyn
 it('selects a skin, toggles wrap/tint mode and saves the appearance', async () => {
   const user = userEvent.setup()
   const value = mount()
-  await user.click(screen.getByRole('tab', { name: /05 \/ Skins/ }))
+  await user.click(screen.getByRole('tab', { name: 'Skins' }))
+  await user.click(screen.getByText('Ajustar vinilo'))
   expect(screen.getByRole('button', { name: 'Vinilo teñido' })).toBeDisabled()
   await user.click(screen.getByRole('button', { name: 'Llamas I' }))
   expect(screen.getByRole('button', { name: 'Vinilo teñido' })).toBeEnabled()
@@ -210,4 +211,19 @@ it('selects a skin, toggles wrap/tint mode and saves the appearance', async () =
     skinMode: 'tint',
     skinScale: 1,
   })
+})
+
+it('filters the full vinyl catalog by name without submitting the garage form', async () => {
+  const user = userEvent.setup()
+  const value = mount()
+  await user.click(screen.getByRole('tab', { name: 'Skins' }))
+  expect(screen.getByRole('button', { name: 'Sticker' })).toBeInTheDocument()
+  const search = screen.getByRole('searchbox', { name: 'Buscar vinilo' })
+  await user.type(search, 'acido{Enter}')
+  expect(screen.getByRole('button', { name: 'Ácido Neón' })).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Sticker' })).not.toBeInTheDocument()
+  expect(value.save).not.toHaveBeenCalled()
+  await user.clear(search)
+  await user.click(screen.getByRole('button', { name: 'Sticker' }))
+  expect(value.preview).toHaveBeenLastCalledWith({ ...defaultAppearance, skin: 'photo-border' })
 })
