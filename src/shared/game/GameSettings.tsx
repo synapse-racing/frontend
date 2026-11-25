@@ -1,26 +1,21 @@
-import { useEffect, useRef, useState } from 'react'
+import { useId, useRef } from 'react'
 import { useGamePreferences } from './preferences.ts'
 export function GameSettings() {
-  const [open, setOpen] = useState(false)
+  const titleId = useId()
   const dialog = useRef<HTMLDialogElement>(null)
   const { preferences, update } = useGamePreferences()
-  useEffect(() => {
-    if (open) dialog.current?.showModal()
-    else if (dialog.current?.open) dialog.current.close()
-  }, [open])
   return (
     <>
-      <button className="text-button" onClick={() => setOpen(true)}>
+      <button type="button" className="text-button" onClick={() => dialog.current?.showModal()}>
         Ajustes
       </button>
       <dialog
         ref={dialog}
         className="game-dialog"
-        onCancel={() => setOpen(false)}
-        onClose={() => setOpen(false)}
+        aria-labelledby={titleId}
       >
         <p className="eyebrow">Configuración del juego</p>
-        <h2>A tu medida.</h2>
+        <h2 id={titleId}>A tu medida.</h2>
         <label className="field">
           Calidad gráfica
           <select
@@ -57,7 +52,7 @@ export function GameSettings() {
           />{' '}
           Pausar animación de fondo
         </label>
-        <button className="primary-button" onClick={() => setOpen(false)}>
+        <button type="button" className="primary-button" onClick={() => dialog.current?.close()}>
           Volver al juego
         </button>
       </dialog>

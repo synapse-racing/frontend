@@ -25,7 +25,7 @@ export function LiveLeaderboard({
 
   return (
     <aside
-      className={`neat-standings ${collapsed ? 'is-collapsed' : ''}`}
+      className="neat-standings"
       aria-label="Clasificación en vivo"
     >
       <header className="neat-standings__header">
@@ -33,6 +33,7 @@ export function LiveLeaderboard({
         <button
           type="button"
           className="neat-standings__toggle"
+          aria-expanded={!collapsed}
           aria-label={collapsed ? 'Expandir tabla' : 'Colapsar tabla'}
           onClick={() => setCollapsed(!collapsed)}
         >

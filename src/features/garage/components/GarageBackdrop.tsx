@@ -95,9 +95,7 @@ export function GarageBackdrop({
       <GaragePoster appearance={appearance} />
       <Suspense fallback={null}>
         <SceneCanvas
-          frameloop={
-            !visible ? 'demand' : 'always'
-          }
+          frameloop={!visible || (paused && !interactive) ? 'demand' : 'always'}
           fallback={
             <div className="garage-unavailable">
               Vista previa estática · La personalización sigue disponible

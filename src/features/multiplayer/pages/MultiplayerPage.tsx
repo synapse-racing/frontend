@@ -32,7 +32,14 @@ export function MultiplayerPage() {
 
   useEffect(() => {
     if (!auth.accessToken) return
-    const socket = connectMultiplayer(auth.accessToken)
+    let socket: MultiplayerSocket
+    try {
+      socket = connectMultiplayer(auth.accessToken)
+    } catch (error) {
+      setConnection('disconnected')
+      setError(errorMessage(error))
+      return
+    }
     socketRef.current = socket
 
     socket.on('connection:ready', () => {
@@ -71,7 +78,7 @@ export function MultiplayerPage() {
     if (!auth.accessToken) return
     void listTrainingRuns(auth.accessToken)
       .then(setTrainingRuns)
-      .catch(() => setError('No se pudieron cargar tus pilotos NEAT'))
+      .catch((error: unknown) => setError(errorMessage(error, 'No se pudieron cargar tus pilotos NEAT')))
   }, [auth.accessToken])
 
   function leaveRoom() {

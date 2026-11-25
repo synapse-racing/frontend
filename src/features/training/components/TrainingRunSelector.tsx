@@ -126,7 +126,7 @@ export function TrainingRunSelector({
 
             <div className="track-preset track-preset--selected">
               <div className="track-preset__header">
-                <span>Pista de pruebas · Desierto</span>
+                <span>Pista de pruebas · Distrito industrial</span>
                 <span className="track-preset__seed-badge">Semilla #{safeSeed}</span>
               </div>
               <TrackMap recipe={{ version: TRACK_VERSION, seed: safeSeed }} />

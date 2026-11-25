@@ -3,9 +3,44 @@ import {
   Color,
   MeshPhysicalMaterial,
   MeshStandardMaterial,
+  RepeatWrapping,
   SRGBColorSpace,
 } from 'three'
 import type { VehicleAppearance } from '../../../features/garage/domain/appearance.ts'
+
+function createCarbonTexture() {
+  if (typeof document === 'undefined') return null
+  const canvas = document.createElement('canvas')
+  canvas.width = 64
+  canvas.height = 64
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return null
+  ctx.fillStyle = '#0f1214'
+  ctx.fillRect(0, 0, 64, 64)
+  for (let y = 0; y < 64; y += 16) {
+    for (let x = 0; x < 64; x += 16) {
+      if ((x / 16 + y / 16) % 2 === 0) {
+        ctx.fillStyle = '#2b343a'
+        ctx.fillRect(x, y, 16, 8)
+        ctx.fillStyle = '#44515a'
+        ctx.fillRect(x, y, 8, 8)
+      } else {
+        ctx.fillStyle = '#1c2226'
+        ctx.fillRect(x, y + 8, 16, 8)
+        ctx.fillStyle = '#2b343a'
+        ctx.fillRect(x + 8, y + 8, 8, 8)
+      }
+    }
+  }
+  const texture = new CanvasTexture(canvas)
+  texture.wrapS = RepeatWrapping
+  texture.wrapT = RepeatWrapping
+  texture.repeat.set(16, 16)
+  texture.colorSpace = SRGBColorSpace
+  return texture
+}
+
+const carbonTexture = createCarbonTexture()
 
 const finishes = {
   matte: {
@@ -90,7 +125,15 @@ export function createVehicleMaterials(
       clearcoatRoughness: 0.08,
       ...fade,
     }),
-    carbon: basic('#171a1d', 0.1, 0.7),
+    carbon: new MeshPhysicalMaterial({
+      color: '#22282d',
+      map: carbonTexture,
+      metalness: 0.35,
+      roughness: 0.35,
+      clearcoat: 0.9,
+      clearcoatRoughness: 0.15,
+      ...fade,
+    }),
     metal: basic('#8c959c', 0.75, 0.32),
     mirror: basic('#b7cdd7', 1, 0.08),
     lights: new MeshStandardMaterial({

@@ -370,3 +370,42 @@ describe.each(models)('$id level-of-detail contract', ({ high, low }) => {
     expect(Math.abs(highSize.z - lowSize.z)).toBeLessThan(0.01)
   })
 })
+
+describe.each(variants.filter(({ label }) => !label.startsWith('formula')))('$label front lighting', ({ definition }) => {
+  it('keeps the luminous surfaces above the actual body mesh without floating tubes', () => {
+    const bodies = definition.parts.paint.map((geometry) => new Mesh(geometry, rayMaterial))
+    bodies.forEach((mesh) => mesh.updateMatrixWorld())
+    const ray = new Raycaster(new Vector3(), new Vector3(0, -1, 0))
+    let minimumClearance = Infinity
+    let maximumClearance = -Infinity
+    for (const geometry of definition.parts.lights) {
+      const positions = geometry.getAttribute('position')
+      const indices = geometry.index
+      const count = indices?.count ?? positions.count
+      for (let index = 0; index < count; index += 3) {
+        const points = [0, 1, 2].map((offset) => new Vector3().fromBufferAttribute(positions, indices ? indices.getX(index + offset) : index + offset))
+        const point = points[0].clone().add(points[1]).add(points[2]).divideScalar(3)
+        ray.ray.origin.set(point.x, 2, point.z)
+        const hit = ray.intersectObjects(bodies, false)[0]
+        expect(hit, 'Every lamp triangle must sit on the body footprint').toBeDefined()
+        minimumClearance = Math.min(minimumClearance, point.y - hit.point.y)
+        maximumClearance = Math.max(maximumClearance, point.y - hit.point.y)
+      }
+    }
+    expect(minimumClearance, 'Lights must not intersect the painted body').toBeGreaterThan(0.001)
+    expect(maximumClearance, 'Lights must remain flush with the housing').toBeLessThan(0.009)
+  })
+})
+
+it.each(['high', 'low'] as const)('keeps the prototype %s number panel clear of physical accent stripes', (detail) => {
+  const definition = models.find(({ id }) => id === 'prototype')![detail]
+  const accents = definition.parts.accent.map((geometry) => new Mesh(geometry, rayMaterial))
+  accents.forEach((mesh) => mesh.updateMatrixWorld())
+  const ray = new Raycaster(new Vector3(), new Vector3(0, -1, 0))
+  for (const x of [-0.04, 0, 0.04]) {
+    for (const z of [-0.85, -0.805, -0.76]) {
+      ray.ray.origin.set(x, 2, z)
+      expect(ray.intersectObjects(accents, false), 'A physical livery stripe must not cover the number').toHaveLength(0)
+    }
+  }
+})

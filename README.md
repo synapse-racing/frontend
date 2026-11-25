@@ -41,8 +41,10 @@ VITE_API_URL=http://localhost:3000/api
 ```
 
 > In development, Vite proxies both `/api` and `/socket.io` to `http://localhost:3000`, so
-> you only need the `VITE_API_URL` variable in production builds. The production Docker
-> image serves the SPA through Nginx, which proxies the API under the same origin.
+> the default `VITE_API_URL=/api` works locally and behind a same-origin reverse proxy.
+> Production requests require HTTPS for both the page and API; HTTP is only allowed between
+> loopback hosts for local development. In Pterodactyl, route `/api/` and `/socket.io/`
+> through the public HTTPS domain and keep the service allocations private.
 
 ## Scripts
 

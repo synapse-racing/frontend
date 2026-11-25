@@ -1,335 +1,241 @@
-import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
-import {
-  CanvasTexture,
-  Color,
-  DoubleSide,
-  InstancedMesh,
-  Object3D,
-  SRGBColorSpace,
-} from 'three'
+import { memo, useEffect, useLayoutEffect, useMemo, useRef, type ReactNode } from 'react'
+import { AdditiveBlending, Color, DoubleSide, InstancedMesh, Object3D } from 'three'
+import type { BufferGeometry } from 'three'
 import type { TrackDefinition } from '../../features/training/domain/track.ts'
 import { useGamePreferences } from '../game/preferences.ts'
-import { createRoadGeometry, trackExtent } from './track-geometry.ts'
+import { createRoadGeometry } from './track-geometry.ts'
 import { createSurfaceTexture } from './surface-texture.ts'
+import {
+  createStreetLayout,
+  districts,
+  type StreetDistrict,
+  type StreetPart,
+} from './urban-layout.ts'
+import {
+  createFacade,
+  createFinishSign,
+  createLampPool,
+  createNightSky,
+  createTowerTexture,
+  facadeGeometry,
+} from './street-textures.ts'
 
-export type TrackTheme = 'desert' | 'tournament'
-
-function BoundaryPaint({
-  track,
-  theme,
+function StreetBatch({
+  parts,
+  children,
+  geometry,
+  flat = false,
+  shape = 'box',
+  castShadow = false,
 }: {
-  track: TrackDefinition
-  theme: TrackTheme
+  parts: StreetPart[]
+  children: ReactNode
+  geometry?: BufferGeometry
+  flat?: boolean
+  shape?: 'box' | 'tank' | 'cap'
+  castShadow?: boolean
 }) {
-  const stripes = useRef<InstancedMesh>(null)
+  const ref = useRef<InstancedMesh>(null)
   useLayoutEffect(() => {
-    const object = new Object3D()
-    track.boundaries.forEach(([x1, z1, x2, z2], index) => {
-      object.position.set((x1 + x2) / 2, 0.055, (z1 + z2) / 2)
-      object.rotation.set(0, Math.atan2(-(z2 - z1), x2 - x1), 0)
-      object.scale.set(
-        Math.hypot(x2 - x1, z2 - z1) + 0.02,
-        0.045,
-        theme === 'desert' ? 0.16 : 0.55,
-      )
+    const mesh = ref.current
+    if (!mesh) return
+    const object = new Object3D(),
+      color = new Color()
+    parts.forEach((p, i) => {
+      object.position.set(p.x, p.y, p.z)
+      object.rotation.set(flat ? -Math.PI / 2 : 0, p.yaw, 0, 'YXZ')
+      object.scale.set(p.width, flat ? p.depth : p.height, flat ? 1 : p.depth)
       object.updateMatrix()
-      stripes.current?.setMatrixAt(index, object.matrix)
+      mesh.setMatrixAt(i, object.matrix)
+      mesh.setColorAt(i, color.set(p.color))
     })
-    if (stripes.current) {
-      stripes.current.instanceMatrix.needsUpdate = true
-      stripes.current.computeBoundingSphere()
-    }
-  }, [track, theme])
+    mesh.instanceMatrix.needsUpdate = true
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
+    mesh.computeBoundingSphere()
+  }, [parts, flat])
   return (
-    <instancedMesh
-      ref={stripes}
-      args={[undefined, undefined, track.boundaries.length]}
-    >
-      <boxGeometry />
-      <meshStandardMaterial
-        color={theme === 'desert' ? '#e4ce84' : '#f3e9d7'}
-        roughness={0.9}
-      />
+    <instancedMesh ref={ref} args={[geometry, undefined, parts.length]} castShadow={castShadow}>
+      {!geometry &&
+        (flat ? (
+          <planeGeometry />
+        ) : shape === 'box' ? (
+          <boxGeometry />
+        ) : (
+          <cylinderGeometry args={[shape === 'cap' ? 0 : 0.5, 0.5, 1, 12]} />
+        ))}
+      {children}
     </instancedMesh>
   )
 }
 
-function TrackBarriers({ track, desert }: { track: TrackDefinition; desert: boolean }) {
-  const mesh = useRef<InstancedMesh>(null)
-  const walls = useMemo(() => track.walls.filter((_, index) => !desert || index % 6 < 2), [track, desert])
-  useLayoutEffect(() => {
-    const object = new Object3D()
-    walls.forEach((wall, index) => {
-      object.position.set(wall.position[0], desert ? 0.25 : 0.38, wall.position[2])
-      object.rotation.set(0, wall.rotationY, 0)
-      object.scale.set(desert ? 1 : wall.size[0], 1, 1)
-      object.updateMatrix()
-      mesh.current?.setMatrixAt(index, object.matrix)
-      mesh.current?.setColorAt(index, new Color(desert ? '#e17c3e' : index % 4 < 2 ? '#c75039' : '#e6e2ce'))
-    })
-    if (mesh.current) {
-      mesh.current.instanceMatrix.needsUpdate = true
-      if (mesh.current.instanceColor) mesh.current.instanceColor.needsUpdate = true
-      mesh.current.computeBoundingSphere()
-    }
-  }, [walls, desert])
-  return <instancedMesh ref={mesh} args={[undefined, undefined, walls.length]} receiveShadow>
-    {desert ? <coneGeometry args={[0.2, 0.5, 8]} /> : <boxGeometry args={[1, 0.7, 0.3]} />}
-    <meshStandardMaterial roughness={0.9} />
-  </instancedMesh>
-}
-
-function SectorGate({
+export const TrackEnvironment = memo(function TrackEnvironment({
   track,
-  theme,
-}: {
-  track: TrackDefinition
-  theme: TrackTheme
-}) {
-  const checkpoint = track.checkpoints.at(-1)!
-  const width = checkpoint.size[0] + 1.8
-  const texture = useMemo(() => {
-    const canvas = document.createElement('canvas')
-    canvas.width = 512
-    canvas.height = 96
-    const context = canvas.getContext('2d')!
-    context.fillStyle = '#202925'
-    context.fillRect(0, 0, 512, 96)
-    context.fillStyle = '#ff793f'
-    context.fillRect(0, 82, 512, 14)
-    context.fillStyle = '#f2eee1'
-    context.font = 'bold italic 35px Arial'
-    context.textAlign = 'center'
-    context.fillText(
-      theme === 'desert' ? 'SYNAPSE RACING / TEST FIELD' : 'SYNAPSE RACING / START + FINISH',
-      256,
-      57,
-    )
-    const texture = new CanvasTexture(canvas)
-    texture.colorSpace = SRGBColorSpace
-    return texture
-  }, [theme])
-  useEffect(() => () => texture.dispose(), [texture])
-  return (
-    <group
-      position={[checkpoint.position[0], 0, checkpoint.position[2]]}
-      rotation={[0, checkpoint.rotationY, 0]}
-    >
-      {[-1, 1].map((side) => (
-        <mesh key={side} position={[(side * width) / 2, 1.8, 0]} castShadow>
-          <boxGeometry args={[0.25, 3.6, 0.3]} />
-          <meshStandardMaterial color="#e5e0c9" />
-        </mesh>
-      ))}
-      <mesh position={[0, 3.4, 0]}>
-        <boxGeometry args={[width + 0.4, 0.85, 0.25]} />
-        <meshStandardMaterial color="#202925" />
-      </mesh>
-      <mesh position={[0, 3.4, 0.14]}>
-        <planeGeometry args={[width, 0.8]} />
-        <meshBasicMaterial map={texture} side={DoubleSide} />
-      </mesh>
-    </group>
-  )
-}
-
-export function TrackEnvironment({
-  track,
-  theme,
+  district,
   cinematic = false,
 }: {
   track: TrackDefinition
-  theme: TrackTheme
+  district: StreetDistrict
   cinematic?: boolean
 }) {
   const { preferences } = useGamePreferences()
-  const high = preferences.quality === 'high',
-    desert = theme === 'desert'
-  const geometry = useMemo(() => createRoadGeometry(track), [track])
-  const surfaces = useMemo(
+  const high = preferences.quality === 'high'
+  const layout = useMemo(() => createStreetLayout(track, district, high), [track, district, high])
+  const road = useMemo(() => createRoadGeometry(track), [track])
+  const facade = useMemo(facadeGeometry, [])
+  const upperFacade = useMemo(() => facadeGeometry(0.15), [])
+  const textures = useMemo(
     () => ({
-      road: createSurfaceTexture('asphalt'),
+      asphalt: createSurfaceTexture('asphalt'),
       ground: createSurfaceTexture('ground'),
+      garage: createFacade(district, 0),
+      depot: createFacade(district, 1),
+      tower: createTowerTexture(district),
+      sky: createNightSky(district),
+      pool: createLampPool(),
+      sign: createFinishSign(district),
     }),
-    [],
+    [district],
   )
-  useEffect(
-    () => () => {
-      surfaces.road.dispose()
-      surfaces.ground.dispose()
-    },
-    [surfaces],
-  )
-  useEffect(() => () => geometry.dispose(), [geometry])
-  const extent = useMemo(() => trackExtent(track), [track])
-  const radius = Math.hypot(extent.x, extent.z) + 22
+  useEffect(() => () => road.dispose(), [road])
+  useEffect(() => () => facade.dispose(), [facade])
+  useEffect(() => () => upperFacade.dispose(), [upperFacade])
+  useEffect(() => () => Object.values(textures).forEach((map) => map.dispose()), [textures])
+  const palette = districts[district]
+  const finish = track.checkpoints.at(-1)!
+  const gateWidth = finish.size[0] + 1.65
+  const groundSize = Math.max(380, (layout.radius + 140) * 2)
   return (
     <>
-      <color attach="background" args={[cinematic ? '#d4c2a7' : desert ? '#d4b78c' : '#a8c3cf']} />
-      <fog attach="fog" args={[desert ? '#d4b78c' : '#a8c3cf', Math.max(75, radius * 2), Math.max(230, radius * 5)]} />
-      <hemisphereLight
-        args={[
-          desert ? '#fff1ce' : '#e8f5ff',
-          desert ? '#977750' : '#607553',
-          1.7,
-        ]}
+      <primitive attach="background" object={textures.sky} />
+      <primitive attach="environment" object={textures.sky} />
+      <fog
+        attach="fog"
+        args={[palette.sky, Math.max(42, layout.radius * 0.7), Math.max(180, layout.radius * 3.1)]}
       />
+      <hemisphereLight args={['#d5e7ff', '#81706e', 1.65]} />
       <directionalLight
-        position={[-30, 45, 15]}
-        intensity={cinematic ? 0.6 : desert ? 2.8 : 2.3}
-        color={desert ? '#ffe0ac' : '#fff5dc'}
+        position={[-layout.radius * 0.64, layout.radius, layout.radius * 0.44]}
+        color="#d4e3ff"
+        intensity={cinematic ? 0.8 : 1.9}
         castShadow={high && !cinematic}
-        shadow-mapSize={[2048, 2048]}
-        shadow-camera-left={-60}
-        shadow-camera-right={60}
-        shadow-camera-top={60}
-        shadow-camera-bottom={-60}
-        shadow-camera-far={140}
-        shadow-bias={-0.0003}
+        shadow-mapSize={[1024, 1024]}
+        shadow-camera-left={-layout.radius}
+        shadow-camera-right={layout.radius}
+        shadow-camera-top={layout.radius}
+        shadow-camera-bottom={-layout.radius}
+        shadow-camera-far={layout.radius * 3 + 30}
+        shadow-bias={-0.0005}
       />
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, -0.045, 0]}
-        receiveShadow
-      >
-        <planeGeometry args={[650, 650]} />
-        <meshStandardMaterial
-          color={desert ? '#bda273' : '#75815a'}
-          map={surfaces.ground}
-          roughness={1}
-        />
+      <directionalLight position={[24, 12, -35]} color={palette.accent} intensity={1.1} />
+
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]} receiveShadow>
+        <planeGeometry args={[groundSize, groundSize]} />
+        <meshStandardMaterial color="#343b47" map={textures.ground} roughness={0.94} />
       </mesh>
-      <mesh geometry={geometry} receiveShadow>
+      <mesh geometry={road} receiveShadow>
         <meshStandardMaterial
-          color={desert ? '#686457' : '#424b4d'}
-          map={surfaces.road}
-          roughness={0.95}
+          color="#626b79"
+          map={textures.asphalt}
+          roughness={0.62}
           side={DoubleSide}
         />
       </mesh>
-      <BoundaryPaint track={track} theme={theme} />
-      <TrackBarriers track={track} desert={desert} />
-      {track.checkpoints.map((checkpoint) => (
-        <group
-          key={checkpoint.id}
-          position={[checkpoint.position[0], 0.015, checkpoint.position[2]]}
-          rotation={[0, checkpoint.rotationY, 0]}
-        >
-          {Array.from({ length: checkpoint.index === track.checkpoints.length - 1 ? 10 : 1 }, (_, index) => (
-            <mesh
-              key={index}
-              position={[checkpoint.index === track.checkpoints.length - 1 ? ((index - 4.5) * checkpoint.size[0]) / 10 : 0, 0, 0]}
-              rotation={[-Math.PI / 2, 0, 0]}
-            >
-              <planeGeometry args={[checkpoint.size[0] / (checkpoint.index === track.checkpoints.length - 1 ? 10 : 1), 0.65]} />
-              <meshBasicMaterial
-                color={index % 2 === 0 ? '#ebe4ce' : '#343b35'}
-              />
-            </mesh>
-          ))}
-        </group>
-      ))}
-      <SectorGate track={track} theme={theme} />
-      {desert ? (
+      <StreetBatch parts={layout.solids}>
+        <meshStandardMaterial roughness={0.84} />
+      </StreetBatch>
+      <StreetBatch parts={layout.paint}>
+        <meshBasicMaterial />
+      </StreetBatch>
+      <StreetBatch parts={layout.lights}>
+        <meshBasicMaterial toneMapped={false} />
+      </StreetBatch>
+      <StreetBatch flat parts={layout.pools}>
+        <meshBasicMaterial
+          map={textures.pool}
+          transparent
+          opacity={0.34}
+          blending={AdditiveBlending}
+          depthWrite={false}
+        />
+      </StreetBatch>
+      <StreetBatch parts={layout.facades[0]} geometry={facade} castShadow={high && !cinematic}>
+        <meshBasicMaterial map={textures.garage} />
+      </StreetBatch>
+      <StreetBatch parts={layout.facades[1]} geometry={facade} castShadow={high && !cinematic}>
+        <meshBasicMaterial map={textures.depot} />
+      </StreetBatch>
+      <StreetBatch parts={layout.towers} geometry={facade}>
+        <meshBasicMaterial map={textures.tower} />
+      </StreetBatch>
+      <StreetBatch parts={layout.upperFloors} geometry={upperFacade} castShadow={high && !cinematic}>
+        <meshBasicMaterial map={textures.tower} />
+      </StreetBatch>
+      {layout.arrows.length > 0 && (
+        <mesh>
+          <bufferGeometry>
+            <bufferAttribute attach="attributes-position" args={[layout.arrows, 3]} />
+          </bufferGeometry>
+          <meshBasicMaterial color={palette.accent} toneMapped={false} side={DoubleSide} />
+        </mesh>
+      )}
+      {layout.tanks.length > 0 && (
         <>
-          {Array.from({ length: high ? 22 : 9 }, (_, index) => {
-            const angle = index * 2.399 + (track.recipe.seed % 12)
-            const distance = radius + (index % 4) * 12
-            return (
-              <mesh
-                key={index}
-                position={[
-                  Math.cos(angle) * distance,
-                  3,
-                  Math.sin(angle) * distance,
-                ]}
-                scale={[7 + (index % 5), 5 + (index % 7), 8]}
-                rotation={[0, angle, 0]}
-              >
-                <dodecahedronGeometry args={[1, 0]} />
-                <meshStandardMaterial
-                  color={index % 2 ? '#ad895e' : '#b6966a'}
-                  roughness={1}
-                  flatShading
-                />
-              </mesh>
-            )
-          })}
-          <group position={[extent.x + 12, 0, 0]}>
-            <mesh position={[0, 1.2, 0]} castShadow>
-              <boxGeometry args={[5, 2.4, 3]} />
-              <meshStandardMaterial color="#d7c9a4" />
-            </mesh>
-            <mesh position={[0, 2.5, 0]}>
-              <boxGeometry args={[5.4, 0.15, 3.4]} />
-              <meshStandardMaterial color="#575e49" />
-            </mesh>
-            <mesh position={[-2.6, 2.8, 0]}>
-              <cylinderGeometry args={[0.06, 0.06, 5.6, 6]} />
-              <meshStandardMaterial color="#626451" />
-            </mesh>
-          </group>
-        </>
-      ) : (
-        <>
-          {[-1, 1].map((side) => (
-            <group
-              key={side}
-              position={[side * (extent.x + 12), 0, 0]}
-              rotation={[0, side > 0 ? 0 : Math.PI, 0]}
-            >
-              {Array.from({ length: high ? 5 : 3 }, (_, row) => (
-                <mesh
-                  key={row}
-                  position={[row * 1.1, row * 0.6 + 0.3, 0]}
-                  receiveShadow
-                  castShadow={high}
-                >
-                  <boxGeometry args={[1.3, 0.6 + row * 1.2, 24]} />
-                  <meshStandardMaterial
-                    color={row % 2 ? '#d4d5c4' : '#45606a'}
-                  />
-                </mesh>
-              ))}
-              <mesh position={[2, 5.4, 0]} castShadow={high}>
-                <boxGeometry args={[8, 0.18, 26]} />
-                <meshStandardMaterial color="#e3e0cb" />
-              </mesh>
-              {[-11, 11].map((z) => (
-                <mesh key={z} position={[4.5, 2.6, z]}>
-                  <boxGeometry args={[0.2, 5.2, 0.2]} />
-                  <meshStandardMaterial color="#4d5e5e" />
-                </mesh>
-              ))}
-            </group>
-          ))}
-          {[-1, 1].flatMap((x) =>
-            [-1, 1].map((z) => (
-              <group
-                key={`${x}-${z}`}
-                position={[x * (extent.x + 7), 0, z * (extent.z + 6)]}
-              >
-                <mesh position={[0, 5, 0]}>
-                  <cylinderGeometry args={[0.12, 0.2, 10, 8]} />
-                  <meshStandardMaterial color="#526165" />
-                </mesh>
-                <mesh position={[0, 10, 0]} rotation={[0.35, 0, 0]}>
-                  <boxGeometry args={[2.8, 0.65, 0.4]} />
-                  <meshStandardMaterial
-                    color="#f1eed7"
-                    emissive="#ffebbb"
-                    emissiveIntensity={0.8}
-                  />
-                </mesh>
-              </group>
-            )),
-          )}
-          <mesh position={[0, 1.3, -extent.z - 9]} castShadow={high}>
-            <boxGeometry args={[15, 2.6, 5]} />
-            <meshStandardMaterial color="#d8ddd2" />
-          </mesh>
+          <StreetBatch parts={layout.tanks} shape="tank">
+            <meshStandardMaterial roughness={0.75} />
+          </StreetBatch>
+          <StreetBatch parts={layout.tankCaps} shape="cap">
+            <meshStandardMaterial roughness={0.84} />
+          </StreetBatch>
         </>
       )}
+      {layout.wires.length > 0 && (
+        <lineSegments>
+          <bufferGeometry>
+            <bufferAttribute attach="attributes-position" args={[layout.wires, 3]} />
+          </bufferGeometry>
+          <lineBasicMaterial color="#293241" />
+        </lineSegments>
+      )}
+      {layout.pennants.length > 0 && (
+        <mesh>
+          <bufferGeometry>
+            <bufferAttribute attach="attributes-position" args={[layout.pennants, 3]} />
+          </bufferGeometry>
+          <meshBasicMaterial color={palette.secondary} side={DoubleSide} />
+        </mesh>
+      )}
+
+      <group
+        position={[finish.position[0], 0, finish.position[2]]}
+        rotation={[0, finish.rotationY, 0]}
+      >
+        {[-1, 1].map((side) => (
+          <group key={side} position={[(side * gateWidth) / 2, 0, 0]}>
+            <mesh position={[0, 2.7, 0]}>
+              <boxGeometry args={[0.23, 5.4, 0.34]} />
+              <meshStandardMaterial color="#72808a" />
+            </mesh>
+            <mesh position={[0, 2.05, 0]}>
+              <boxGeometry args={[0.25, 1.15, 0.36]} />
+              <meshBasicMaterial color={palette.accent} />
+            </mesh>
+          </group>
+        ))}
+        <mesh position={[0, 5.12, 0]}>
+          <boxGeometry args={[gateWidth + 0.35, 0.98, 0.36]} />
+          <meshStandardMaterial color="#23313c" />
+        </mesh>
+        {[-1, 1].map((side) => (
+          <mesh
+            key={side}
+            position={[0, 5.12, side * 0.19]}
+            rotation={[0, side === 1 ? 0 : Math.PI, 0]}
+          >
+            <planeGeometry args={[gateWidth + 0.25, 0.94]} />
+            <meshBasicMaterial map={textures.sign} toneMapped={false} />
+          </mesh>
+        ))}
+      </group>
     </>
   )
-}
+})

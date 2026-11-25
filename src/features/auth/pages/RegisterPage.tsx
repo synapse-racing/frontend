@@ -34,7 +34,7 @@ export function RegisterPage() {
 
   return (
     <AuthLayout>
-      <form className="auth-form" onSubmit={submit} noValidate>
+      <form className="auth-form auth-form--register" onSubmit={submit} noValidate>
         <h2>Crear cuenta</h2>
         <p className="auth-form__lead">{auth.status === 'visitor' ? 'Crea tu cuenta para guardar los entrenamientos de este dispositivo.' : 'Prepara tu primer laboratorio NEAT.'}</p>
 

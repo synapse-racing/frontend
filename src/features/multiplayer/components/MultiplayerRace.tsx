@@ -95,7 +95,7 @@ export function MultiplayerRace({
   return (
     <section className="multiplayer-race">
       <SceneCanvas>
-        <TrackEnvironment track={track} theme="tournament" />
+        <TrackEnvironment track={track} district="night-race" />
         {snapshot.players.map((player) => (
           <RemoteRaceCar
             key={player.userId}
@@ -245,7 +245,7 @@ export function MultiplayerRace({
           <div>
             <p className="eyebrow">Clasificación oficial</p>
             <h2>Carrera finalizada</h2>
-            <ol>
+            <ol aria-label="Resultados por piloto" tabIndex={0}>
               {result.players.map((player) => (
                 <li key={player.userId}>
                   <span>#{player.rank}</span>
