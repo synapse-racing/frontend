@@ -7,7 +7,14 @@ export function AuthLayout({ children }: PropsWithChildren) {
     <main className="auth-shell">
       <header className="auth-access-header">
         <Link className="auth-brand" to="/">
-          ← SYNAPSE RACING
+          ←{' '}
+          <img
+            src="/synapse.png"
+            alt=""
+            className="brand-logo"
+            aria-hidden="true"
+          />
+          SYNAPSE <span className="wordmark__accent">RACING</span>
         </Link>
         <GameSettings />
       </header>

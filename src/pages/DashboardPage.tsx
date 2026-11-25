@@ -38,7 +38,13 @@ export function DashboardPage() {
     <main className="game-shell dashboard">
       <header className="game-header">
         <Link className="wordmark" to="/">
-          SYNAPSE RACING
+          <img
+            src="/synapse.png"
+            alt=""
+            className="brand-logo"
+            aria-hidden="true"
+          />
+          SYNAPSE <span className="wordmark__accent">RACING</span>
         </Link>
         <div className="header-actions">
           <GameSettings />

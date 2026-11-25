@@ -166,6 +166,29 @@
   text-shadow: 0 0 10px var(--accent);
 }
 
+.brand-logo {
+  height: 2.2rem;
+  width: auto;
+  object-fit: contain;
+  margin-right: 0.55rem;
+  transform: skewX(10deg);
+  filter: drop-shadow(0 0 8px rgba(0, 255, 102, 0.55));
+}
+
+.title-brand-row {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 2.5vw, 1.5rem);
+}
+
+.title-hero-logo {
+  width: clamp(3.8rem, min(11vw, 13dvh), 7.2rem);
+  height: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 16px rgba(0, 255, 102, 0.65));
+}
+
 /* ==========================================================================
    TITLE SCREEN (PORTADA CINEMATOGRÁFICA)
    ========================================================================== */

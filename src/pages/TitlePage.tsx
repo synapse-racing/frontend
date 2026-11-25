@@ -34,6 +34,12 @@ export function TitlePage() {
     <main className="game-shell title-screen">
       <header className="game-header">
         <span className="wordmark">
+          <img
+            src="/synapse.png"
+            alt=""
+            className="brand-logo"
+            aria-hidden="true"
+          />
           SYNAPSE <span className="wordmark__accent">RACING</span>
         </span>
         <GameSettings />
@@ -42,9 +48,16 @@ export function TitlePage() {
         <p className="eyebrow title-kicker">
           <span /> STREET TUNING SIMULATOR // 2000s
         </p>
-        <h1>
-          SYNAPSE<span>RACING</span>
-        </h1>
+        <div className="title-brand-row">
+          <img
+            src="/synapse.png"
+            alt="Synapse Racing"
+            className="title-hero-logo"
+          />
+          <h1>
+            SYNAPSE<span>RACING</span>
+          </h1>
+        </div>
         <p className="title-tagline">
           ASFALTO NOCTURNO · MOTORES RUGIENDO · SIN REGLAS
         </p>
