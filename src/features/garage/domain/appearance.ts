@@ -26,21 +26,24 @@ export const vehicleCatalog: ReadonlyArray<{
 }> = [
   {
     id: 'formula',
-    name: 'Apex F1',
-    category: 'Monoplaza',
-    description: 'Cabina abierta. Ruedas expuestas. ADN de circuito.',
+    name: 'Bavaria E46 M-Spec',
+    category: 'Sedán Drift 3 Vol.',
+    description:
+      'Tracción trasera ensanchada para reventar rotondas. Doble riñón, alerón GT y cuatro escapes tronando.',
   },
   {
     id: 'gt',
-    name: 'Veloce GT',
-    category: 'Gran turismo',
-    description: 'Carrocería ancha y una silueta de competición clásica.',
+    name: 'Saxo VTS "Poligonero"',
+    category: 'Compacto 2 Vol.',
+    description:
+      'Corto, cuadrado y sin alerón (portón alisado). Faldones a ras de asfalto, rejillas XXL y un escape gordo.',
   },
   {
     id: 'prototype',
-    name: 'Spectre P1',
-    category: 'Prototipo',
-    description: 'Perfil bajo, cabina cerrada y líneas de resistencia.',
+    name: 'Calibra Turbo 16V',
+    category: 'Coupé Fastback',
+    description:
+      'El más bajo y afilado en cuña. Morro largo, faros rasgados, alerón bajo y doble salida de escape.',
   },
 ]
 

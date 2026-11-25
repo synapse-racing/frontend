@@ -1,37 +1,37 @@
 {
   "formula": {
     "high": {
-      "bytes": 659432,
-      "triangles": 28426,
-      "draws": 23
+      "bytes": 1015268,
+      "triangles": 45412,
+      "draws": 24
     },
     "low": {
-      "bytes": 209868,
-      "triangles": 7468,
-      "draws": 15
+      "bytes": 224344,
+      "triangles": 9404,
+      "draws": 16
     }
   },
   "gt": {
     "high": {
-      "bytes": 960544,
-      "triangles": 45112,
+      "bytes": 794472,
+      "triangles": 37536,
       "draws": 24
     },
     "low": {
-      "bytes": 264868,
-      "triangles": 11484,
+      "bytes": 196452,
+      "triangles": 8592,
       "draws": 16
     }
   },
   "prototype": {
     "high": {
-      "bytes": 861996,
-      "triangles": 39362,
+      "bytes": 788892,
+      "triangles": 37420,
       "draws": 24
     },
     "low": {
-      "bytes": 245244,
-      "triangles": 9926,
+      "bytes": 209928,
+      "triangles": 9040,
       "draws": 16
     }
   }

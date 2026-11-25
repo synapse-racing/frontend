@@ -1,33 +1,35 @@
 import { createBuilder } from './modeling.mjs'
 
+// Compacto 3 puertas hatchback (estilo Saxo VTS / Golf GTI Mk3)
+// El más corto y cuadrado de los tres (2 volúmenes, SIN alerón, portón trasero alisado)
+// z, width, centerHeight, shoulderHeight, bottomHeight
 const BODY = [
-  [-1.16, 0.425, 0.285, 0.302, 0.145],
-  [-1.09, 0.475, 0.325, 0.35, 0.135],
-  [-0.98, 0.505, 0.358, 0.408, 0.125],
-  [-0.82, 0.52, 0.378, 0.458, 0.125],
-  [-0.69, 0.52, 0.386, 0.472, 0.125],
-  [-0.51, 0.512, 0.402, 0.449, 0.125],
-  [-0.34, 0.495, 0.421, 0.436, 0.125],
-  [-0.1, 0.488, 0.427, 0.435, 0.125],
-  [0.25, 0.495, 0.424, 0.441, 0.125],
-  [0.48, 0.515, 0.421, 0.461, 0.125],
-  [0.71, 0.52, 0.416, 0.476, 0.125],
-  [0.88, 0.516, 0.405, 0.448, 0.132],
-  [1.04, 0.488, 0.376, 0.409, 0.145],
-  [1.16, 0.45, 0.342, 0.366, 0.155],
+  [-1.02, 0.434, 0.345, 0.332, 0.112],
+  [-0.98, 0.448, 0.398, 0.386, 0.102],
+  [-0.90, 0.456, 0.445, 0.434, 0.094],
+  [-0.78, 0.464, 0.458, 0.448, 0.090],
+  [-0.60, 0.470, 0.464, 0.456, 0.090],
+  [-0.40, 0.466, 0.470, 0.460, 0.088],
+  [-0.05, 0.468, 0.474, 0.462, 0.088],
+  [0.32, 0.470, 0.478, 0.464, 0.088],
+  [0.60, 0.474, 0.480, 0.466, 0.090],
+  [0.84, 0.464, 0.478, 0.464, 0.094],
+  [0.98, 0.448, 0.472, 0.458, 0.100],
+  [1.02, 0.434, 0.454, 0.440, 0.108],
 ]
 
-// z, roof center, roof half-width, belt half-width, belt height.
+// Cabina alta y cuadrada con portón trasero casi vertical sin maletero sobresaliente
+// z, roofCenter, roofHalfWidth, beltHalfWidth, beltHeight
 const CABIN = [
-  [-0.385, 0.43, 0.371, 0.394, 0.426],
-  [-0.3, 0.492, 0.344, 0.398, 0.433],
-  [-0.16, 0.606, 0.315, 0.4, 0.437],
-  [-0.045, 0.674, 0.296, 0.399, 0.439],
-  [0.08, 0.689, 0.293, 0.398, 0.44],
-  [0.26, 0.683, 0.299, 0.4, 0.441],
-  [0.38, 0.65, 0.316, 0.403, 0.441],
-  [0.54, 0.547, 0.347, 0.407, 0.439],
-  [0.71, 0.431, 0.395, 0.41, 0.426],
+  [-0.39, 0.470, 0.406, 0.432, 0.460],
+  [-0.31, 0.575, 0.386, 0.432, 0.462],
+  [-0.18, 0.735, 0.364, 0.432, 0.464],
+  [-0.08, 0.762, 0.358, 0.432, 0.466],
+  [0.24, 0.768, 0.356, 0.434, 0.468],
+  [0.62, 0.758, 0.356, 0.438, 0.470],
+  [0.78, 0.738, 0.358, 0.438, 0.470],
+  [0.90, 0.618, 0.384, 0.436, 0.470],
+  [0.99, 0.472, 0.416, 0.428, 0.458],
 ]
 
 function cabinSection(z) {
@@ -35,23 +37,11 @@ function cabinSection(z) {
   if (index <= 0) return CABIN[index < 0 ? CABIN.length - 1 : 0]
   const a = CABIN[index - 1],
     c = CABIN[index]
-  const previous = CABIN[Math.max(0, index - 2)]
-  const next = CABIN[Math.min(CABIN.length - 1, index + 1)]
   const span = c[0] - a[0],
     t = (z - a[0]) / span
-  const t2 = t * t,
-    t3 = t2 * t
-  return a.map((value, field) => {
-    if (field === 0) return z
-    const fromSlope = (c[field] - previous[field]) / (c[0] - previous[0])
-    const toSlope = (next[field] - a[field]) / (next[0] - a[0])
-    return (
-      (2 * t3 - 3 * t2 + 1) * value +
-      (t3 - 2 * t2 + t) * span * fromSlope +
-      (-2 * t3 + 3 * t2) * c[field] +
-      (t3 - t2) * span * toSlope
-    )
-  })
+  return a.map((value, field) =>
+    field === 0 ? z : value + (c[field] - value) * t,
+  )
 }
 
 function range(from, to, segments) {
@@ -64,31 +54,37 @@ function range(from, to, segments) {
 export function buildGt(detail = 'high') {
   const b = createBuilder(detail)
   const high = detail === 'high'
+  const archClearance = 0.032
+  const archLip = 0.024
+
+  // Ejes cortos propios del compacto urbano con llantas 10-radios
   const wheels = [-1, 1].flatMap((side) => [
     {
-      x: side * 0.445,
-      y: 0.205,
-      z: -0.69,
-      radius: 0.205,
-      width: 0.15,
+      x: side * 0.430,
+      y: 0.190,
+      z: -0.60,
+      radius: 0.190,
+      width: 0.160,
       front: true,
       style: 'mesh',
     },
     {
-      x: side * 0.445,
-      y: 0.205,
-      z: 0.71,
-      radius: 0.205,
-      width: 0.15,
+      x: side * 0.430,
+      y: 0.190,
+      z: 0.60,
+      radius: 0.190,
+      width: 0.160,
       front: false,
       style: 'mesh',
     },
   ])
+
   const body = b.body(BODY, wheels, {
-    archClearance: 0.032,
-    archLip: 0.025,
-    segments: high ? 80 : 34,
-    frontSweep: 0.06,
+    archClearance,
+    archLip,
+    segments: high ? 62 : 24,
+    frontSweep: 0.012,
+    rearSweep: 0.010,
   })
 
   const topPoint = (x, z, lift = 0) => {
@@ -96,442 +92,329 @@ export function buildGt(detail = 'high') {
     point[1] += lift
     return point
   }
-  const frontPoint = (x, y, lift = 0.006) => [
-    x,
-    y,
-    -1.16 + 0.06 * (Math.abs(x) / 0.425) ** 4 - lift,
-  ]
   const roofPoint = (z, ratio, lift = 0) => {
     const [, center, width] = cabinSection(z)
-    return [ratio * width, center - 0.022 * Math.abs(ratio) ** 4 + lift, z]
+    return [ratio * width, center - 0.012 * Math.abs(ratio) ** 4 + lift, z]
   }
   const cabinSide = (side, z, height, lift = 0) => {
     const [, top, topWidth, bottomWidth, bottom] = cabinSection(z)
-    const bulge = 0.006 * Math.sin(height * Math.PI)
     return [
-      side * (bottomWidth + (topWidth - bottomWidth) * height + bulge + lift),
-      bottom + (top - 0.022 - bottom) * height,
+      side * (bottomWidth + (topWidth - bottomWidth) * height + lift),
+      bottom + (top - 0.012 - bottom) * height,
       z,
     ]
   }
-  const topStrip = (role, side, rows, lift = 0.005) =>
-    b.patch(
-      role,
-      rows.map(([z, inside, outside]) => {
-        const edge = [
-          topPoint(side * inside, z, lift),
-          topPoint(side * outside, z, lift),
-        ]
-        return side < 0 ? edge.reverse() : edge
-      }),
-    )
 
-  const cabinRows = range(-0.385, 0.71, high ? 40 : 20)
+  // Cabina alta de 3 puertas (techo largo y caída trasera vertical limpia)
+  const cabinRows = range(-0.39, 0.99, high ? 28 : 14)
   b.patch(
     'paint',
     cabinRows.map((z) =>
-      range(-1, 1, high ? 16 : 8).map((u) => roofPoint(z, u)),
+      range(-1, 1, high ? 10 : 6).map((u) => roofPoint(z, u)),
     ),
   )
   for (const side of [-1, 1]) {
     b.patch(
       'paint',
-      cabinRows.map((z) => range(0, 1, 4).map((t) => cabinSide(side, z, t))),
+      cabinRows.map((z) => range(0, 1, 3).map((t) => cabinSide(side, z, t))),
       side > 0,
     )
   }
 
-  // Glass follows the same sculpted shell, leaving actual painted pillars and roof rails.
+  // Cristales delantero, luneta trasera vertical y laterales 3 puertas
   for (const [start, end, width] of [
-    [-0.345, -0.06, 0.89],
-    [0.376, 0.655, 0.87],
+    [-0.355, -0.19, 0.87],
+    [0.81, 0.96, 0.86],
   ]) {
     b.patch(
       'glass',
-      range(start, end, high ? 15 : 8).map((z) =>
-        range(-width, width, high ? 12 : 6).map((u) => roofPoint(z, u, 0.0025)),
+      range(start, end, high ? 10 : 5).map((z) =>
+        range(-width, width, high ? 8 : 4).map((u) => roofPoint(z, u, 0.0025)),
       ),
     )
   }
   for (const side of [-1, 1]) {
     for (const [start, end] of [
-      [-0.303, 0.166],
-      [0.205, 0.564],
+      [-0.31, 0.20],
+      [0.25, 0.72],
     ]) {
       b.patch(
         'glass',
-        range(start, end, high ? 16 : 8).map((z) =>
-          range(0.135, 0.865, 3).map((t) => cabinSide(side, z, t, 0.0025)),
+        range(start, end, high ? 10 : 5).map((z) =>
+          range(0.14, 0.88, 2).map((t) => cabinSide(side, z, t, 0.0025)),
         ),
         side > 0,
       )
     }
+    // Pilar B negro
     b.patch(
       'carbon',
-      range(0.171, 0.2, 1).map((z) =>
-        [0.12, 0.89].map((t) => cabinSide(side, z, t, 0.003)),
+      range(0.20, 0.25, 1).map((z) =>
+        [0.12, 0.90].map((t) => cabinSide(side, z, t, 0.003)),
       ),
       side > 0,
     )
     b.tube(
-      'paint',
-      range(-0.325, 0.595, high ? 12 : 6).map((z) =>
-        cabinSide(side, z, 0.94, 0.001),
-      ),
-      0.007,
-    )
-    b.tube(
       'carbon',
-      range(-0.325, 0.605, high ? 12 : 6).map((z) =>
-        cabinSide(side, z, 0.075, 0.003),
+      range(-0.32, 0.74, high ? 8 : 4).map((z) =>
+        cabinSide(side, z, 0.08, 0.003),
       ),
       0.004,
     )
 
-    const mirrorBase = cabinSide(side, -0.275, 0.36, 0.003)
+    // Espejos retrovisores anclados a la esquina delantera de la puerta
+    const mirrorBase = cabinSide(side, -0.31, 0.22, 0.002)
     b.mirror(
       side,
       mirrorBase,
-      [side * 0.555, 0.493, -0.315],
-      [0.123, 0.052, 0.083],
+      [side * 0.540, 0.520, -0.32],
+      [0.115, 0.052, 0.075],
     )
 
+    // Faros delanteros rectangulares de compacto 90s/2000s
     const lampSurface = (role, rows, lift) => {
       const grid = []
       for (let row = 0; row < rows.length - 1; row++) {
-        const from = rows[row], to = rows[row + 1]
-        for (const t of range(0, 1, high ? 8 : 5).slice(row ? 1 : 0)) {
+        const from = rows[row],
+          to = rows[row + 1]
+        for (const t of range(0, 1, high ? 6 : 3).slice(row ? 1 : 0)) {
           const z = from[0] + (to[0] - from[0]) * t
           const inside = from[1] + (to[1] - from[1]) * t
           const outside = from[2] + (to[2] - from[2]) * t
-          grid.push(range(inside, outside, high ? 12 : 8).map((x) => {
-            const point = topPoint(side * x, z)
-            return [point[0], point[2]]
-          }))
+          grid.push(
+            range(inside, outside, high ? 8 : 4).map((x) => {
+              const point = topPoint(side * x, z)
+              return [point[0], point[2]]
+            }),
+          )
         }
       }
       b.bodyDetail(role, grid, lift, side < 0)
     }
-    lampSurface('carbon', [
-      [-1.107, 0.297, 0.412],
-      [-1.065, 0.289, 0.454],
-      [-0.995, 0.33, 0.478],
-      [-0.971, 0.379, 0.472],
-    ], 0.003)
-    lampSurface('glass', [
-      [-1.097, 0.31, 0.408],
-      [-1.063, 0.302, 0.443],
-      [-0.998, 0.341, 0.466],
-      [-0.984, 0.382, 0.462],
-    ], 0.0045)
-    lampSurface('lights', [
-      [-1.084, 0.315, 0.417],
-      [-1.073, 0.311, 0.433],
-    ], 0.006)
-    lampSurface('lights', [
-      [-1.024, 0.337, 0.451],
-      [-1.013, 0.345, 0.459],
-    ], 0.006)
-
-    topStrip(
+    lampSurface(
       'carbon',
-      side,
       [
-        [-0.671, 0.189, 0.256],
-        [-0.615, 0.176, 0.255],
-        [-0.476, 0.169, 0.233],
+        [-1.012, 0.215, 0.412],
+        [-0.925, 0.215, 0.412],
       ],
+      0.003,
+    )
+    lampSurface(
+      'glass',
+      [
+        [-1.004, 0.228, 0.400],
+        [-0.933, 0.228, 0.400],
+      ],
+      0.0045,
+    )
+    lampSurface(
+      'lights',
+      [
+        [-0.994, 0.240, 0.312],
+        [-0.944, 0.240, 0.312],
+      ],
+      0.006,
+    )
+    lampSurface(
+      'lights',
+      [
+        [-0.994, 0.330, 0.388],
+        [-0.944, 0.330, 0.388],
+      ],
+      0.006,
+    )
+
+    // Pasos de rueda ensanchados VTS sin tapar el neumático
+    const wheelList = wheels.filter((w) => Math.sign(w.x) === side)
+    for (const wheel of wheelList) {
+      const rInner = wheel.radius + archClearance
+      const rOuter = rInner + 0.044
+      const angles = range(0.05, Math.PI - 0.05, high ? 16 : 8)
+      b.patch(
+        'paint',
+        angles.map((theta) => {
+          const zIn = wheel.z + Math.cos(theta) * rInner
+          const yIn = wheel.y + Math.sin(theta) * rInner
+          const zOut = wheel.z + Math.cos(theta) * rOuter
+          const yOut = wheel.y + Math.sin(theta) * rOuter
+          const widthBase = body.sample(zIn).width
+          return [
+            [side * widthBase, yOut, zOut],
+            [side * (widthBase + 0.026), yIn + 0.004, zIn],
+          ]
+        }),
+        side < 0,
+      )
+      b.patch(
+        'carbon',
+        angles.map((theta) => {
+          const zIn = wheel.z + Math.cos(theta) * rInner
+          const yIn = wheel.y + Math.sin(theta) * rInner
+          const widthBase = body.sample(zIn).width
+          return [
+            [side * (widthBase - 0.055), yIn + 0.004, zIn],
+            [side * (widthBase + 0.026), yIn + 0.004, zIn],
+          ]
+        }),
+        side > 0,
+      )
+    }
+
+    // Faldones laterales MUY bajos pegados al suelo (German/Poligonero look)
+    b.box(
+      'paint',
+      [0.056, 0.078, 0.72],
+      [side * 0.476, 0.106, 0.0],
+      [0, 0, side * -0.08],
       0.004,
     )
-    if (high) {
-      for (const z of [-0.632, -0.589, -0.546, -0.503]) {
-        b.tube(
-          'paint',
-          [topPoint(side * 0.18, z, 0.009), topPoint(side * 0.243, z, 0.009)],
-          0.004,
-        )
-      }
-      b.tube(
-        'paint',
-        [-0.945, -0.81, -0.62, -0.445].map((z) =>
-          topPoint(side * (0.125 + (z + 0.945) * 0.045), z, 0.002),
-        ),
-        0.0035,
-      )
-    }
-
-    b.panel(
-      'accent',
-      [
-        [side * 0.511, 0.123, -0.434],
-        [side * 0.524, 0.112, -0.395],
-        [side * 0.524, 0.112, 0.449],
-        [side * 0.507, 0.159, 0.454],
-        [side * 0.501, 0.155, -0.422],
-      ],
-      0.014,
-    )
-    b.panel(
+    b.box(
       'carbon',
-      [
-        [side * 0.501, 0.177, 0.338],
-        [side * 0.512, 0.187, 0.437],
-        [side * 0.512, 0.319, 0.446],
-        [side * 0.503, 0.294, 0.35],
-      ],
-      0.006,
+      [0.062, 0.018, 0.73],
+      [side * 0.482, 0.068, 0.0],
+      [0, 0, 0],
+      0.002,
+    )
+    b.box(
+      'accent',
+      [0.010, 0.014, 0.70],
+      [side * 0.506, 0.082, 0.0],
+      [0, 0, 0],
+      0.002,
     )
 
+    // Moldura de puerta negra y tirador
+    b.box(
+      'carbon',
+      [0.012, 0.024, 0.68],
+      [side * 0.468, 0.275, 0.0],
+      [0, 0, 0],
+      0.002,
+    )
     if (high) {
-      const doorPoint = (z, y) => {
-        const point = body.sidePoint(side, z, y)
-        point[0] += side * 0.002
-        return point
-      }
-      b.tube(
-        'carbon',
-        [
-          doorPoint(-0.319, 0.424),
-          doorPoint(-0.358, 0.341),
-          doorPoint(-0.343, 0.205),
-          doorPoint(-0.278, 0.176),
-          doorPoint(0.243, 0.176),
-          doorPoint(0.3, 0.245),
-          doorPoint(0.286, 0.416),
-        ],
-        0.0022,
-      )
       b.box(
         'metal',
-        [0.009, 0.012, 0.066],
-        [side * 0.498, 0.392, 0.228],
+        [0.010, 0.012, 0.065],
+        [side * 0.470, 0.405, 0.11],
         [0, 0, 0],
-        0.004,
+        0.002,
       )
     }
   }
 
-  b.panel(
-    'carbon',
-    [
-      [-0.43, 0.114, -1.133],
-      [-0.3, 0.114, -1.173],
-      [0, 0.114, -1.19],
-      [0.3, 0.114, -1.173],
-      [0.43, 0.114, -1.133],
-      [0.512, 0.114, -1.08],
-      [0.533, 0.114, -0.968],
-      [0.488, 0.114, -0.949],
-      [-0.488, 0.114, -0.949],
-      [-0.533, 0.114, -0.968],
-      [-0.512, 0.114, -1.107],
-    ],
-    0.019,
-  )
-  b.patch(
-    'carbon',
-    [
-      [0.162, 0.268],
-      [0.245, 0.248],
-      [0.265, 0.21],
-      [0.278, 0.158],
-    ].map(([y, width]) =>
-      range(-width, width, high ? 16 : 8).map((x) => frontPoint(x, y)),
-    ),
-  )
-  b.tube(
-    'accent',
-    range(-0.264, 0.264, high ? 12 : 6).map((x) =>
-      frontPoint(x, 0.148 + 0.01 * (x / 0.264) ** 2, 0.009),
-    ),
-    0.007,
-  )
-  for (const side of [-1, 1]) {
-    b.patch(
-      'carbon',
-      [0, 0.5, 1].map((t) =>
-        range(0.302 - 0.008 * t, 0.401 + 0.001 * t, high ? 8 : 4).map((x) =>
-          frontPoint(side * x, 0.167 + t * 0.093 + (x - 0.302) * 0.11),
-        ),
-      ),
-      side < 0,
-    )
-    if (high) {
-      for (const y of [0.193, 0.222, 0.247])
-        b.tube(
-          'metal',
-          range(0.31, 0.39, 4).map((x) => frontPoint(side * x, y, 0.01)),
-          0.0025,
-        )
-      b.panel(
-        'carbon',
-        [
-          [side * 0.485, 0.145, -1.076],
-          [side * 0.543, 0.164, -1.026],
-          [side * 0.514, 0.186, -0.974],
-        ],
-        0.006,
-      )
-    }
-  }
+  // Parachoques delantero cuadrado con rejillas XXL pegado al suelo
+  b.box('paint', [0.89, 0.165, 0.065], [0, 0.172, -1.012], [0, 0, 0], 0.004)
+  b.box('carbon', [0.91, 0.024, 0.105], [0, 0.076, -1.028], [0, 0, 0], 0.002)
+  b.box('accent', [0.86, 0.012, 0.018], [0, 0.092, -1.068], [0, 0, 0], 0.002)
+  // Gran entrada central + rejillas laterales
+  b.box('carbon', [0.46, 0.120, 0.032], [0, 0.162, -1.038], [0, 0, 0], 0.002)
+  b.box('metal', [0.41, 0.086, 0.024], [0, 0.162, -1.036], [0, 0, 0], 0.002)
   if (high) {
-    for (const x of [-0.21, -0.14, -0.07, 0, 0.07, 0.14, 0.21])
-      b.box(
-        'metal',
-        [0.004, 0.081, 0.004],
-        frontPoint(x, 0.211, 0.01),
-        [0, 0, 0],
-        0.001,
-      )
-  }
-
-  b.panel(
-    'carbon',
-    [
-      [-0.428, 0.151, 1.168],
-      [-0.398, 0.252, 1.168],
-      [0.398, 0.252, 1.168],
-      [0.428, 0.151, 1.168],
-    ],
-    0.01,
-  )
-  b.panel(
-    'carbon',
-    [
-      [-0.431, 0.12, 1.184],
-      [0.431, 0.12, 1.184],
-      [0.427, 0.123, 0.992],
-      [-0.427, 0.123, 0.992],
-    ],
-    0.014,
-  )
-  for (const x of high ? [-0.35, -0.18, 0, 0.18, 0.35] : [-0.33, 0, 0.33]) {
-    b.panel(
-      'carbon',
-      [
-        [x, 0.115, 0.982],
-        [x, 0.107, 1.185],
-        [x, 0.21, 1.185],
-        [x, 0.188, 1.074],
-      ],
-      0.009,
-    )
+    for (const y of [0.132, 0.162, 0.192]) {
+      b.box('carbon', [0.42, 0.007, 0.028], [0, y, -1.044], [0, 0, 0], 0.001)
+    }
   }
   for (const side of [-1, 1]) {
-    b.panel(
+    b.box(
       'carbon',
-      [
-        [side * 0.077, 0.299, 1.168],
-        [side * 0.427, 0.317, 1.168],
-        [side * 0.426, 0.349, 1.168],
-        [side * 0.079, 0.331, 1.168],
-      ],
-      0.006,
+      [0.145, 0.098, 0.030],
+      [side * 0.335, 0.162, -1.036],
+      [0, 0, 0],
+      0.002,
     )
-    b.tube(
+  }
+  // Calandra delantera oscura entre faros
+  b.box('carbon', [0.39, 0.068, 0.024], [0, 0.312, -1.022], [0, 0, 0], 0.002)
+  b.box('accent', [0.37, 0.012, 0.026], [0, 0.312, -1.026], [0, 0, 0], 0.001)
+
+  // Toma de aire discreta en el capó corto (sin tapar calcomanía central en z=-0.68)
+  for (const side of [-1, 1]) {
+    b.box(
+      'carbon',
+      [0.09, 0.014, 0.12],
+      [side * 0.23, 0.462, -0.58],
+      [-0.04, 0, 0],
+      0.002,
+    )
+  }
+
+  // Parachoques trasero limpio ("portón trasero alisado" estilo German look, SIN alerón)
+  b.box('paint', [0.89, 0.175, 0.065], [0, 0.172, 1.012], [0, 0, 0], 0.004)
+  b.box('carbon', [0.82, 0.062, 0.045], [0, 0.104, 1.032], [0, 0, 0], 0.002)
+  b.box('accent', [0.78, 0.014, 0.018], [0, 0.150, 1.044], [0, 0, 0], 0.002)
+
+  // Matrícula movida al parachoques trasero (portón superior completamente alisado!)
+  b.box('carbon', [0.22, 0.064, 0.014], [0, 0.212, 1.044], [0, 0, 0], 0.002)
+  if (high) {
+    b.box('metal', [0.19, 0.046, 0.016], [0, 0.212, 1.046], [0, 0, 0], 0.001)
+  }
+
+  // Faros traseros cuadrados en los laterales del portón alisado
+  for (const side of [-1, 1]) {
+    b.box(
+      'carbon',
+      [0.205, 0.084, 0.020],
+      [side * 0.315, 0.378, 1.016],
+      [0, 0, 0],
+      0.003,
+    )
+    b.box(
       'rearLights',
-      [
-        [side * 0.089, 0.317, 1.175],
-        [side * 0.265, 0.327, 1.175],
-        [side * 0.414, 0.338, 1.175],
-      ],
-      0.0075,
+      [0.180, 0.058, 0.022],
+      [side * 0.315, 0.378, 1.022],
+      [0, 0, 0],
+      0.002,
     )
-    b.tube(
-      'metal',
-      [
-        [side * 0.277, 0.193, 1.142],
-        [side * 0.277, 0.193, 1.184],
-      ],
-      0.023,
-    )
-    b.ellipsoid('carbon', [0.017, 0.017, 0.002], [side * 0.277, 0.193, 1.187])
   }
-  b.box('carbon', [0.138, 0.043, 0.006], [0, 0.275, 1.169], [0, 0, 0], 0.006)
+
+  // UN SOLO tubo de escape gordo visible atrás (estilo escape libre / trompeta)
   b.tube(
-    'accent',
+    'metal',
     [
-      [-0.397, 0.265, 1.173],
-      [0, 0.258, 1.173],
-      [0.397, 0.265, 1.173],
+      [-0.24, 0.120, 0.98],
+      [-0.24, 0.120, 1.095],
     ],
-    0.004,
+    0.040,
   )
+  b.ellipsoid('carbon', [0.030, 0.030, 0.003], [-0.24, 0.120, 1.097])
 
-  // A swept airfoil and shaped swan-neck stays avoid a slab-shaped rear wing.
-  const span = range(-0.516, 0.516, high ? 14 : 6)
-  const airfoil = [
-    [0.892, 0.548],
-    [0.916, 0.567],
-    [0.98, 0.568],
-    [1.066, 0.55],
-  ]
-  const wingGrid = airfoil.map(([z, y]) =>
-    span.map((x) => [
-      x,
-      y + 0.009 * (Math.abs(x) / 0.516) ** 2,
-      z + 0.017 * (Math.abs(x) / 0.516) ** 2,
-    ]),
-  )
-  b.patch('carbon', wingGrid)
-  b.patch(
-    'carbon',
-    wingGrid.map((row) => row.map(([x, y, z]) => [x, y - 0.011, z])),
-    true,
-  )
-  b.patch(
-    'carbon',
-    [wingGrid[0].map(([x, y, z]) => [x, y - 0.011, z]), wingGrid[0]],
-    false,
-  )
-  b.patch(
-    'carbon',
-    [wingGrid.at(-1), wingGrid.at(-1).map(([x, y, z]) => [x, y - 0.011, z])],
-    false,
-  )
-  for (const side of [-1, 1]) {
-    b.panel(
-      'carbon',
-      [
-        [side * 0.282, 0.42, 0.886],
-        [side * 0.282, 0.558, 0.964],
-        [side * 0.282, 0.558, 1.008],
-        [side * 0.282, 0.409, 0.961],
-      ],
-      0.017,
-    )
-    b.panel(
-      'accent',
-      [
-        [side * 0.517, 0.533, 0.901],
-        [side * 0.517, 0.595, 0.908],
-        [side * 0.517, 0.593, 1.073],
-        [side * 0.517, 0.532, 1.089],
-      ],
-      0.009,
-    )
-  }
-
-  const plaqueZ = -0.81
+  // Calcomanías del número en el capó corto y puertas
+  const plaqueZ = -0.68
   const plaquePosition = topPoint(0, plaqueZ, 0.005)
   const slope =
     (topPoint(0, plaqueZ + 0.01)[1] - topPoint(0, plaqueZ - 0.01)[1]) / 0.02
   const normalLength = Math.hypot(1, slope)
+
+  const leftDoor = body.sidePoint(-1, -0.02, 0.34)
+  const rightDoor = body.sidePoint(1, -0.02, 0.34)
+
   return b.finish({
     wheels,
     decals: [
       {
         position: plaquePosition,
         normal: [0, 1 / normalLength, -slope / normalLength],
-        width: 0.205,
-        height: 0.205,
+        width: 0.18,
+        height: 0.18,
+      },
+      {
+        position: leftDoor,
+        normal: [-1, 0, 0],
+        width: 0.16,
+        height: 0.13,
+      },
+      {
+        position: rightDoor,
+        normal: [1, 0, 0],
+        width: 0.16,
+        height: 0.13,
       },
     ],
     anchors: {
-      cockpit: [0, 0.533, 0.135],
-      frontAxle: [0, 0.205, -0.69],
-      rearAxle: [0, 0.205, 0.71],
-      roof: [0, 0.689, 0.08],
+      cockpit: [0, 0.58, 0.12],
+      frontAxle: [0, 0.190, -0.60],
+      rearAxle: [0, 0.190, 0.60],
+      roof: [0, 0.768, 0.24],
     },
   })
 }

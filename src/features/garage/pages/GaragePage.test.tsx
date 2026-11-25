@@ -50,14 +50,14 @@ it('returns to the paddock directly when there are no changes', async () => {
 it('previews a model and discards it without saving', async () => {
   const user = userEvent.setup()
   const value = mount()
-  await user.click(screen.getByRole('button', { name: /Veloce GT/ }))
+  await user.click(screen.getByRole('button', { name: /Saxo VTS/ }))
   expect(value.preview).toHaveBeenLastCalledWith({
     ...defaultAppearance,
     modelId: 'gt',
   })
   await user.click(screen.getByRole('button', { name: 'Descartar' }))
   expect(value.preview).toHaveBeenLastCalledWith(defaultAppearance)
-  expect(screen.getByRole('button', { name: /Apex F1/ })).toHaveAttribute(
+  expect(screen.getByRole('button', { name: /Bavaria E46/ })).toHaveAttribute(
     'aria-pressed',
     'true',
   )
@@ -104,7 +104,7 @@ it('saves and returns to the paddock in a single step', async () => {
 it('stays in the garage when saving and returning fails', async () => {
   const user = userEvent.setup()
   mount({ save: vi.fn().mockRejectedValue(new Error('Sin conexión')) })
-  await user.click(screen.getByRole('button', { name: /Spectre P1/ }))
+  await user.click(screen.getByRole('button', { name: /Calibra Turbo/ }))
   await user.click(screen.getByRole('button', { name: 'Guardar y volver' }))
   expect(screen.getByRole('alert')).toHaveTextContent('Comprueba tu conexión')
   expect(
@@ -119,10 +119,10 @@ it('keeps a failed save editable and retries the same design', async () => {
     .mockRejectedValueOnce(new Error('Sin conexión'))
     .mockResolvedValue(undefined)
   mount({ save })
-  await user.click(screen.getByRole('button', { name: /Spectre P1/ }))
+  await user.click(screen.getByRole('button', { name: /Calibra Turbo/ }))
   await user.click(screen.getByRole('button', { name: 'Guardar' }))
   expect(screen.getByRole('alert')).toHaveTextContent('Comprueba tu conexión')
-  expect(screen.getByRole('button', { name: /Spectre P1/ })).toHaveAttribute(
+  expect(screen.getByRole('button', { name: /Calibra Turbo/ })).toHaveAttribute(
     'aria-pressed',
     'true',
   )
@@ -137,7 +137,7 @@ it('keeps a failed save editable and retries the same design', async () => {
 it('asks before leaving with unsaved changes and can save on the way out', async () => {
   const user = userEvent.setup()
   const value = mount()
-  await user.click(screen.getByRole('button', { name: /Veloce GT/ }))
+  await user.click(screen.getByRole('button', { name: /Saxo VTS/ }))
   await user.click(screen.getByRole('link', { name: /Paddock/ }))
   const dialog = screen.getByRole('dialog', { name: 'Cambios sin guardar' })
   expect(dialog).toBeInTheDocument()
@@ -157,7 +157,7 @@ it('asks before leaving with unsaved changes and can save on the way out', async
 it('discards changes from the leave dialog', async () => {
   const user = userEvent.setup()
   const value = mount()
-  await user.click(screen.getByRole('button', { name: /Veloce GT/ }))
+  await user.click(screen.getByRole('button', { name: /Saxo VTS/ }))
   await user.click(screen.getByRole('link', { name: /Paddock/ }))
   await user.click(screen.getByRole('button', { name: 'Descartar y salir' }))
   expect(
@@ -170,7 +170,7 @@ it('discards changes from the leave dialog', async () => {
 it('saves with Ctrl+S', async () => {
   const user = userEvent.setup()
   const value = mount()
-  await user.click(screen.getByRole('button', { name: /Spectre P1/ }))
+  await user.click(screen.getByRole('button', { name: /Calibra Turbo/ }))
   await user.keyboard('{Control>}s{/Control}')
   expect(value.save).toHaveBeenCalledExactlyOnceWith({
     ...defaultAppearance,

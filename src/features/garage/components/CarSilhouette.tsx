@@ -30,26 +30,40 @@ export function CarSilhouette({
         fill={color}
         d={
           modelId === 'formula'
-            ? 'M10 39h47l9-11h19l14 8 39-2 10 8-9 6H52l-9-7H10z'
+            ? // BMW E46 3-box widebody sedan: long hood, upright centered cabin, horizontal trunk
+              'M10 35l39-2 15-16h33l14 14 35 1 4 14h-12l-7-12h-13l-7 12H51l-7-12H31l-7 12H10z'
             : modelId === 'gt'
-              ? 'M14 35l31-5 20-16h37l20 19 22 4 5 10h-9l-8-13-12 1-7 12H53L43 33H31l-8 14H12z'
-              : 'M10 33l43-4 15-13h25l22 15 30 1 6 15h-12l-8-13h-12l-8 13H52l-8-13H31l-8 13H9z'
+              ? // Saxo VTS compact 2-box hatchback: shortest body, square tall roof, vertical hatch, NO wing
+                'M20 33l28-3 14-18h54l16 18 4 16h-10l-7-12h-12l-7 12H52l-7-12H33l-7 12H18z'
+              : // Calibra Turbo low wedge fastback coupe: lowest nose, sweeping rear glass to tail
+                'M8 38l46-6 18-13h24l36 13 18 3 2 11h-12l-7-12h-13l-7 12H51l-7-12H31l-7 12H9z'
         }
-      />
-      <path
-        d={modelId === 'formula' ? 'M72 28v-9h9l6 9' : 'M67 18h26l15 13H54z'}
-        fill="#152b34"
       />
       <path
         d={
           modelId === 'formula'
-            ? 'M130 23h22v5h-22zM141 28v9'
-            : 'M132 24h20v4h-20zM142 28v8'
+            ? 'M66 19h29l11 11H54z'
+            : modelId === 'gt'
+              ? 'M64 14h48l12 15H53z'
+              : 'M72 21h23l28 11H58z'
         }
-        stroke={color}
-        fill={color}
+        fill="#152b34"
       />
-      <path d="M57 42h48" stroke="#fff" strokeWidth="2" opacity=".7" />
+      {modelId === 'formula' && (
+        <path
+          d="M127 16h24v4h-24zM136 20v12M143 20v12"
+          stroke={color}
+          fill={color}
+        />
+      )}
+      {modelId === 'prototype' && (
+        <path
+          d="M133 27h20v3.5h-20zM143 30.5v5"
+          stroke={color}
+          fill={color}
+        />
+      )}
+      <path d="M57 43h48" stroke="#fff" strokeWidth="2" opacity=".7" />
     </svg>
   )
 }
